@@ -34,6 +34,8 @@ interface Affiliate {
   phone: string;
   createdAt: string;
   isActive: boolean;
+  kycVerified?: boolean;
+  verifiedStatus?: "verified" | "pending" | "rejected";
   totalClients: number;
   totalRevenue: number;
   totalCommission: number;
@@ -154,12 +156,14 @@ const AffiliateRow = ({
       </div>
     </td>
     <td className="px-5 py-4">
-      {affiliate.couponCode ? (
-        <span className="font-mono text-[10px] bg-primary/5 text-primary border border-primary/10 px-3 py-1.5 rounded-lg font-black tracking-widest uppercase">
-          {affiliate.couponCode}
+      {affiliate.kycVerified || affiliate.verifiedStatus === "verified" ? (
+        <span className="inline-flex items-center gap-1.5 text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1.5 rounded-lg font-black uppercase tracking-widest">
+          <UserCheck className="w-3 h-3" /> Verified
         </span>
       ) : (
-        <span className="text-xs text-muted-foreground italic">No code</span>
+        <span className="inline-flex items-center gap-1.5 text-[10px] bg-amber-50 text-amber-700 border border-amber-100 px-3 py-1.5 rounded-lg font-black uppercase tracking-widest">
+          <AlertCircle className="w-3 h-3" /> Pending
+        </span>
       )}
     </td>
     <td className="px-5 py-4 text-center">
@@ -430,9 +434,7 @@ export default function AdminAffiliateManagement() {
   const filtered = (affiliates || []).filter(
     (a) =>
       a.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (a.couponCode &&
-        a.couponCode.toLowerCase().includes(searchQuery.toLowerCase())),
+      a.email?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -449,7 +451,7 @@ export default function AdminAffiliateManagement() {
               Affiliate <span className="text-primary italic">Management</span>
             </h1>
             <p className="text-sm md:text-base text-muted-foreground font-medium">
-              Monitor partners, referral codes, clients, and commission earnings.
+              Monitor partners, verification status, clients, and commission earnings.
             </p>
           </div>
         </div>
@@ -466,13 +468,11 @@ export default function AdminAffiliateManagement() {
             label="Revenue Generated"
             value={formatCurrency(summary.totalRevenue)}
             icon={TrendingUp}
-            sub="From affiliate referrals"
           />
           <StatCard
             label="Commission Payable"
             value={formatCurrency(summary.totalCommissionPayable)}
             icon={DollarSign}
-            sub="15% of referred revenue"
           />
         </div>
 
@@ -484,7 +484,7 @@ export default function AdminAffiliateManagement() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="Search by name, email, or coupon code…"
+                placeholder="Search by name or email…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-muted/50 border border-transparent rounded-2xl text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/5 focus:bg-background focus:border-primary/20 transition-all"
@@ -518,7 +518,7 @@ export default function AdminAffiliateManagement() {
                 <thead>
                   <tr className="bg-muted/50 text-left text-xs font-black text-muted-foreground uppercase tracking-widest border-b border-border">
                     <th className="px-5 py-4">Affiliate Partner</th>
-                    <th className="px-5 py-4">Promotional Code</th>
+                    <th className="px-5 py-4">Verified Status</th>
                     <th className="px-5 py-4 text-center">Clients</th>
                     <th className="px-5 py-4">Revenue</th>
                     <th className="px-5 py-4">Commission</th>

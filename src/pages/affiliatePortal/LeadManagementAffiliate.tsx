@@ -134,10 +134,10 @@ const LeadManagementAffiliate = () => {
                 {/* 1. Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-fade-in-down">
                     <div>
-                        <h1 className="text-[2.25rem] font-black text-[#1a2d1d] tracking-tight leading-none mb-3">
+                        <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
                             Lead <span className="italic">Management</span>
                         </h1>
-                        <p className="text-lg text-[#64748b] font-medium tracking-tight">
+                        <p className="mt-2 text-lg font-medium text-[#6B8F78] tracking-tight">
                             Track and manage your referral leads
                         </p>
                     </div>

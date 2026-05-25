@@ -29,6 +29,12 @@ import QuotationStats from "@/components/affiliatePortal/QuotationStats";
 import { useAuth } from "@/contexts/AuthContext";
 import { affiliatePortalService } from "@/services/affiliatePortal.service";
 import { toast } from "react-hot-toast";
+import {
+    AFFILIATE_DISCOUNTS,
+    AFFILIATE_PRICING_CITIES,
+    AFFILIATE_PRICING_SPACES,
+    AffiliateDiscountPercent,
+} from "@/data/affiliatePricing";
 
 // Static Data for Backend Readiness
 const STATIC_RECENT_QUOTATIONS = [
@@ -55,6 +61,7 @@ interface QuotationFormErrors {
     numberOfSeats?: string;
     duration?: string;
     startDate?: string;
+    discountPercent?: string;
 }
 
 const QuotationGenerator = () => {
@@ -87,6 +94,7 @@ const QuotationGenerator = () => {
         city: "",
         spaceId: "",
         planType: "", // For VO: br, gst, mailing
+        discountPercent: "5",
         numberOfSeats: "1",
         duration: "1",
         startDate: "",
@@ -198,14 +206,7 @@ const QuotationGenerator = () => {
         if (!formData.city) { newErrors.city = "City is required"; isValid = false; }
         if (!formData.spaceId) { newErrors.location = "Please select a space"; isValid = false; }
 
-        if (formData.spaceType === "Coworking" && !formData.numberOfSeats) {
-            newErrors.numberOfSeats = "Seats required"; isValid = false;
-        }
-
-        if (formData.spaceType === "Virtual Office" && !formData.planType) {
-            // @ts-ignore
-            newErrors.planType = "Plan type is required"; isValid = false;
-        }
+        if (!formData.discountPercent) { newErrors.discountPercent = "Discount is required"; isValid = false; }
 
         if (!formData.duration) { newErrors.duration = "Duration is required"; isValid = false; }
         if (!formData.startDate) { newErrors.startDate = "Start Date is required"; isValid = false; }
@@ -226,14 +227,20 @@ const QuotationGenerator = () => {
         setFormData(prev => ({ ...prev, spaceId: "", planType: "" }));
 
         try {
-            const response = await affiliatePortalService.getAvailableSpaces(formData.city, formData.spaceType);
-            if (response.success && Array.isArray(response.data)) {
-                setAvailableSpaces(response.data);
-                if (response.data.length === 0) {
-                    toast.error("No spaces found for the selected criteria.");
-                } else {
-                    toast.success(`${response.data.length} spaces found!`);
-                }
+            const spaces = AFFILIATE_PRICING_SPACES
+                .filter((space) => space.city.toLowerCase() === formData.city.toLowerCase())
+                .map((space, index) => ({
+                    ...space,
+                    _id: `${space.city}-${space.spaceName}-${space.location}-${index}`,
+                    name: space.spaceName,
+                    area: space.location,
+                }));
+
+            setAvailableSpaces(spaces);
+            if (spaces.length === 0) {
+                toast.error("No affiliate pricing found for the selected city.");
+            } else {
+                toast.success(`${spaces.length} affiliate-approved spaces found!`);
             }
         } catch (error) {
             toast.error("Failed to fetch spaces.");
@@ -243,30 +250,15 @@ const QuotationGenerator = () => {
     };
 
     const calculatePrice = () => {
-        if (!selectedSpace || !formData.duration) return 0;
+        if (!selectedSpace || !formData.discountPercent) return 0;
+        const discount = Number(formData.discountPercent) as AffiliateDiscountPercent;
+        return selectedSpace.discounts?.[discount]?.customerPays || 0;
+    };
 
-        const months = parseInt(formData.duration);
-        if (isNaN(months)) return 0;
-
-        const parsePriceString = (priceStr: string | number | undefined) => {
-            if (typeof priceStr === 'number') return priceStr;
-            if (!priceStr) return 0;
-            const cleanStr = priceStr.replace(/\D/g, '');
-            return parseInt(cleanStr, 10) || 0;
-        };
-
-        if (formData.spaceType === "Coworking") {
-            const seats = parseInt(formData.numberOfSeats) || 1;
-            const pricePerMonth = parsePriceString(selectedSpace.price) || 0;
-            return pricePerMonth * seats * months;
-        } else {
-            let monthlyPrice = 0;
-            if (formData.planType === "br") monthlyPrice = parsePriceString(selectedSpace.brPlanPrice) || 0;
-            if (formData.planType === "gst") monthlyPrice = parsePriceString(selectedSpace.gstPlanPrice) || 0;
-            if (formData.planType === "mailing") monthlyPrice = parsePriceString(selectedSpace.mailingPlanPrice) || 0;
-
-            return monthlyPrice * months;
-        }
+    const calculateAffiliateEarning = () => {
+        if (!selectedSpace || !formData.discountPercent) return 0;
+        const discount = Number(formData.discountPercent) as AffiliateDiscountPercent;
+        return selectedSpace.discounts?.[discount]?.affiliateEarns || 0;
     };
 
     const handleGenerateQuotation = async () => {
@@ -291,12 +283,18 @@ const QuotationGenerator = () => {
                     spaceType: formData.spaceType,
                     city: formData.city,
                     location: selectedSpace?.area || "N/A",
-                    numberOfSeats: parseInt(formData.numberOfSeats) || 0,
+                    numberOfSeats: parseInt(formData.numberOfSeats) || 1,
                     duration: formData.duration,
                     startDate: formData.startDate,
                 },
                 price: totalPrice,
-                notes: formData.notes
+                notes: [
+                    formData.notes,
+                    `Affiliate discount: ${formData.discountPercent}%`,
+                    `Listing price: INR ${selectedSpace?.listingPrice || 0}`,
+                    `Space cost: INR ${selectedSpace?.spaceCost || 0}`,
+                    `Affiliate earns: INR ${calculateAffiliateEarning()}`,
+                ].filter(Boolean).join("\n")
             };
 
             const response = await affiliatePortalService.createQuotation(payload);
@@ -313,8 +311,9 @@ const QuotationGenerator = () => {
                     city: "",
                     spaceId: "",
                     planType: "",
-                    numberOfSeats: "",
-                    duration: "",
+                    discountPercent: "5",
+                    numberOfSeats: "1",
+                    duration: "1",
                     startDate: "",
                     notes: "",
                 });
@@ -488,8 +487,8 @@ const QuotationGenerator = () => {
             )}
             {/* Header Section */}
             <div className="mb-10">
-                <h1 className="text-4xl font-extrabold text-[#1a1a1a] tracking-tight">
-                    Quotation <span className="italic font-bold text-[#2d5a4c]">Generator</span>
+                <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                    Quotation <span className="text-[#4A6D56] italic">Generator</span>
                 </h1>
                 <p className="text-[#6b7280] mt-2 text-lg font-medium">
                     Create instant quotations with FlashSpace and your affiliate branding
@@ -575,7 +574,6 @@ const QuotationGenerator = () => {
                                             <SelectValue placeholder="Select space type" />
                                         </SelectTrigger>
                                         <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
-                                            <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Coworking">Coworking</SelectItem>
                                             <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Virtual Office">Virtual Office</SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -588,9 +586,9 @@ const QuotationGenerator = () => {
                                             <SelectValue placeholder="Select city" />
                                         </SelectTrigger>
                                         <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
-                                            <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Ahmedabad">Ahmedabad</SelectItem>
-                                            <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Delhi">Delhi</SelectItem>
-                                            <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Bangalore">Bangalore</SelectItem>
+                                            {AFFILIATE_PRICING_CITIES.map((city) => (
+                                                <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" key={city} value={city}>{city}</SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     {errors.city && <p className="text-xs text-red-500">{errors.city}</p>}
@@ -637,35 +635,27 @@ const QuotationGenerator = () => {
 
                                 {selectedSpace && (
                                     <>
-                                        {formData.spaceType === "Coworking" ? (
-                                            <div className="space-y-2">
-                                                <Label className={`text-sm font-semibold text-[#374151] ${errors.numberOfSeats ? "text-red-500" : ""}`}>Number of Seats</Label>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="e.g., 10"
-                                                    className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus-visible:ring-1 focus-visible:ring-gray-200 h-14 rounded-xl text-[#1a1a1a] placeholder:text-[#9ca3af] ${errors.numberOfSeats ? "bg-red-50 text-red-900" : ""}`}
-                                                    value={formData.numberOfSeats}
-                                                    onChange={(e) => handleInputChange("numberOfSeats", e.target.value)}
-                                                />
-                                                {errors.numberOfSeats && <p className="text-xs text-red-500 font-medium">{errors.numberOfSeats}</p>}
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-2">
-                                                <Label className="text-sm font-semibold text-gray-700">Select Plan <span className="text-red-500">*</span></Label>
-                                                <Select value={formData.planType} onValueChange={(val) => handleInputChange("planType", val)}>
-                                                    <SelectTrigger className="bg-gray-50/50 hover:bg-gray-50/80 transition-colors focus:ring-2 focus:ring-[#5bb09c]/20 h-12 rounded-xl">
-                                                        <SelectValue placeholder="Select plan type" />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
-                                                        <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="br">Business Registration (BR)</SelectItem>
-                                                        <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="gst">GST Registration</SelectItem>
-                                                        <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="mailing">Mailing Address</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        )}
                                         <div className="space-y-2">
-                                            <Label className={`text-sm font-semibold text-[#374151] ${errors.duration ? "text-red-500" : ""}`}>Duration (Months)</Label>
+                                            <Label className={`text-sm font-semibold text-[#374151] ${errors.discountPercent ? "text-red-500" : ""}`}>Client Discount</Label>
+                                            <Select value={formData.discountPercent} onValueChange={(val) => handleInputChange("discountPercent", val)}>
+                                                <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.discountPercent ? "bg-red-50" : ""}`}>
+                                                    <SelectValue placeholder="Select discount" />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                                    {AFFILIATE_DISCOUNTS.map((discount) => {
+                                                        const option = selectedSpace.discounts?.[discount];
+                                                        return option ? (
+                                                            <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#2d5a4c]/10 focus:text-[#2d5a4c] font-semibold transition-colors py-3 pr-3 pl-10" key={discount} value={discount.toString()}>
+                                                                {discount}% off - Customer INR {option.customerPays.toLocaleString("en-IN")}
+                                                            </SelectItem>
+                                                        ) : null;
+                                                    })}
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.discountPercent && <p className="text-xs text-red-500 font-medium">{errors.discountPercent}</p>}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className={`text-sm font-semibold text-[#374151] ${errors.duration ? "text-red-500" : ""}`}>Duration</Label>
                                             <Select value={formData.duration} onValueChange={(val) => handleInputChange("duration", val)}>
                                                 <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.duration ? "bg-red-50" : ""}`}>
                                                     <SelectValue placeholder="Select duration" />

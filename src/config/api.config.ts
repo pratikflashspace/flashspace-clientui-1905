@@ -129,6 +129,8 @@ export const API_ENDPOINTS = {
     QUOTATIONS_STATS: "/api/affiliate/quotations/stats",
     SUPPORT_TICKETS: "/api/affiliate/support/tickets",
     LEADERBOARD: "/api/affiliate/leaderboard",
+    BOOKINGS: "/api/affiliate/bookings",
+    CLIENTS: "/api/affiliate/clients",
     DASHBOARD_STATS: "/api/affiliate/dashboard/stats",
     DASHBOARD_INSIGHTS: "/api/affiliate/dashboard/insights",
     COUPON_GENERATE: "/api/affiliate/coupons/generate",

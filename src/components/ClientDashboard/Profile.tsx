@@ -43,7 +43,12 @@ interface ProfileDataState {
   registeredAddress: string;
 }
 
-const Profile: React.FC = () => {
+interface ProfileProps {
+  hideCompanyDetails?: boolean;
+  isCompact?: boolean;
+}
+
+const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact = false }) => {
   const { user, updateUser, refreshProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<"personal" | "company" | "kyc">(
@@ -52,7 +57,6 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [pincodeLoading, setPincodeLoading] = useState(false);
 
   const [profileData, setProfileData] = useState<ProfileDataState>({
     fullName: "",
@@ -220,45 +224,6 @@ const Profile: React.FC = () => {
     };
   }, []);
 
-  const fetchPincodeDetails = async (pincode: string) => {
-    if (pincode.length !== 6) return;
-    try {
-      setPincodeLoading(true);
-      const response = await fetch(`https://api.postalpincode.in/pincode/${pincode}`);
-      const data = await response.json();
-      if (data && data[0] && data[0].Status === "Success" && data[0].PostOffice && data[0].PostOffice.length > 0) {
-        const postOffice = data[0].PostOffice[0];
-        let stateName = postOffice.State;
-        let cityName = postOffice.District;
-        let countryCode = profileData.country || "IN";
-
-        // Try mapping to exact country-state-city values
-        const states = State.getStatesOfCountry(countryCode);
-        const matchedState = states.find(s => s.name.toLowerCase() === stateName.toLowerCase() || s.name.toLowerCase().includes(stateName.toLowerCase()) || stateName.toLowerCase().includes(s.name.toLowerCase()));
-        
-        if (matchedState) {
-          stateName = matchedState.name;
-          const cities = City.getCitiesOfState(countryCode, matchedState.isoCode);
-          const matchedCity = cities.find(c => c.name.toLowerCase() === cityName.toLowerCase() || c.name.toLowerCase().includes(cityName.toLowerCase()) || cityName.toLowerCase().includes(c.name.toLowerCase()));
-          if (matchedCity) {
-            cityName = matchedCity.name;
-          }
-        }
-
-        setProfileData(prev => ({
-          ...prev,
-          city: cityName,
-          state: stateName,
-          country: countryCode, 
-        }));
-      }
-    } catch (err) {
-      console.error("Failed to fetch pincode details", err);
-    } finally {
-      setPincodeLoading(false);
-    }
-  };
-
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -395,7 +360,7 @@ const Profile: React.FC = () => {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setProfileData({ ...profileData, [field]: value });
+    setProfileData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleCancel = () => {
@@ -460,14 +425,14 @@ const Profile: React.FC = () => {
   const tabs = [
     { id: "personal", label: "Personal Info", icon: User },
     { id: "kyc", label: "KYC Verification", icon: ShieldCheck },
-    { id: "company", label: "Company Details", icon: Building2 },
+    ...(hideCompanyDetails ? [] : [{ id: "company", label: "Company Details", icon: Building2 }]),
   ];
 
   const [imagePreview, setImagePreview] = useState<{ url: string; title: string } | null>(null);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className={`min-h-screen bg-gray-50 ${isCompact ? 'py-4 px-3' : 'py-8 px-4 md:px-8'}`}>
+      <div className={`mx-auto ${isCompact ? 'max-w-3xl space-y-5' : 'max-w-4xl space-y-8'}`}>
         {/* Image Preview Modal */}
         {imagePreview && (
           <div 
@@ -519,7 +484,7 @@ const Profile: React.FC = () => {
         {!loading && !error && (
           <>
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+            <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-6 ${isCompact ? 'hidden' : ''}`}>
               <div className="space-y-1">
                 <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
                   My Profile
@@ -528,37 +493,12 @@ const Profile: React.FC = () => {
                   Manage your personal information and company details
                 </p>
               </div>
-              {activeTab !== "company" && (!isEditing ? (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
-                >
-                  <Edit3 className="w-4 h-4" /> Edit Profile
-                </button>
-              ) : (
-                <div className="flex gap-3">
-                  <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
-                  >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    Save Changes
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-8 py-3.5 rounded-2xl font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95 text-center"
-                  >
-                    <X className="w-4 h-4" /> Cancel
-                  </button>
-                </div>
-              ))}
             </div>
 
             {/* Profile Info Card */}
-            <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className={`bg-white shadow-sm border border-gray-100 overflow-hidden ${isCompact ? 'rounded-2xl' : 'rounded-3xl'}`}>
             {/* Cover Image */}
-            <div className="h-48 relative group/cover cursor-pointer overflow-hidden">
+            <div className={`${isCompact ? 'h-32' : 'h-48'} relative group/cover cursor-pointer overflow-hidden`}>
               {user?.coverImage ? (
                 <img 
                   src={user.coverImage.startsWith('http') ? user.coverImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.coverImage}`} 
@@ -605,12 +545,12 @@ const Profile: React.FC = () => {
                 />
               </label>
             </div>
-              <div className="px-8 pb-8">
-                <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 relative z-10">
+              <div className={`px-4 sm:px-8 pb-4 sm:pb-8`}>
+                <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 relative z-10 mt-2">
                   {/* Profile Image */}
-                  <div className="relative group">
+                  <div className={`relative group ${isCompact ? '-mt-12' : '-mt-16'}`}>
                     <div 
-                      className="w-32 h-32 rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02] relative cursor-pointer"
+                      className={`${isCompact ? 'w-24 h-24' : 'w-32 h-32'} rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02] relative cursor-pointer`}
                       onClick={() => profileImage && setImagePreview({ 
                         url: profileImage.startsWith('http') ? profileImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${profileImage}`, 
                         title: "Profile Picture" 
@@ -649,15 +589,17 @@ const Profile: React.FC = () => {
 
                   {/* Name and ID */}
                   <div className="text-center sm:text-left flex-1 pb-2">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-1">
-                      <h2 className="text-2xl font-extrabold text-[#35503F]">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-1">
+                      <h2 className={`${isCompact ? 'text-xl' : 'text-2xl'} font-extrabold text-[#35503F]`}>
                         {user?.fullName || "User Name"}
                       </h2>
                       {getKYCBadge((kycData as any)?.status || "not_submitted")}
                     </div>
-                    <p className="text-gray-500 font-medium">
-                      {kycData?.businessInfo?.companyName || "No company added"}
-                    </p>
+                    {!hideCompanyDetails && (
+                      <p className="text-gray-500 font-medium">
+                        {kycData?.businessInfo?.companyName || "No company added"}
+                      </p>
+                    )}
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 flex items-center gap-2">
                        <ShieldCheck className="w-3 h-3 text-[#35503F]" />
                        Client ID: {(user?._id || user?.id)?.slice(-8).toUpperCase() || "N/A"}
@@ -667,38 +609,67 @@ const Profile: React.FC = () => {
               </div>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="relative flex p-1 rounded-2xl shadow-inner bg-gray-200/60 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth h-auto border border-gray-300/30">
-              {/* Sliding Indicator */}
-              <div 
-                className="absolute inset-y-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-lg ring-1 ring-black/5"
-                style={{
-                  left: activeTab === "personal" ? "4px" : activeTab === "kyc" ? "calc(33.33% + 4px)" : "calc(66.66% + 4px)",
-                  width: "calc(33.33% - 8px)"
-                }}
-              />
-              
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id as typeof activeTab);
-                    setIsEditing(false);
+            {/* Navigation Tabs and Actions */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="relative flex p-1 rounded-2xl shadow-inner bg-gray-200/60 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth h-auto border border-gray-300/30">
+                {/* Sliding Indicator */}
+                <div 
+                  className="absolute inset-y-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-lg ring-1 ring-black/5"
+                  style={{
+                    left: activeTab === "personal" ? "4px" : activeTab === "kyc" ? `calc(${100 / tabs.length}% + 4px)` : `calc(${100 / tabs.length * 2}% + 4px)`,
+                    width: `calc(${100 / tabs.length}% - 8px)`
                   }}
-                  className={`relative z-10 flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
-                    activeTab === tab.id
-                      ? "text-[#35503F] font-black"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
+                />
+                
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setActiveTab(tab.id as typeof activeTab);
+                      setIsEditing(false);
+                    }}
+                    className={`relative z-10 flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? "text-[#35503F] font-black"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <tab.icon className="w-4 h-4" />
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Edit Profile Button */}
+              {activeTab !== "company" && (!isEditing ? (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-4 py-2 rounded-xl font-bold hover:bg-[#35503F]/90 transition-all shadow-sm active:scale-95 text-sm whitespace-nowrap"
                 >
-                  <tab.icon className="w-4 h-4" />
-                  {tab.label}
+                  <Edit3 className="w-4 h-4" /> Edit Profile
                 </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-4 py-2 rounded-xl font-bold hover:bg-[#35503F]/90 transition-all shadow-sm active:scale-95 text-sm whitespace-nowrap"
+                  >
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Save
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95 text-sm whitespace-nowrap"
+                  >
+                    <X className="w-4 h-4" /> Cancel
+                  </button>
+                </div>
               ))}
             </div>
 
             {/* Content */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className={`bg-white shadow-sm border border-gray-100 ${isCompact ? 'rounded-2xl p-4 sm:p-5' : 'rounded-xl p-6'}`}>
               {/* Personal Info Tab */}
               {activeTab === "personal" && (
                 <div className="space-y-6">
@@ -841,13 +812,9 @@ const Profile: React.FC = () => {
                               onChange={(e) => {
                                 const value = e.target.value.replace(/\D/g, '');
                                 handleInputChange("pincode", value);
-                                if (value.length === 6) fetchPincodeDetails(value);
                               }}
                               className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all"
                             />
-                            {pincodeLoading && (
-                              <Loader2 className="w-4 h-4 text-gray-400 animate-spin absolute right-3 top-3.5" />
-                            )}
                           </div>
                         ) : (
                           <p className="text-gray-900">{profileData.pincode || "N/A"}</p>
@@ -1115,10 +1082,10 @@ const Profile: React.FC = () => {
                 </div>
               )}
 
-              {/* KYC Verification Tab */}
+              {/* KYC Tab */}
               {activeTab === "kyc" && (
-                <div className="space-y-6">
-                  <KYCVerification />
+                <div className="animate-fade-in">
+                  <KYCVerification hideCompanyDetails={hideCompanyDetails} isCompact={isCompact} />
                 </div>
               )}
 

@@ -60,12 +60,30 @@ const AnimatedCounter = ({
 };
 
 // --- Components ---
-const formatCurrency = (val: number) =>
+const formatCurrency = (v: number) =>
     new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
-        minimumFractionDigits: 0,
-    }).format(val);
+        maximumFractionDigits: 0,
+    }).format(v);
+
+const getNextSundayDateTime = () => {
+    const d = new Date();
+    const day = d.getDay();
+    const diff = (7 - day) % 7;
+    const addDays = (diff === 0 && d.getHours() >= 19) ? 7 : diff;
+    
+    const nextSunday = new Date(d);
+    nextSunday.setDate(d.getDate() + addDays);
+    
+    const formattedDate = nextSunday.toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+    });
+    
+    return `${formattedDate} at 7 PM`;
+};
 
 const StatCard = ({
     label,
@@ -200,9 +218,9 @@ const Payouts = () => {
             <div className="w-full space-y-8 animate-fade-in">
                 {/* 1. Header */}
                 <div className="space-y-2">
-                    <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
                         Payout{" "}
-                        <span className="text-[#35503D] italic">
+                        <span className="text-[#4A6D56] italic">
                             Management
                         </span>
                     </h1>
@@ -233,7 +251,8 @@ const Payouts = () => {
                     {/* Static value for date */}
                     <StatCard
                         label="Next Auto Payout"
-                        value="10th"
+                        value={getNextSundayDateTime()}
+                        colorClass="text-[1.2rem] text-[#35503F]"
                         delay={300}
                     />
                 </div>
@@ -304,12 +323,9 @@ const Payouts = () => {
                                             <p className="text-2xl font-bold text-slate-900">
                                                 {formatCurrency(item.commission)}
                                             </p>
-                                            <button
-                                                onClick={() => handleInitiatePayout(item)}
-                                                className="w-full md:w-auto px-4 py-2 bg-[#5aa39c]/10 text-[#5aa39c] rounded-lg text-sm font-semibold hover:bg-[#5aa39c] hover:text-white transition group-hover:shadow flex items-center justify-center gap-2"
-                                            >
-                                                Payout <ArrowRight size={16} />
-                                            </button>
+                                            <div className="w-full md:w-auto px-4 py-2 bg-[#f0f4f3] text-[#35503F] rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+                                                <Clock size={16} /> Auto Payout: {getNextSundayDateTime()}
+                                            </div>
                                         </div>
                                     </div>
                                 )) : (

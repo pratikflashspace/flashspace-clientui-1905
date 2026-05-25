@@ -368,7 +368,7 @@ const VirtualOffice = () => {
 
       <div className="flex w-full">
         <aside className="hidden lg:block w-[300px] shrink-0">
-          <nav className="sticky top-[120px] pl-10 pr-[24px] py-12 flex flex-col gap-1">
+          <nav className="sticky top-[120px] pl-[max(2rem,calc((100vw-1280px)/2))] pr-[24px] py-12 flex flex-col gap-1">
             {sidebarItems.map((n) => {
               const isActive = active === n.id;
               return (
@@ -392,7 +392,7 @@ const VirtualOffice = () => {
 
         <div className="flex-1 min-w-0">
           <section ref={assignRef("features")} id="features" className="py-12 lg:py-16">
-            <div className="space-y-10 px-6 lg:px-8">
+            <div className="space-y-10 px-6 lg:pl-8 lg:pr-[max(2rem,calc((100vw-1280px)/2))]">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden">
                 <img src={featureVirtualOffice} alt="Virtual office space" className="w-full h-[350px] lg:h-[420px] object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
@@ -422,7 +422,7 @@ const VirtualOffice = () => {
                 </Button>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-6">
+              <div className="grid sm:grid-cols-2 gap-6 mt-10">
                 {voFeatures.map((f, i) => (
                   <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="p-6 rounded-2xl bg-white border border-[#D4E0D0] flex items-start gap-4">
                     <div className="w-10 h-10 rounded-xl bg-[#F0F4EE] flex items-center justify-center shrink-0">
@@ -452,7 +452,7 @@ const VirtualOffice = () => {
           </section>
 
           <section ref={assignRef("ai")} id="ai" className="py-12 lg:py-16 border-t border-border/50">
-            <div className="space-y-10 px-6 lg:px-8">
+            <div className="space-y-10 px-6 lg:pl-8 lg:pr-[max(2rem,calc((100vw-1280px)/2))]">
               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden">
                 <img src={officeIllustrated} alt="AI workspace platform" className="w-full h-[400px] lg:h-[500px] object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />

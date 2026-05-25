@@ -89,19 +89,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             path: "/affiliate-portal/payouts",
         },
         {
-            name: "Invoices",
-            icon: FileText,
-            path: "/affiliate-portal/affiliate-invoices",
-        },
-        {
-            name: "Lead Management",
+            name: "Coupons and Vouchers",
             icon: Target,
-            path: "/affiliate-portal/lead-management",
-        },
-        {
-            name: "Quotation Generator",
-            icon: FileOutput,
-            path: "/affiliate-portal/quotation-generator",
+            path: "/affiliate-portal/coupons",
         },
         {
             name: "Marketing Tools",
@@ -117,16 +107,6 @@ const Sidebar: React.FC<SidebarProps> = ({
             name: "Support",
             icon: MessageSquare,
             path: "/affiliate-portal/support",
-        },
-        {
-            name: "KYC Verification",
-            icon: Shield,
-            path: "/affiliate-portal/kyc",
-        },
-        {
-            name: "Notifications",
-            icon: Bell,
-            path: "/affiliate-portal/notifications",
         },
     ];
 
@@ -151,19 +131,12 @@ const Sidebar: React.FC<SidebarProps> = ({
                 {/* Header branding */}
                 <div className={`flex flex-col shrink-0 transition-all duration-300 ${isDesktopCollapsed ? "p-4 items-center" : "w-[287px] h-[137px] p-[24px]"}`}>
                     <div className={`flex items-center w-full ${isDesktopCollapsed ? "justify-center" : "justify-between"}`}>
-                        <div
-                            className={`font-black tracking-tight transition-all duration-300 overflow-hidden whitespace-nowrap flex items-center ${isDesktopCollapsed ? "text-2xl" : "w-[239px] h-[32px] text-[32px] leading-none"}`}
-                            style={{ fontFamily: "'Inter Tight', sans-serif" }}
-                        >
-                            {isDesktopCollapsed ? (
-                                <span className="text-[#1a2d1d]">f</span>
-                            ) : (
-                                <>
-                                    <span className="text-[#1a2d1d]">flash</span>
-                                    <span className="text-[#334d3d] opacity-80">space</span>
-                                </>
-                            )}
-                        </div>
+                        <img
+                            src="/Logo/Flashspace Logo.png"
+                            alt="FlashSpace Logo"
+                            onClick={() => navigate("/")}
+                            className={`w-auto object-contain transition-all duration-300 ml-[-12px] cursor-pointer ${isDesktopCollapsed ? "h-7" : "h-9"}`}
+                        />
                         <button
                             onClick={() => setIsMobileOpen(false)}
                             className="xl:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
@@ -183,7 +156,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
 
                 {/* Navigation Menu */}
-                <div className="flex-1 min-h-0 overflow-y-scroll px-4 space-y-2 custom-scrollbar overflow-x-hidden" data-lenis-prevent>
+                <div className="flex-1 min-h-0 overflow-hidden px-4 space-y-2" data-lenis-prevent>
                     {menuItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = activePage === item.name;

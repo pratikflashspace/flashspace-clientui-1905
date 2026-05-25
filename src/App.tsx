@@ -108,6 +108,7 @@ const AddSpace = lazy(() => import("./pages/spacePortal/AddSpace"));
 const PropertyDetails = lazy(() => import("./pages/spacePortal/PropertyDetails"));
 const SpacePortalFeedbackNPS = lazy(() => import("./pages/spacePortal/FeedbackNPS"));
 const SpacePortalTicketAndTasks = lazy(() => import("./pages/spacePortal/TicketsAndTasks"));
+const Profile = lazy(() => import("./components/ClientDashboard/Profile"));
 const MailAndVisits = lazy(() => import("./pages/spacePortal/MailAndVisits"));
 const TeamManagement = lazy(() => import("./pages/spacePortal/TeamManagement.tsx"));
 
@@ -121,8 +122,9 @@ const AffiliateLayout = lazy(() => import("./pages/affiliatePortal/AffiliateLayo
 const LeadManagementAffiliate = lazy(() => import("./pages/affiliatePortal/LeadManagementAffiliate"));
 const QuotationGenerator = lazy(() => import("./pages/affiliatePortal/QuotationGenerator"));
 const MarketingTools = lazy(() => import("./pages/affiliatePortal/MarketingTools"));
+const CouponsAndVouchers = lazy(() => import("./pages/affiliatePortal/CouponsAndVouchers"));
 const LeaderBoard = lazy(() => import("./pages/affiliatePortal/LeaderBoard"));
-const Support = lazy(() => import("./pages/affiliatePortal/Support"));
+const Support = lazy(() => import("./components/affiliatePortal/SupportTickets"));
 const AffiliateKYC = lazy(() => import("./pages/affiliatePortal/KYC"));
 const AffiliateNotifications = lazy(() => import("./pages/affiliatePortal/Notifications"));
 const AffiliateClientManagement = lazy(() => import("@/pages/affiliatePortal/AffiliateClientManagement"));
@@ -568,9 +570,13 @@ const App = () => (
                             path="marketing-tools"
                             element={<MarketingTools />}
                           />
+                          <Route
+                            path="coupons"
+                            element={<CouponsAndVouchers />}
+                          />
                           <Route path="leaderboard" element={<LeaderBoard />} />
                           <Route path="support" element={<Support />} />
-                          <Route path="kyc" element={<AffiliateKYC />} />
+                          <Route path="kyc" element={<Profile hideCompanyDetails={true} />} />
                           <Route
                             path="notifications"
                             element={<AffiliateNotifications />}

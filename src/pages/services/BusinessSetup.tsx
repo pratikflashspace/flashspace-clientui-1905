@@ -228,7 +228,7 @@ const BusinessSetup = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {features.map((feature, index) => (
-                <Card key={index} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover-lift border border-gray-200">
+                <Card key={index} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 cursor-default border border-gray-200">
                   <CardHeader className="text-center">
                     <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
                       <span className="text-accent">{feature.icon}</span>
@@ -343,7 +343,7 @@ const BusinessSetup = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {cityServices.map((service) => (
-                <Card key={service.id} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover-lift border border-gray-200">
+                <Card key={service.id} className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 cursor-default border border-gray-200">
                   <CardHeader>
                     <div className="flex justify-between items-start mb-2">
                       <CardTitle className="text-xl text-gray-900 font-semibold">

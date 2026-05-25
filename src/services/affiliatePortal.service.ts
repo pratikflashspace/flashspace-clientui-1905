@@ -189,6 +189,73 @@ export interface AffiliateInvoicesResponse {
     };
 }
 
+export interface AffiliateBookingDto {
+    id: string;
+    bookingNumber: string;
+    client: {
+        id?: string;
+        name: string;
+        email: string;
+        phone: string;
+    };
+    company?: string;
+    plan: string;
+    space: string;
+    city: string;
+    area: string;
+    duration: string;
+    amount: number;
+    commission: number;
+    status: string;
+    couponCode: string;
+    startDate?: string;
+    endDate?: string;
+    createdAt?: string;
+}
+
+export interface AffiliateBookingsResponse {
+    bookings: AffiliateBookingDto[];
+    stats: {
+        totalBookings: number;
+        activeBookings: number;
+        pendingBookings: number;
+        renewalDue: number;
+        totalCommission: number;
+    };
+}
+
+interface AffiliateClientBookingDto {
+    bookingId: string;
+    bookingNumber: string;
+    user: {
+        id?: string;
+        fullName: string;
+        email: string;
+        phone: string;
+    };
+    space: string;
+    city: string;
+    plan: string;
+    tenure: string;
+    amount: number;
+    commissionAmount: number;
+    couponCode: string;
+    status: string;
+    startDate?: string;
+    endDate?: string;
+    createdAt?: string;
+}
+
+interface AffiliateClientsResponse {
+    clients: AffiliateClientBookingDto[];
+    stats?: {
+        totalClients: number;
+        totalCommission: number;
+        activeBookings: number;
+        successfulBookings: number;
+    };
+}
+
 
 
 class AffiliatePortalService {
@@ -326,6 +393,52 @@ class AffiliatePortalService {
             `${API_ENDPOINTS.AFFILIATE.LEADERBOARD}?page=${page}&limit=${limit}`,
         );
         return response.data;
+    }
+
+    async getBookings() {
+        const response = await axiosInstance.get<ApiResponse<AffiliateClientsResponse>>(
+            API_ENDPOINTS.AFFILIATE.CLIENTS,
+        );
+        const payload = response.data;
+        const clients = payload.data?.clients || [];
+
+        return {
+            ...payload,
+            data: {
+                bookings: clients.map((client) => ({
+                    id: client.bookingId,
+                    bookingNumber: client.bookingNumber,
+                    client: {
+                        id: client.user.id,
+                        name: client.user.fullName,
+                        email: client.user.email,
+                        phone: client.user.phone,
+                    },
+                    company: client.user.fullName,
+                    plan: client.plan,
+                    space: client.space,
+                    city: client.city,
+                    area: "",
+                    duration: client.tenure,
+                    amount: client.amount,
+                    commission: client.commissionAmount,
+                    status: client.status,
+                    couponCode: client.couponCode,
+                    startDate: client.startDate,
+                    endDate: client.endDate,
+                    createdAt: client.createdAt,
+                })),
+                stats: {
+                    totalBookings: clients.length,
+                    activeBookings: clients.filter((client) => client.status === "active").length,
+                    pendingBookings: clients.filter((client) =>
+                        ["pending_payment", "pending_kyc"].includes(client.status),
+                    ).length,
+                    renewalDue: 0,
+                    totalCommission: payload.data?.stats?.totalCommission || 0,
+                },
+            },
+        } satisfies ApiResponse<AffiliateBookingsResponse>;
     }
 
 

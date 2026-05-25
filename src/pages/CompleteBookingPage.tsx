@@ -177,7 +177,7 @@ const CompleteBookingPage = () => {
         }
         setCouponLoading(true);
         try {
-            const result = await validateCoupon(couponCode.trim().toUpperCase());
+            const result = await validateCoupon(couponCode.trim().toUpperCase(), spaceDetails?.name);
             if (result.valid && result.data) {
                 setAppliedCoupon({
                     code: result.data.code,      

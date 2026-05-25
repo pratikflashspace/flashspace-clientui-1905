@@ -1,180 +1,86 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Eye,
-    Share2,
-    Search,
-    Filter,
-    Download,
-    Calendar,
-    MapPin,
-    X,
+    AlertCircle,
     Building2,
-    Mail,
-    Phone,
-    MessageSquare,
-    FileText,
+    Calendar,
     CheckCircle,
-    RefreshCw,
+    Download,
+    Eye,
+    Loader2,
+    Mail,
+    MapPin,
+    MessageSquare,
+    Phone,
+    Search,
+    X,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { affiliatePortalService } from "@/services/affiliatePortal.service";
+import { affiliatePortalService, AffiliateBookingDto } from "@/services/affiliatePortal.service";
+import { GetInTouchModal } from "@/components/modals/GetInTouchModal";
 
-// --- Types & Interfaces ---
 interface Booking {
     id: string;
     company: string;
-    contactPerson: string; // Added for modal
-    email: string; // Added for modal
-    phone: string; // Added for modal
+    contactPerson: string;
+    email: string;
+    phone: string;
     plan: string;
     location: string;
     duration: string;
-    amount: string; // Added for modal
+    amount: string;
     commission: string;
     status: "Active" | "Pending" | "Renewal Due";
 }
 
-// --- Mock Data (Extended with details for the popup) ---
-const STATIC_ACTIVE_BOOKINGS: Booking[] = [
-    {
-        id: "BO-2024-001",
-        company: "Tech Innovations Pvt Ltd",
-        contactPerson: "Rahul Sharma",
-        email: "rahul@techinnovations.com",
-        phone: "+91 98765 43210",
-        plan: "Virtual Office Premium",
-        location: "Mumbai - BKC",
-        duration: "Jan 15, 2024 - Jan 15, 2025",
-        amount: "₹45,000",
-        commission: "₹4,500",
-        status: "Active",
-    },
-    {
-        id: "BO-2024-002",
-        company: "StartupXYZ Solutions",
-        contactPerson: "Aditi Verma",
-        email: "aditi@startupxyz.com",
-        phone: "+91 98123 45678",
-        plan: "Team Space",
-        location: "Delhi - CP",
-        duration: "Dec 1, 2023 - Nov 30, 2024",
-        amount: "₹1,20,000",
-        commission: "₹12,000",
-        status: "Active",
-    },
-    {
-        id: "BO-2024-003",
-        company: "Global Consulting",
-        contactPerson: "Vikram Singh",
-        email: "vikram@globalcons.com",
-        phone: "+91 99887 76655",
-        plan: "Virtual Office Standard",
-        location: "Bangalore - HSR",
-        duration: "Feb 1, 2024 - Jan 31, 2025",
-        amount: "₹28,000",
-        commission: "₹2,800",
-        status: "Active",
-    },
-    {
-        id: "BO-2024-006",
-        company: "Alpha Wave Inc",
-        contactPerson: "Sneha Gupta",
-        email: "sneha@alphawave.com",
-        phone: "+91 91234 56789",
-        plan: "Meeting Rooms",
-        location: "Pune - Baner",
-        duration: "Mar 10, 2024 - Mar 10, 2025",
-        amount: "₹15,000",
-        commission: "₹1,500",
-        status: "Active",
-    },
-];
+const formatINR = (value: number) =>
+    new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+    }).format(Number(value || 0));
 
-const STATIC_PENDING_BOOKINGS: Booking[] = [
-    {
-        id: "BO-2024-004",
-        company: "Design Hub Studios",
-        contactPerson: "Amit Roy",
-        email: "amit@designhub.com",
-        phone: "+91 88776 65544",
-        plan: "Hot Desk Monthly",
-        location: "Chennai - Anna Nagar",
-        duration: "Feb 5, 2024 - Mar 5, 2024",
-        amount: "₹8,000",
-        commission: "₹800",
-        status: "Pending",
-    },
-    {
-        id: "BO-2024-005",
-        company: "Fintech Solutions Inc",
-        contactPerson: "Priya Nair",
-        email: "priya@fintechsol.com",
-        phone: "+91 77665 54433",
-        plan: "Virtual Office Premium",
-        location: "Mumbai - Andheri",
-        duration: "Feb 10, 2024 - Feb 10, 2025",
-        amount: "₹52,000",
-        commission: "₹5,200",
-        status: "Pending",
-    },
-    {
-        id: "BO-2024-007",
-        company: "EduTech Global",
-        contactPerson: "Rohan Das",
-        email: "rohan@edutech.com",
-        phone: "+91 66554 43322",
-        plan: "Team Space",
-        location: "Noida - Sec 62",
-        duration: "Pending Activation",
-        amount: "₹80,000",
-        commission: "₹8,000",
-        status: "Pending",
-    },
-];
+const formatDate = (value?: string) => {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+    });
+};
 
-const STATIC_RENEWAL_BOOKINGS: Booking[] = [
-    {
-        id: "BO-2023-089",
-        company: "DataFlow Analytics",
-        contactPerson: "Kavita Iyer",
-        email: "kavita@dataflow.com",
-        phone: "+91 55443 32211",
-        plan: "Team Space",
-        location: "Bangalore - Koramangala",
-        duration: "Feb 15, 2023 - Feb 15, 2024",
-        amount: "₹85,000",
-        commission: "₹8,500",
-        status: "Renewal Due",
-    },
-    {
-        id: "BO-2023-092",
-        company: "CloudTech Systems",
-        contactPerson: "Arjun Reddy",
-        email: "arjun@cloudtech.com",
-        phone: "+91 44332 21100",
-        plan: "Virtual Office Standard",
-        location: "Hyderabad - HITEC City",
-        duration: "Feb 20, 2023 - Feb 20, 2024",
-        amount: "₹32,000",
-        commission: "₹3,200",
-        status: "Renewal Due",
-    },
-    {
-        id: "BO-2023-095",
-        company: "Bright Future Marketing",
-        contactPerson: "Neha Kapoor",
-        email: "neha@brightfuture.com",
-        phone: "+91 33221 10099",
-        plan: "Hot Desk",
-        location: "Mumbai - Powai",
-        duration: "Feb 28, 2023 - Feb 28, 2024",
-        amount: "₹12,000",
-        commission: "₹1,200",
-        status: "Renewal Due",
-    },
-];
+const isRenewalDue = (booking: AffiliateBookingDto) => {
+    if (booking.status !== "active" || !booking.endDate) return false;
+    const daysLeft = (new Date(booking.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+    return Number.isFinite(daysLeft) && daysLeft >= 0 && daysLeft <= 30;
+};
 
-// --- Components ---
+const toDisplayStatus = (booking: AffiliateBookingDto): Booking["status"] => {
+    if (isRenewalDue(booking)) return "Renewal Due";
+    if (booking.status === "active") return "Active";
+    return "Pending";
+};
+
+const mapBooking = (booking: AffiliateBookingDto): Booking => {
+    const dateRange =
+        booking.startDate || booking.endDate
+            ? [formatDate(booking.startDate), formatDate(booking.endDate)].filter(Boolean).join(" - ")
+            : booking.duration;
+
+    return {
+        id: booking.bookingNumber || booking.id,
+        company: booking.company || booking.client.name,
+        contactPerson: booking.client.name,
+        email: booking.client.email,
+        phone: booking.client.phone,
+        plan: booking.plan,
+        location: [booking.city, booking.area || booking.space].filter((item) => item && item !== "—").join(" - ") || "—",
+        duration: dateRange || booking.duration || "—",
+        amount: formatINR(booking.amount),
+        commission: formatINR(booking.commission),
+        status: toDisplayStatus(booking),
+    };
+};
 
 const StatCard = ({
     value,
@@ -196,7 +102,7 @@ const StatCard = ({
     </div>
 );
 
-const StatusBadge = ({ status }: { status: string }) => {
+const StatusBadge = ({ status }: { status: Booking["status"] }) => {
     const styles = {
         Active: "text-[#10b981] bg-[#f0fdf4] border-[#bcf0da]",
         Pending: "text-[#f59e0b] bg-[#fffbeb] border-[#fef3c7]",
@@ -204,9 +110,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     };
 
     return (
-        <span
-            className={`px-2.5 py-1 rounded-full text-[11px] font-bold border flex items-center gap-1.5 w-fit ${styles[status as keyof typeof styles] || "bg-gray-50 text-gray-600"}`}
-        >
+        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold border flex items-center gap-1.5 w-fit ${styles[status]}`}>
             {status === "Active" && <CheckCircle size={12} strokeWidth={3} />}
             {status === "Pending" && <div className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] animate-pulse" />}
             {status}
@@ -214,257 +118,143 @@ const StatusBadge = ({ status }: { status: string }) => {
     );
 };
 
-// --- MODAL COMPONENT ---
 const BookingDetailsModal = ({
     booking,
     onClose,
+    onContact,
 }: {
     booking: Booking;
     onClose: () => void;
-}) => {
-    if (!booking) return null;
-
-    return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-                onClick={onClose}
-            ></div>
-
-            {/* Modal Content */}
-            <div className="relative w-full max-w-[500px] bg-white rounded-2xl shadow-2xl overflow-hidden animate-scale-up flex flex-col max-h-[90vh]">
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 pb-2">
-                    <h2 className="text-xl font-bold text-slate-900">
-                        Booking Details
-                    </h2>
-                    <div className="flex items-center gap-3">
-                        <StatusBadge status={booking.status} />
-                        <button
-                            onClick={onClose}
-                            className="p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
-                </div>
-
-                {/* Scrollable Body */}
-                <div className="p-6 pt-2 overflow-y-auto space-y-6 custom-scrollbar" data-lenis-prevent>
-                    {/* Section 1: Basic Info */}
-                    <div className="space-y-4">
-                        <div className="p-4 bg-gray-50 rounded-xl space-y-1">
-                            <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-                                Booking ID
-                            </p>
-                            <p className="text-lg font-bold text-[#334D3D] font-mono">
-                                {booking.id}
-                            </p>
-                        </div>
-
-                        <div className="space-y-3 pl-1">
-                            <div className="flex items-start gap-3">
-                                <Building2
-                                    size={20}
-                                    className="text-[#334D3D] mt-0.5 shrink-0"
-                                />
-                                <div>
-                                    <p className="font-bold text-slate-900">
-                                        {booking.company}
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                        {booking.contactPerson}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <MapPin
-                                    size={20}
-                                    className="text-[#334D3D] shrink-0"
-                                />
-                                <p className="text-sm text-slate-700">
-                                    {booking.location}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Calendar
-                                    size={20}
-                                    className="text-[#334D3D] shrink-0"
-                                />
-                                <p className="text-sm text-slate-700">
-                                    {booking.duration}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Section 2: Plan Details */}
-                    <div>
-                        <h3 className="text-sm font-bold text-slate-900 mb-3">
-                            Plan Details
-                        </h3>
-                        <div className="bg-[#f8f9fa] p-5 rounded-xl space-y-3 border border-gray-100">
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-gray-500 font-medium">
-                                    Plan Type
-                                </span>
-                                <span className="text-xs font-semibold px-2 py-1 bg-white border border-gray-200 rounded text-gray-700 shadow-sm">
-                                    {booking.plan}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center border-b border-gray-200 pb-3">
-                                <span className="text-sm text-gray-500 font-medium">
-                                    Booking Amount
-                                </span>
-                                <span className="text-sm font-bold text-slate-900">
-                                    {booking.amount}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center pt-1">
-                                <span className="text-sm text-gray-500 font-medium">
-                                    Your Commission
-                                </span>
-                                <span className="text-base font-bold text-[#334D3D]">
-                                    {booking.commission}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Section 3: Contact Info */}
-                    <div>
-                        <h3 className="text-sm font-bold text-slate-900 mb-3">
-                            Contact Information
-                        </h3>
-                        <div className="bg-[#f8f9fa] p-5 rounded-xl space-y-3 border border-gray-100">
-                            <div className="flex items-center gap-3">
-                                <Mail size={16} className="text-[#334D3D]" />
-                                <p className="text-sm text-slate-700">
-                                    {booking.email}
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Phone size={16} className="text-[#334D3D]" />
-                                <p className="text-sm text-slate-700">
-                                    {booking.phone}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer Actions */}
-                <div className="p-6 border-t border-gray-100 grid grid-cols-2 gap-3 bg-white">
-                    <button className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-slate-700 font-semibold text-sm hover:bg-gray-50 transition-colors">
-                        <Download size={18} />
-                        Agreement
-                    </button>
-                    <button className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#334D3D] text-white font-semibold text-sm hover:bg-[#26392D] shadow-sm shadow-emerald-100 transition-colors">
-                        <MessageSquare size={18} />
-                        Contact
+    onContact: () => void;
+}) => (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+        <div className="relative w-full max-w-[500px] bg-white rounded-2xl shadow-2xl overflow-hidden animate-scale-up flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between p-6 pb-2">
+                <h2 className="text-xl font-bold text-slate-900">Booking Details</h2>
+                <div className="flex items-center gap-3">
+                    <StatusBadge status={booking.status} />
+                    <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                        <X size={20} />
                     </button>
                 </div>
             </div>
+
+            <div className="p-6 pt-2 overflow-y-auto space-y-6 custom-scrollbar" data-lenis-prevent>
+                <div className="space-y-4">
+                    <div className="p-4 bg-gray-50 rounded-xl space-y-1">
+                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Booking ID</p>
+                        <p className="text-lg font-bold text-[#334D3D] font-mono">{booking.id}</p>
+                    </div>
+
+                    <div className="space-y-3 pl-1">
+                        <div className="flex items-start gap-3">
+                            <Building2 size={20} className="text-[#334D3D] mt-0.5 shrink-0" />
+                            <div>
+                                <p className="font-bold text-slate-900">{booking.company}</p>
+                                <p className="text-sm text-gray-500">{booking.contactPerson}</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <MapPin size={20} className="text-[#334D3D] shrink-0" />
+                            <p className="text-sm text-slate-700">{booking.location}</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Calendar size={20} className="text-[#334D3D] shrink-0" />
+                            <p className="text-sm text-slate-700">{booking.duration}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="text-sm font-bold text-slate-900 mb-3">Plan Details</h3>
+                    <div className="bg-[#f8f9fa] p-5 rounded-xl space-y-3 border border-gray-100">
+                        <div className="flex justify-between items-center gap-4">
+                            <span className="text-sm text-gray-500 font-medium">Plan Type</span>
+                            <span className="text-xs font-semibold px-2 py-1 bg-white border border-gray-200 rounded text-gray-700 shadow-sm text-right">{booking.plan}</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-gray-200 pb-3">
+                            <span className="text-sm text-gray-500 font-medium">Booking Amount</span>
+                            <span className="text-sm font-bold text-slate-900">{booking.amount}</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-1">
+                            <span className="text-sm text-gray-500 font-medium">Your Commission</span>
+                            <span className="text-base font-bold text-[#334D3D]">{booking.commission}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 className="text-sm font-bold text-slate-900 mb-3">Contact Information</h3>
+                    <div className="bg-[#f8f9fa] p-5 rounded-xl space-y-3 border border-gray-100">
+                        <div className="flex items-center gap-3">
+                            <Mail size={16} className="text-[#334D3D]" />
+                            <p className="text-sm text-slate-700 break-all">{booking.email}</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Phone size={16} className="text-[#334D3D]" />
+                            <p className="text-sm text-slate-700">{booking.phone}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-100 flex items-center justify-end gap-3 bg-white">
+                <button 
+                    onClick={onClose}
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl border border-gray-200 text-slate-700 font-semibold text-sm hover:bg-gray-50 transition-colors"
+                >
+                    Close
+                </button>
+                <button 
+                    onClick={onContact}
+                    className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-[#334D3D] text-white font-semibold text-sm hover:bg-[#26392D] shadow-sm shadow-emerald-100 transition-colors"
+                >
+                    <MessageSquare size={18} />
+                    Contact
+                </button>
+            </div>
         </div>
-    );
-};
+    </div>
+);
 
-// --- MAIN PAGE COMPONENT ---
 const BookingManagement = () => {
-    const { user, isAuthenticated } = useAuth();
-    const [activeTab, setActiveTab] = useState<
-        "active" | "pending" | "renewals"
-    >("active");
+    const [activeTab, setActiveTab] = useState<"active" | "pending" | "renewals">("active");
     const [searchQuery, setSearchQuery] = useState("");
-    const [activeBookings, setActiveBookings] =
-        useState<Booking[]>(STATIC_ACTIVE_BOOKINGS);
-    const [pendingBookings, setPendingBookings] =
-        useState<Booking[]>(STATIC_PENDING_BOOKINGS);
-    const [renewalBookings, setRenewalBookings] =
-        useState<Booking[]>(STATIC_RENEWAL_BOOKINGS);
+    const [activeBookings, setActiveBookings] = useState<Booking[]>([]);
+    const [pendingBookings, setPendingBookings] = useState<Booking[]>([]);
+    const [renewalBookings, setRenewalBookings] = useState<Booking[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+    const [isContactOpen, setIsContactOpen] = useState(false);
 
-    // State for Modal
-    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(
-        null,
-    );
+    const fetchBookings = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await affiliatePortalService.getBookings();
+            if (!response.success || !response.data) {
+                throw new Error(response.message || "Failed to fetch bookings");
+            }
 
-    const canUseSeedData =
-        isAuthenticated &&
-        (user?.role === "admin" || user?.role === "affiliate");
+            const mapped = response.data.bookings.map(mapBooking);
+            setActiveBookings(mapped.filter((item) => item.status === "Active"));
+            setPendingBookings(mapped.filter((item) => item.status === "Pending"));
+            setRenewalBookings(mapped.filter((item) => item.status === "Renewal Due"));
+        } catch (err: any) {
+            setActiveBookings([]);
+            setPendingBookings([]);
+            setRenewalBookings([]);
+            setError(err?.response?.data?.message || err?.message || "Failed to fetch bookings");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const formatINR = (value: number) => `₹${value.toLocaleString("en-IN")}`;
-        const toBookingStatus = (status: string): Booking["status"] => {
-            if (status === "Accepted") return "Active";
-            if (status === "Rejected") return "Renewal Due";
-            return "Pending";
-        };
-
-        const resetStatic = () => {
-            setActiveBookings(STATIC_ACTIVE_BOOKINGS);
-            setPendingBookings(STATIC_PENDING_BOOKINGS);
-            setRenewalBookings(STATIC_RENEWAL_BOOKINGS);
-        };
-
-        const fetchBookings = async () => {
-            if (!canUseSeedData) {
-                resetStatic();
-                return;
-            }
-
-            try {
-                const response = await affiliatePortalService.getQuotations();
-                if (!response.success || !Array.isArray(response.data)) {
-                    resetStatic();
-                    return;
-                }
-
-                const mapped: Booking[] = response.data.map((quote) => {
-                    const amount = Number(quote.price || 0);
-                    const commission = Math.round(amount * 0.1);
-                    const bookingStatus = toBookingStatus(quote.status);
-                    const startDateText = new Date(
-                        quote.spaceRequirements.startDate,
-                    ).toLocaleDateString("en-IN", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                    });
-
-                    return {
-                        id: quote.quotationId,
-                        company:
-                            quote.clientDetails.companyName ||
-                            quote.clientDetails.name,
-                        contactPerson: quote.clientDetails.name,
-                        email: quote.clientDetails.email,
-                        phone: quote.clientDetails.phone,
-                        plan: `${quote.spaceRequirements.spaceType} (${quote.spaceRequirements.numberOfSeats} seats)`,
-                        location: `${quote.spaceRequirements.city} - ${quote.spaceRequirements.location}`,
-                        duration: `${quote.spaceRequirements.duration} (Start: ${startDateText})`,
-                        amount: formatINR(amount),
-                        commission: formatINR(commission),
-                        status: bookingStatus,
-                    };
-                });
-
-                setActiveBookings(
-                    mapped.filter((item) => item.status === "Active"),
-                );
-                setPendingBookings(
-                    mapped.filter((item) => item.status === "Pending"),
-                );
-                setRenewalBookings(
-                    mapped.filter((item) => item.status === "Renewal Due"),
-                );
-            } catch {
-                resetStatic();
-            }
-        };
-
         fetchBookings();
-    }, [canUseSeedData]);
+    }, []);
 
     const getCurrentData = () => {
         switch (activeTab) {
@@ -479,212 +269,157 @@ const BookingManagement = () => {
         }
     };
 
-    const filteredData = getCurrentData().filter(
-        (item) =>
-            item.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.id.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
-
-    const totalCommissions = useMemo(() => {
-        const all = [...activeBookings, ...pendingBookings, ...renewalBookings];
-        const total = all.reduce((sum, booking) => {
-            const numeric = Number(booking.commission.replace(/[^0-9]/g, "")) || 0;
-            return sum + numeric;
-        }, 0);
-        return `₹${total.toLocaleString("en-IN")}`;
-    }, [activeBookings, pendingBookings, renewalBookings]);
+    const filteredData = getCurrentData().filter((item) => {
+        const query = searchQuery.toLowerCase();
+        return (
+            item.company.toLowerCase().includes(query) ||
+            item.contactPerson.toLowerCase().includes(query) ||
+            item.id.toLowerCase().includes(query)
+        );
+    });
 
     return (
-        <div className="min-h-screen bg-[#f7f7f6] p-8 lg:p-12 font-sans w-full relative">
-            {/* Modal Injection */}
+        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-12 font-sans w-full relative">
+            <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
             {selectedBooking && (
-                <BookingDetailsModal
-                    booking={selectedBooking}
-                    onClose={() => setSelectedBooking(null)}
+                <BookingDetailsModal 
+                    booking={selectedBooking} 
+                    onClose={() => setSelectedBooking(null)} 
+                    onContact={() => {
+                        setSelectedBooking(null);
+                        setIsContactOpen(true);
+                    }}
                 />
             )}
 
             <div className="w-full space-y-8 animate-fade-in">
-                {/* Header */}
                 <div className="animate-fade-in-down mb-10">
-                    <h1 className="text-[2.25rem] font-black text-[#1a2d1d] tracking-tight leading-none mb-3">
-                        Booking <span className="text-[#35503F] italic">Management</span>
+                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                        Booking <span className="text-[#4A6D56] italic">Management</span>
                     </h1>
-                    <p className="text-lg text-[#64748b] font-medium tracking-tight">
+                    <p className="mt-2 text-lg font-medium text-[#6B8F78] tracking-tight">
                         Track all your referred clients and their bookings
                     </p>
                 </div>
 
-                {/* Stats Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StatCard
-                        value={`${activeBookings.length}`}
-                        label="Active Bookings"
-                        colorClass="text-[#1a2d1d]"
-                        delay={0}
-                    />
-                    <StatCard
-                        value={`${pendingBookings.length}`}
-                        label="Pending Activation"
-                        colorClass="text-[#1a2d1d]"
-                        delay={100}
-                    />
-                    <StatCard
-                        value={`${renewalBookings.length}`}
-                        label="Renewals Due"
-                        colorClass="text-[#1a2d1d]"
-                        delay={200}
-                    />
-                    <StatCard
-                        value={totalCommissions.replace("₹", "₹")} // Ensure it shows correctly
-                        label="Total Commissions"
-                        colorClass="text-[#10b981]"
-                        delay={300}
-                    />
+                    <StatCard value={`${activeBookings.length + pendingBookings.length + renewalBookings.length}`} label="Total Bookings" colorClass="text-[#1a2d1d]" delay={0} />
+                    <StatCard value={`${activeBookings.length}`} label="Active Bookings" colorClass="text-[#1a2d1d]" delay={100} />
+                    <StatCard value={`${pendingBookings.length}`} label="Pending Activation" colorClass="text-[#1a2d1d]" delay={200} />
+                    <StatCard value={`${renewalBookings.length}`} label="Renewals Due" colorClass="text-[#1a2d1d]" delay={300} />
                 </div>
 
-                {/* Filter & Tabs */}
                 <div className="space-y-4">
-                    <div className="flex bg-[#f4f5f0] p-1.5 rounded-xl w-fit mb-6">
-                        {(["active", "pending", "renewals"] as const).map(
-                            (tab) => (
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                        <div className="flex bg-[#f4f5f0] p-1.5 rounded-xl w-full overflow-x-auto lg:w-fit">
+                            {(["active", "pending", "renewals"] as const).map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
-                                    className={`
-                    px-6 py-2.5 rounded-lg text-[13px] font-bold transition-all duration-300 capitalize whitespace-nowrap
-                    ${activeTab === tab
+                                    className={`px-5 py-2.5 rounded-lg text-[13px] font-bold transition-all duration-300 capitalize whitespace-nowrap flex-1 lg:flex-none ${
+                                        activeTab === tab
                                             ? "bg-[#f8f8f8] text-[#1a2d1d] shadow-sm ring-1 ring-black/5"
                                             : "text-[#64748b] hover:text-[#1a2d1d]"
-                                        }
-                  `}
+                                    }`}
                                 >
-                                    {tab === "active"
-                                        ? "Active Bookings"
-                                        : tab === "renewals"
-                                            ? "Upcoming Renewals"
-                                            : "Pending"}
+                                    {tab === "active" ? "Active Bookings" : tab === "renewals" ? "Upcoming Renewals" : "Pending"}
                                 </button>
-                            ),
-                        )}
-                    </div>
+                            ))}
+                        </div>
 
-                    {/* Table */}
-                    <div className="bg-[#f8f8f8] rounded-2xl border-[3px] border-[#f1f2ed] shadow overflow-hidden animate-slide-up">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse">
-                                <thead>
-                                    <tr className="border-b-[3px] border-[#f1f2ed] bg-[#f6f6f4]">
-                                        {[
-                                            "Booking ID",
-                                            "Company",
-                                            "Plan",
-                                            "Location",
-                                            "Duration",
-                                            "Commission",
-                                            "Status",
-                                            "Actions",
-                                        ].map((head) => (
-                                            <th
-                                                key={head}
-                                                className="px-6 py-5 text-[12px] font-bold text-[#64748b] uppercase tracking-wider whitespace-nowrap"
-                                            >
-                                                {head}
-                                            </th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y-[3px] divide-[#f1f2ed]">
-                                    {filteredData.length > 0 ? (
-                                        filteredData.map((booking, idx) => (
-                                            <tr
-                                                key={booking.id}
-                                                className="group hover:bg-[#f7f7f6] transition-colors duration-150"
-                                                style={{
-                                                    animationDelay: `${idx * 50}ms`,
-                                                }}
-                                            >
-                                                <td className="px-6 py-6 text-[13px] font-bold text-[#1a2d1d] whitespace-nowrap">
-                                                    {booking.id}
-                                                </td>
-                                                <td className="px-6 py-6 text-[13px] text-[#1a2d1d] font-bold whitespace-nowrap">
-                                                    {booking.company}
-                                                </td>
-
-                                                <td className="px-6 py-6 whitespace-nowrap">
-                                                    <div className="inline-flex px-3 py-1.5 bg-[#f8fafc]/80 rounded-xl text-[11px] font-bold text-[#475569] border border-[#e2e8f0]/60 whitespace-nowrap leading-tight">
-                                                        {booking.plan}
-                                                    </div>
-                                                </td>
-
-                                                <td className="px-6 py-6 text-[13px] text-[#64748b] font-medium whitespace-nowrap">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <MapPin
-                                                            size={14}
-                                                            className="text-gray-300"
-                                                        />
-                                                        {booking.location}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-6 text-[13px] text-[#64748b] font-medium whitespace-nowrap">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <Calendar
-                                                            size={14}
-                                                            className="text-gray-300"
-                                                        />
-                                                        {booking.duration}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-6 text-[14px] font-black text-[#10b981] whitespace-nowrap">
-                                                    {booking.commission}
-                                                </td>
-                                                <td className="px-6 py-6 whitespace-nowrap">
-                                                    <StatusBadge
-                                                        status={booking.status}
-                                                    />
-                                                </td>
-                                                <td className="px-6 py-6 whitespace-nowrap">
-                                                    <div className="flex items-center gap-2">
-                                                        {/* Eye Button now triggers modal */}
-                                                        <button
-                                                            onClick={() =>
-                                                                setSelectedBooking(
-                                                                    booking,
-                                                                )
-                                                            }
-                                                            className="p-2.5 bg-[#f8fafc] hover:bg-[#1a2d1d]/5 text-[#64748b] hover:text-[#1a2d1d] rounded-xl transition-all duration-200 border border-transparent hover:border-[#1a2d1d]/10"
-                                                            title="View Details"
-                                                        >
-                                                            <Eye size={16} />
-                                                        </button>
-                                                        <button className="p-2.5 bg-[#f8fafc] hover:bg-[#1a2d1d]/5 text-[#64748b] hover:text-[#1a2d1d] rounded-xl transition-all duration-200 border border-transparent hover:border-[#1a2d1d]/10">
-                                                            <Share2 size={16} />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td
-                                                colSpan={8}
-                                                className="px-6 py-12 text-center text-gray-400"
-                                            >
-                                                <div className="flex flex-col items-center gap-2">
-                                                    <Search
-                                                        size={32}
-                                                        className="opacity-20"
-                                                    />
-                                                    <p>No bookings found.</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                        <div className="relative w-full lg:w-80">
+                            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
+                            <input
+                                value={searchQuery}
+                                onChange={(event) => setSearchQuery(event.target.value)}
+                                placeholder="Search booking or client"
+                                className="w-full rounded-xl border border-[#e2e8f0] bg-white py-3 pl-10 pr-4 text-sm font-medium text-[#1a2d1d] outline-none transition focus:border-[#35503F]"
+                            />
                         </div>
                     </div>
 
+                    <div className="bg-[#f8f8f8] rounded-2xl border-[3px] border-[#f1f2ed] shadow overflow-hidden animate-slide-up">
+                        {loading ? (
+                            <div className="py-20 flex flex-col items-center justify-center gap-3 text-[#64748b]">
+                                <Loader2 size={30} className="animate-spin text-[#35503F]" />
+                                <p className="text-sm font-semibold">Loading bookings...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="py-20 flex flex-col items-center justify-center gap-3 text-center px-6">
+                                <AlertCircle size={34} className="text-red-400" />
+                                <p className="text-sm font-semibold text-slate-700">{error}</p>
+                                <button onClick={fetchBookings} className="text-sm font-bold text-[#35503F] underline">
+                                    Retry
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="border-b-[3px] border-[#f1f2ed] bg-[#f6f6f4]">
+                                            {["Booking ID", "Client", "Plan", "Location", "Duration", "Amount", "Commission", "Status", "Actions"].map((head) => (
+                                                <th key={head} className="px-6 py-5 text-[12px] font-bold text-[#64748b] uppercase tracking-wider whitespace-nowrap">
+                                                    {head}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y-[3px] divide-[#f1f2ed]">
+                                        {filteredData.length > 0 ? (
+                                            filteredData.map((booking, idx) => (
+                                                <tr key={booking.id} className="group hover:bg-[#f7f7f6] transition-colors duration-150" style={{ animationDelay: `${idx * 50}ms` }}>
+                                                    <td className="px-6 py-6 text-[13px] font-bold text-[#1a2d1d] whitespace-nowrap">{booking.id}</td>
+                                                    <td className="px-6 py-6 text-[13px] text-[#1a2d1d] font-bold whitespace-nowrap">{booking.company}</td>
+                                                    <td className="px-6 py-6 whitespace-nowrap">
+                                                        <div className="inline-flex px-3 py-1.5 bg-[#f8fafc]/80 rounded-xl text-[11px] font-bold text-[#475569] border border-[#e2e8f0]/60 whitespace-nowrap leading-tight">
+                                                            {booking.plan}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-6 text-[13px] text-[#64748b] font-medium whitespace-nowrap">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <MapPin size={14} className="text-gray-300" />
+                                                            {booking.location}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-6 text-[13px] text-[#64748b] font-medium whitespace-nowrap">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <Calendar size={14} className="text-gray-300" />
+                                                            {booking.duration}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-6 text-[13px] font-bold text-[#1a2d1d] whitespace-nowrap">{booking.amount}</td>
+                                                    <td className="px-6 py-6 text-[14px] font-black text-[#10b981] whitespace-nowrap">{booking.commission}</td>
+                                                    <td className="px-6 py-6 whitespace-nowrap">
+                                                        <StatusBadge status={booking.status} />
+                                                    </td>
+                                                    <td className="px-6 py-6 whitespace-nowrap">
+                                                        <div className="flex items-center gap-2">
+                                                            <button
+                                                                onClick={() => setSelectedBooking(booking)}
+                                                                className="p-2.5 bg-[#f8fafc] hover:bg-[#1a2d1d]/5 text-[#64748b] hover:text-[#1a2d1d] rounded-xl transition-all duration-200 border border-transparent hover:border-[#1a2d1d]/10"
+                                                                title="View Details"
+                                                            >
+                                                                <Eye size={16} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={9} className="px-6 py-12 text-center text-gray-400">
+                                                    <div className="flex flex-col items-center gap-2">
+                                                        <Search size={32} className="opacity-20" />
+                                                        <p>No bookings found.</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -693,7 +428,6 @@ const BookingManagement = () => {
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes scaleUp { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        
         .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
         .animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; opacity: 0; animation-fill-mode: forwards; }
         .animate-slide-up { animation: slideUp 0.6s ease-out forwards; }

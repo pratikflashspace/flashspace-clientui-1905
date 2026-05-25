@@ -65,6 +65,11 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     icon: <Handshake className="w-5 h-5" />,
   },
   {
+    label: "Affiliate Management",
+    href: "/admin/affiliates",
+    icon: <Network className="w-5 h-5" />,
+  },
+  {
     label: "Payment & Invoices",
     href: "/admin/invoices",
     icon: <Receipt className="w-5 h-5" />,

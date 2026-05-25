@@ -118,7 +118,12 @@ const resolveDocumentUrl = async (
   return { url: candidates[0], exists: false };
 };
 
-export default function KYCVerification() {
+interface KYCVerificationProps {
+  hideCompanyDetails?: boolean;
+  isCompact?: boolean;
+}
+
+export default function KYCVerification({ hideCompanyDetails = false, isCompact = false }: KYCVerificationProps) {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [profileId, setProfileId] = useState<string | null>(
@@ -1164,7 +1169,8 @@ export default function KYCVerification() {
           </div>
 
           {/* 2. Partner Profiles Section */}
-          <div>
+          {!hideCompanyDetails && (
+            <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className={`text-lg font-bold ${!isPersonalVerified ? "text-gray-400" : "text-gray-800"}`}>
                 2. Partner Profiles <span className="text-gray-400 font-normal text-sm ml-1">(Optional)</span>
@@ -1242,9 +1248,11 @@ export default function KYCVerification() {
               )}
             </div>
           </div>
+          )}
 
           {/* 3. Business Profiles Section */}
-          <div>
+          {!hideCompanyDetails && (
+            <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className={`text-lg font-bold ${!isPersonalVerified ? "text-gray-400" : "text-gray-800"}`}>3. Business Profiles</h2>
               {!isPersonalVerified && (
@@ -1352,13 +1360,14 @@ export default function KYCVerification() {
               )}
             </div>
           </div>
+          )}
 
         </div>
       </div>
     );
   }
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+    <div className={`${isCompact ? 'py-4 px-2' : 'min-h-screen bg-gray-50 py-8 px-4 md:px-8'}`} style={isCompact ? { zoom: 0.85 } : undefined}>
       <input
         ref={fileInputRef}
         type="file"
@@ -1367,7 +1376,7 @@ export default function KYCVerification() {
         onChange={handleFileSelect}
       />
 
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className={`mx-auto ${isCompact ? 'max-w-3xl space-y-4' : 'max-w-4xl space-y-6'}`}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold  text-[#35503F]">
@@ -1401,23 +1410,23 @@ export default function KYCVerification() {
         </div>
 
         {/* Status and Progress Card */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className={`w-14 h-14 rounded-2xl ${getOverallStatusConfig(kycData?.overallStatus || "not_started").bg.replace("500", "100")} flex items-center justify-center`}>
-                {React.createElement(getOverallStatusConfig(kycData?.overallStatus || "not_started").icon, { className: `w-7 h-7 ${getOverallStatusConfig(kycData?.overallStatus || "not_started").bg.replace("bg-", "text-")}` })}
+        <div className={`bg-white shadow-sm border border-gray-100 ${isCompact ? 'rounded-2xl p-4 md:p-5' : 'rounded-3xl p-6 md:p-8'}`}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className={`${isCompact ? 'w-10 h-10 rounded-xl' : 'w-14 h-14 rounded-2xl'} ${getOverallStatusConfig(kycData?.overallStatus || "not_started").bg.replace("500", "100")} flex items-center justify-center`}>
+                {React.createElement(getOverallStatusConfig(kycData?.overallStatus || "not_started").icon, { className: `${isCompact ? 'w-5 h-5' : 'w-7 h-7'} ${getOverallStatusConfig(kycData?.overallStatus || "not_started").bg.replace("bg-", "text-")}` })}
               </div>
               <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Current Status</p>
-                <h3 className="text-xl font-bold text-gray-900">
+                <p className={`${isCompact ? 'text-[10px] mb-0.5' : 'text-xs mb-1'} font-bold text-gray-400 uppercase tracking-widest`}>Current Status</p>
+                <h3 className={`${isCompact ? 'text-lg' : 'text-xl'} font-bold text-gray-900 leading-tight`}>
                   {getOverallStatusConfig(kycData?.overallStatus || "not_started").text}
                 </h3>
               </div>
             </div>
-            <div className="flex-1 max-w-md">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-bold text-gray-500">Profile Completion</span>
-                <span className="text-sm font-extrabold text-[#35503F]">{getCompletionPercentage()}%</span>
+            <div className="flex-1 max-w-md w-full">
+              <div className="flex justify-between items-center mb-1.5 md:mb-2">
+                <span className={`${isCompact ? 'text-xs' : 'text-sm'} font-bold text-gray-500`}>Profile Completion</span>
+                <span className={`${isCompact ? 'text-xs' : 'text-sm'} font-extrabold text-[#35503F]`}>{getCompletionPercentage()}%</span>
               </div>
               <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                 <div
@@ -1429,10 +1438,10 @@ export default function KYCVerification() {
           </div>
 
           {/* Stepper Navigation */}
-          <div className="relative flex items-center justify-between p-1 bg-gray-200/60 shadow-inner rounded-3xl border border-gray-300/30 overflow-x-auto no-scrollbar py-1">
+          <div className="relative flex items-center justify-between p-1 bg-gray-200/60 shadow-inner rounded-[20px] border border-gray-300/30 overflow-x-auto no-scrollbar py-1 mt-6">
             {/* Sliding Indicator */}
             <div 
-              className="absolute inset-y-1 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] bg-white rounded-2xl shadow-lg ring-1 ring-black/5"
+              className="absolute inset-y-1 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] bg-white rounded-[16px] shadow-lg ring-1 ring-black/5"
               style={{
                 width: `calc(${100 / steps.length}% - 8px)`,
                 left: `calc(${steps.findIndex(s => s.id === activeStep) * (100 / steps.length)}% + 4px)`,
@@ -1449,7 +1458,7 @@ export default function KYCVerification() {
                   key={step.id}
                   disabled={!isAccessible}
                   onClick={() => setActiveStep(step.id as VerificationStep)}
-                  className={`relative z-10 flex flex-col items-center justify-center py-4 min-w-[80px] flex-1 group transition-all ${
+                  className={`relative z-10 flex flex-col items-center justify-center py-2.5 min-w-[80px] flex-1 group transition-all ${
                     !isAccessible ? "opacity-40 grayscale cursor-not-allowed" : "cursor-pointer"
                   }`}
                 >
