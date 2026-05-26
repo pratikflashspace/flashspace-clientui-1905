@@ -107,9 +107,9 @@ const LeaderBoard: React.FC = () => {
         </div>
 
         {currentUser && (
-          <div className="flex min-h-[106px] flex-col gap-5 rounded-[18px] bg-[#36503F] px-6 py-5 text-white shadow-sm md:flex-row md:items-center md:justify-between md:px-7">
-            <div className="flex min-w-0 items-center gap-5">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/15 text-base font-black">
+          <div className="flex min-h-[86px] flex-col gap-4 rounded-[18px] bg-[#36503F] px-5 py-4 text-white shadow-sm md:flex-row md:items-center md:justify-between md:px-6">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15 text-base font-black">
                 {currentUser.rank ? `#${currentUser.rank}` : "-"}
               </div>
               <div className="min-w-0">
@@ -124,16 +124,16 @@ const LeaderBoard: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-8 text-center md:ml-auto md:w-[280px] md:gap-10">
               <div className="min-w-0">
-                <p className="text-2xl font-black leading-none">{currentUser.successfulBookings}</p>
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
+                <p className="text-[22px] font-black leading-none">{currentUser.successfulBookings}</p>
+                <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
                   Bookings
                 </p>
               </div>
               <div className="min-w-0">
-                <p className="text-2xl font-black leading-none text-[#FEF8C5]">
+                <p className="text-[22px] font-black leading-none text-[#FEF8C5]">
                   {formatCurrency(currentUser.totalCommission)}
                 </p>
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
+                <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
                   Commission
                 </p>
               </div>

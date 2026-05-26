@@ -219,11 +219,15 @@ const AffiliateDetailPanel = ({
     load();
   }, [affiliateId]);
 
+  const safeSearch = searchQuery.toLowerCase().trim();
   const filtered = (data?.clients || []).filter(
-    (c) =>
-      c.user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.bookingNumber.toLowerCase().includes(searchQuery.toLowerCase()),
+    (c) => {
+      if (!safeSearch) return true;
+      const name = (c.user?.fullName || "").toLowerCase();
+      const email = (c.user?.email || "").toLowerCase();
+      const booking = (c.bookingNumber || "").toLowerCase();
+      return name.includes(safeSearch) || email.includes(safeSearch) || booking.includes(safeSearch);
+    }
   );
 
   return (
@@ -431,11 +435,17 @@ export default function AdminAffiliateManagement() {
     fetchAffiliates();
   }, [fetchAffiliates]);
 
-  const filtered = (affiliates || []).filter(
-    (a) =>
-      a.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.email?.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const safeMainSearch = searchQuery.toLowerCase().trim();
+  const filtered = (affiliates || [])
+    .sort((a, b) => (b.totalCommission || 0) - (a.totalCommission || 0))
+    .filter(
+      (a) => {
+        if (!safeMainSearch) return true;
+        const name = (a.fullName || "").toLowerCase();
+        const email = (a.email || "").toLowerCase();
+        return name.includes(safeMainSearch) || email.includes(safeMainSearch);
+      }
+    );
 
   return (
     <DashboardLayout
