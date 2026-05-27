@@ -325,16 +325,22 @@ export default function Billing() {
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <span className="text-sm font-medium text-[#6B8F78]">Total Paid</span>
-            <p className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{formatCurrency(stats.totalPaid)}</p>
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Total Paid</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{formatCurrency(stats.totalPaid)}</p>
           </div>
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <p className="text-sm font-medium text-[#6B8F78]">Pending Dues</p>
-            <p className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{formatCurrency(stats.pendingAmount)}</p>
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Pending Dues</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{formatCurrency(stats.pendingAmount)}</p>
           </div>
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <p className="text-sm font-medium text-[#6B8F78]">Active Subscriptions</p>
-            <p className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{stats.activeSubscriptions}</p>
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Active Subscriptions</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{stats.activeSubscriptions}</p>
           </div>
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
             <p className="text-sm font-medium text-[#6B8F78]">Next Billing</p>

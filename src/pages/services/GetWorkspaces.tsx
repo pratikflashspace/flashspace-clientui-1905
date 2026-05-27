@@ -953,14 +953,12 @@ const GetWorkspaces = () => {
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
 
   const goPrevPage = () => {
-    if (workspaceType !== "virtual-office" && workspaceType !== "business-setup") return;
     if (pagination?.hasPrevPage) {
       setPage((p) => Math.max(1, p - 1));
     }
   };
 
   const goNextPage = () => {
-    if (workspaceType !== "virtual-office" && workspaceType !== "business-setup") return;
     if (pagination?.hasNextPage) {
       setPage((p) => p + 1);
     }
@@ -1024,6 +1022,7 @@ const GetWorkspaces = () => {
             activeCity,
             page,
             PAGE_SIZE,
+            debouncedSearch
           );
           setPagination(pagination || null);
           fetchedData = offices.filter(isPubliclyVisibleWorkspace);
@@ -1066,12 +1065,16 @@ const GetWorkspaces = () => {
               spaceId: vo.spaceId || vo.property?.spaceId || "",
             })),
           );
-        } else if (workspaceType === "coworking") {
-          fetchedData = (await getCoworkingSpacesByCity(activeCity)).filter(
-            isPubliclyVisibleWorkspace,
-          );
-          setPagination(null);
-          setWorkspaces(
+          } else if (workspaceType === "coworking") {
+            const { spaces, pagination } = await getCoworkingSpacesByCity(
+              activeCity,
+              page,
+              PAGE_SIZE,
+              debouncedSearch
+            );
+            setPagination(pagination || null);
+            fetchedData = spaces.filter(isPubliclyVisibleWorkspace);
+            setWorkspaces(
             fetchedData.map((cw) => ({
               id: cw._id || "",
               name: cw.property?.name || cw.name || "Coworking Space",
@@ -1113,7 +1116,7 @@ const GetWorkspaces = () => {
     };
 
     fetchWorkspaces();
-  }, [workspaceType, activeCity, page]);
+  }, [workspaceType, activeCity, page, debouncedSearch]);
 
   // Client-side filtering logic
   const filteredWorkspaces = useMemo(() => {
@@ -1389,27 +1392,6 @@ const GetWorkspaces = () => {
               </p>
               )}
               <div className="flex items-center gap-2">
-                {(workspaceType === "virtual-office" || workspaceType === "business-setup") && totalPages > 1 && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <button
-                      onClick={goPrevPage}
-                      disabled={!pagination?.hasPrevPage}
-                      className="px-3 py-1 rounded-full border border-border bg-card text-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
-                    >
-                      Prev
-                    </button>
-                    <span className="text-[11px]">
-                      Page {currentPage} / {totalPages}
-                    </span>
-                    <button
-                      onClick={goNextPage}
-                      disabled={!pagination?.hasNextPage}
-                      className="px-3 py-1 rounded-full border border-border bg-card text-foreground disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
-                    >
-                      Next
-                    </button>
-                  </div>
-                )}
                 <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
                   <button
                     onClick={() => setViewMode("list")}
@@ -1472,6 +1454,27 @@ const GetWorkspaces = () => {
                 )}
               </div>
             )}
+          </div>
+          <div className="flex items-center justify-between border-t border-border/40 py-4 pr-5 sm:pr-8 bg-background">
+              <span className="text-xs text-muted-foreground ml-5">
+                  Page {currentPage} of {totalPages}
+              </span>
+              <div className="flex items-center gap-2">
+                  <button
+                      onClick={goPrevPage}
+                      disabled={!pagination?.hasPrevPage}
+                      className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+                  >
+                      Previous
+                  </button>
+                  <button
+                      onClick={goNextPage}
+                      disabled={!pagination?.hasNextPage}
+                      className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+                  >
+                      Next
+                  </button>
+              </div>
           </div>
         </div>
 
@@ -1556,6 +1559,27 @@ const GetWorkspaces = () => {
               )}
             </div>
           )}
+           <div className="flex items-center justify-between border-t border-border/40 py-4 pb-8 bg-background">
+              <span className="text-xs text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+              </span>
+              <div className="flex items-center gap-2">
+                  <button
+                      onClick={goPrevPage}
+                      disabled={!pagination?.hasPrevPage}
+                      className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+                  >
+                      Prev
+                  </button>
+                  <button
+                      onClick={goNextPage}
+                      disabled={!pagination?.hasNextPage}
+                      className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+                  >
+                      Next
+                  </button>
+              </div>
+          </div>
         </div>
 
         {/* Expand Map floating button and Map View */}

@@ -107,7 +107,7 @@ const MyBookings: React.FC = () => {
       const typeMap: Record<string, string> = {
         virtual_office: "VirtualOffice",
         coworking_space: "CoworkingSpace",
-        business_setup: "BusinessSetup",
+        meeting_room: "MeetingRoom",
       };
 
       const response = await userDashboardService.getBookings({
@@ -136,15 +136,11 @@ const MyBookings: React.FC = () => {
               active: response.data.filter((b: any) => b.status === "active").length,
               virtualOffice: response.data.filter((b: any) => b.type === "VirtualOffice" || b.bookingType === "VirtualOffice").length,
               coworking: response.data.filter((b: any) => b.type === "CoworkingSpace" || b.bookingType === "CoworkingSpace").length,
-              businessSetup: response.data.filter((b: any) => b.type === "BusinessSetup" || b.bookingType === "BusinessSetup" || b.paymentType === "business_setup" || (b.plan?.name || "").toLowerCase().includes("business")).length,
+              meetingRoom: response.data.filter((b: any) => b.type === "MeetingRoom" || b.bookingType === "MeetingRoom").length,
             };
           }
 
           if (stats) {
-            // override meeting room with business setup
-            if (stats.businessSetup === undefined && stats.meetingRoom !== undefined) {
-                stats.businessSetup = stats.meetingRoom;
-            }
             setBookingStats(stats);
           }
         }
@@ -421,23 +417,6 @@ const MyBookings: React.FC = () => {
     }).format(amount);
   };
 
-  function isBusinessSetupBooking(booking?: Booking | null) {
-    if (!booking) return false;
-    const values = [
-      booking.type,
-      (booking as any).bookingType,
-      (booking as any).paymentType,
-      booking.plan?.name,
-      booking.spaceSnapshot?.name,
-    ]
-      .filter(Boolean)
-      .map((value) => String(value).toLowerCase().replace(/[\s-]+/g, "_"));
-
-    return values.some(
-      (value) => value.includes("business_setup") || value.includes("businesssetup"),
-    );
-  };
-
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -447,10 +426,6 @@ const MyBookings: React.FC = () => {
   };
 
   function getWorkspaceDisplayName(booking?: Booking | null) {
-    if (isBusinessSetupBooking(booking)) {
-      return booking?.plan?.name || booking?.spaceSnapshot?.name || "Business Setup";
-    }
-
     const normalizeSpaceCode = (value?: string) => {
       const trimmed = value?.trim();
       if (!trimmed) return "";
@@ -565,6 +540,23 @@ const MyBookings: React.FC = () => {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
+  const isBusinessSetupBooking = (booking?: Booking | null) => {
+    if (!booking) return false;
+    const values = [
+      booking.type,
+      (booking as any).bookingType,
+      (booking as any).paymentType,
+      booking.plan?.name,
+      booking.spaceSnapshot?.name,
+    ]
+      .filter(Boolean)
+      .map((value) => String(value).toLowerCase().replace(/[\s-]+/g, "_"));
+
+    return values.some(
+      (value) => value.includes("business_setup") || value.includes("businesssetup") || value.includes("meeting_room") || value.includes("meetingroom"),
+    );
+  };
+
   // Price Unit Helper
   const getPriceUnit = (unit?: string) => {
     if (!unit) return "/year";
@@ -628,34 +620,44 @@ const MyBookings: React.FC = () => {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Bookings</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">
+          <div className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Total Bookings</span>
+            </div>
+            <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">
               {bookingStats.total}
             </p>
           </div>
-          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-[#10B981]">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Active</p>
-            <p className="text-3xl font-extrabold text-[#10B981]">
+          <div className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Active</span>
+            </div>
+            <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">
               {bookingStats.active}
             </p>
           </div>
-          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Virtual Offices</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">
+          <div className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Virtual Offices</span>
+            </div>
+            <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">
               {bookingStats.virtualOffice}
             </p>
           </div>
-          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Coworking</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">
+          <div className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Coworking</span>
+            </div>
+            <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">
               {bookingStats.coworking}
             </p>
           </div>
-          <div className="bg-white py-8 px-6 rounded-2xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Business Setup</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">
-              {(bookingStats as any).businessSetup || 0}
+          <div className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Business Setup</span>
+            </div>
+            <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">
+              {bookingStats.meetingRoom}
             </p>
           </div>
         </div>
@@ -673,7 +675,7 @@ const MyBookings: React.FC = () => {
                 icon: Building2,
               },
               { id: "coworking_space", label: "Coworking", icon: Briefcase },
-              { id: "business_setup", label: "Business Setup", icon: CalendarIcon },
+              { id: "meeting_room", label: "Business Setup", icon: CalendarIcon },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -824,7 +826,7 @@ const MyBookings: React.FC = () => {
                     key={booking._id}
                     type="button"
                     onClick={() => setSelectedBooking(booking)}
-                    className="text-left bg-white rounded-2xl p-5 shadow-md border border-gray-200 hover:border-[#35503F]/40 hover:shadow-lg transition-all group relative min-h-[250px] flex flex-col"
+                    className="text-left bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative min-h-[250px] flex flex-col"
                   >
                     <div className="flex items-start justify-between gap-3 mb-5">
                       <div className="min-w-0">
@@ -882,7 +884,7 @@ const MyBookings: React.FC = () => {
               return (
                 <div
                   key={booking._id}
-                  className="bg-white rounded-2xl p-4 shadow-md border border-gray-200 hover:border-[#35503F]/40 hover:shadow-lg transition-all group relative"
+                  className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative"
                 >
                   {/* Header: ID & Status */}
                   <div className="flex items-center justify-between mb-3">
@@ -917,11 +919,13 @@ const MyBookings: React.FC = () => {
                       >
                         {booking.type === "VirtualOffice" ||
                           booking.type === "virtual_office"
-                          ? "Virtual Office"
-                          : booking.type === "BusinessSetup" ||
-                            booking.type === "business_setup"
-                            ? "Business Setup"
-                            : "Coworking"}
+                            ? "Virtual Office"
+                            : booking.type === "BusinessSetup" ||
+                              booking.type === "business_setup" ||
+                              booking.type === "MeetingRoom" ||
+                              booking.type === "meeting_room"
+                              ? "Business Setup"
+                              : "Coworking"}
                       </span>
                     </div>
                     <div className="flex items-start gap-1.5 text-gray-500 text-xs mb-2 h-8">

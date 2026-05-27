@@ -20,7 +20,7 @@ export const GlobalAccessSection = () => {
                     <img
                         src={featureGlobalAccess}
                         alt="Global workspace access"
-                        className="w-full h-[350px] lg:h-[450px] object-fit"
+                        className="w-full h-[350px] lg:h-[450px] object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">

@@ -30,11 +30,15 @@ const formatMonthPrice = (value: any) => {
  */
 export const getCoworkingSpacesByCity = async (
   city: string,
-): Promise<CoworkingSpaceItem[]> => {
+  page: number = 1,
+  limit: number = 12,
+  search?: string
+): Promise<{ spaces: CoworkingSpaceItem[]; pagination?: any }> => {
   try {
     // console.log(`📍 Fetching coworking spaces for city: ${city}`);
     const response = await axiosInstance.get(
       `/coworkingSpace/getByCity/${city}`,
+      { params: { page, limit, search } }
     );
     const data = response.data as ApiResponse<any>;
 
@@ -47,37 +51,40 @@ export const getCoworkingSpacesByCity = async (
       console.log(`✅ Successfully fetched ${spaces.length} coworking spaces`);
 
       // Map backend data to frontend expectations
-      return spaces.map((s: any) => {
-        // Find the lowest monthly price in inventory
-        const monthlyPrices =
-          s.inventory
-            ?.filter((i: any) => i.pricePerMonth)
-            .map((i: any) => i.pricePerMonth) || [];
+      return {
+        spaces: spaces.map((s: any) => {
+          // Find the lowest monthly price in inventory
+          const monthlyPrices =
+            s.inventory
+              ?.filter((i: any) => i.pricePerMonth)
+              .map((i: any) => i.pricePerMonth) || [];
 
-        const minPrice =
-          monthlyPrices.length > 0 ? Math.min(...monthlyPrices) : 0;
+          const minPrice =
+            monthlyPrices.length > 0 ? Math.min(...monthlyPrices) : 0;
 
-        return {
-          ...s,
-          coordinates:
-            s.coordinates ||
-            (Array.isArray(s.location?.coordinates) &&
-            s.location.coordinates.length === 2
-              ? {
-                  lat: s.location.coordinates[1],
-                  lng: s.location.coordinates[0],
-                }
-              : undefined),
-          features: s.amenities || [],
-          price:
-            (minPrice ? `₹${minPrice.toLocaleString()}/mo` : "") ||
-            s.price ||
-            formatMonthPrice(s.finalPricePerMonth || s.partnerPricePerMonth) ||
-            "Price on request",
-          rating: toNumber(s.rating) || toNumber(s.avgRating),
-          reviews: toNumber(s.reviews) || toNumber(s.totalReviews),
-        };
-      });
+          return {
+            ...s,
+            coordinates:
+              s.coordinates ||
+              (Array.isArray(s.location?.coordinates) &&
+              s.location.coordinates.length === 2
+                ? {
+                    lat: s.location.coordinates[1],
+                    lng: s.location.coordinates[0],
+                  }
+                : undefined),
+            features: s.amenities || [],
+            price:
+              (minPrice ? `₹${minPrice.toLocaleString()}/mo` : "") ||
+              s.price ||
+              formatMonthPrice(s.finalPricePerMonth || s.partnerPricePerMonth) ||
+              "Price on request",
+            rating: toNumber(s.rating) || toNumber(s.avgRating),
+            reviews: toNumber(s.reviews) || toNumber(s.totalReviews),
+          };
+        }),
+        pagination: (response.data as any).pagination,
+      };
     }
 
     throw new Error(data.message || "Failed to fetch coworking spaces");

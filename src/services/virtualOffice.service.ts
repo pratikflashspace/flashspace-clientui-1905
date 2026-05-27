@@ -41,11 +41,12 @@ export const getVirtualOfficesByCity = async (
   city: string,
   page: number = 1,
   limit: number = 12,
+  search?: string
 ): Promise<{ offices: VirtualOfficeItem[]; pagination?: PaginationMeta }> => {
   try {
     const response = await axiosInstance.get(
       `/virtualOffice/getByCity/${city}`,
-      { params: { page, limit } },
+      { params: { page, limit, search } },
     );
     const data = response.data as ApiResponse<any>;
 

@@ -492,7 +492,7 @@ export default function Dashboard() {
               className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg"
             >
               <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-medium text-[#6B8F78]">{card.title}</span>
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">{card.title}</span>
                 <div className="w-8 h-8 rounded-lg bg-[#36503F]/10 flex items-center justify-center">
                   <card.icon className="w-4 h-4 text-[#36503F]" />
                 </div>
