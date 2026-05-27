@@ -114,19 +114,28 @@ export const PlanLocationsShowcase = () => {
             "FSSAI Registration",
             "Startup India Registration",
             "MSME Registration",
-        ].map((name, i) => ({
-            _id: `bs-${i}`,
-            name,
-            address: "",
-            area: "Online",
-            price: ["₹2499/yr", "₹11999/yr", "₹2999/yr", "₹1499/yr", "₹1499/yr"][i],
-            rating: 4.8 + (i % 3) * 0.1,
-            reviews: 120 + i * 15,
-            images: [`/business${i+1}.png`],
-            features: ["Expert Support", "Fast Processing", "End-to-end Setup"],
-            popular: true,
-            availability: "Available Now"
-        }));
+        ].map((name, i) => {
+            let imgPath = `/home${i+1}.jpg`;
+            if (name === "FSSAI Registration") { imgPath = "/business1.png"; }
+            else if (name === "Startup India Registration") { imgPath = "/business2.png"; }
+            else if (name.includes("Company Registration")) { imgPath = "/business3.png"; }
+            else if (name.includes("MSME")) { imgPath = "/business4.png"; }
+            else if (name === "GST Registration") { imgPath = "/business5.png"; }
+            
+            return {
+                _id: `bs-${i}`,
+                name,
+                address: "",
+                area: "Online",
+                price: ["₹2499/yr", "₹11999/yr", "₹2999/yr", "₹1499/yr", "₹1499/yr"][i],
+                rating: 4.8 + (i % 3) * 0.1,
+                reviews: 120 + i * 15,
+                images: [imgPath],
+                features: ["Expert Support", "Fast Processing", "End-to-end Setup"],
+                popular: name === "GST Registration",
+                availability: "Available Now"
+            };
+        });
     }, []);
 
     // Responsive items per page matching grid: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
