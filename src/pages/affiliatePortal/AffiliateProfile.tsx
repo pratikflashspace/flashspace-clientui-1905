@@ -199,7 +199,7 @@ export default function Profile() {
 
           <div className="rounded-2xl border border-gray-200 bg-[#f8f8f8] p-6 shadow">
 
-            <h2 className="text-lg font-bold text-slate-900">
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="font-sans text-lg font-bold text-slate-900">
 
               Contact Details
 
@@ -235,7 +235,7 @@ export default function Profile() {
 
           <div className="rounded-2xl border border-slate-200 bg-[#f8f8f8] p-6 shadow-sm">
 
-            <h2 className="text-lg font-bold text-slate-900">
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="font-sans text-lg font-bold text-slate-900">
 
               Organization Details
 

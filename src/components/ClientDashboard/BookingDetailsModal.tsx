@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Booking } from "@/types/services";
 import { 
   X, MapPin, FileText, Loader2, Download, Upload, Eye, CheckCircle, 
-  AlertCircle, ChevronRight, Edit2, Check, ChevronDown, Ticket
+  AlertCircle, ChevronRight, Edit2, Check, ChevronDown, Ticket, Calendar
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import userDashboardService from "@/services/userDashboard.service";
@@ -41,6 +41,21 @@ export default function BookingDetailsModal({
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [uploadingDoc, setUploadingDoc] = useState<{ type: string; profileId: string } | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const isBusinessSetup = (() => {
+    const values = [
+      booking.type,
+      (booking as any).bookingType,
+      (booking as any).paymentType,
+      booking.plan?.name,
+      booking.spaceSnapshot?.name,
+    ]
+      .filter(Boolean)
+      .map((value) => String(value).toLowerCase().replace(/[\s-]+/g, "_"));
+
+    return values.some(
+      (value) => value.includes("business_setup") || value.includes("businesssetup"),
+    );
+  })();
 
   useEffect(() => {
     const fetchKyc = async () => {
@@ -335,7 +350,7 @@ export default function BookingDetailsModal({
         {/* Individual Profile Content */}
         {kycProfile?.kycType === 'individual' && !kycProfile?.isPartner && (
           <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-            <h3 className="font-bold text-gray-900 mb-3 border-b pb-2">Personal Documents</h3>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-gray-900 mb-3 border-b pb-2">Personal Documents</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[
                 { label: "PAN Card", type: "pan_card" },
@@ -395,7 +410,7 @@ export default function BookingDetailsModal({
           <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
             {/* Partner Selection Dropdown */}
             <div className="relative">
-              <h3 className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center justify-between">
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center justify-between">
                 <span>Select Partners/Directors</span>
                 {selectedPartners.length > 0 && (
                   <button 
@@ -473,7 +488,7 @@ export default function BookingDetailsModal({
                 const partnerName = partner.profileName || partner.personalInfo?.fullName || "Partner";
                 return (
                   <div key={partnerId} className="animate-in fade-in slide-in-from-top-2 duration-300">
-                    <h3 className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-2">
+                    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-[#35503F]"></div>
                       Documents: <span className="text-[#35503F]">{partnerName}</span>
                     </h3>
@@ -575,7 +590,7 @@ export default function BookingDetailsModal({
             )}
 
             <div className="bg-[#35503F]/5 border border-[#35503F]/10 rounded-2xl p-4">
-              <h4 className="text-[10px] font-bold text-[#35503F] uppercase tracking-wider mb-2 opacity-70">Business Information</h4>
+              <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[10px] font-bold text-[#35503F] uppercase tracking-wider mb-2 opacity-70">Business Information</h4>
               <div className="grid grid-cols-2 gap-y-3">
                 <div>
                   <p className="text-[10px] text-gray-500 font-medium">Company Name</p>
@@ -604,7 +619,7 @@ export default function BookingDetailsModal({
 
             {/* Business Documents */}
             <div className="space-y-4">
-              <h3 className="font-bold text-gray-900 mb-3 border-b pb-2">Verify Business Documents</h3>
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-gray-900 mb-3 border-b pb-2">Verify Business Documents</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
                   { label: "Certificate of Incorporation", type: "coi" },
@@ -712,7 +727,7 @@ export default function BookingDetailsModal({
         {/* 1. Draft Agreement */}
         <div className="bg-white border-2 border-gray-100 rounded-2xl p-5 shadow-sm relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -z-10"></div>
-          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-gray-900 mb-4 flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">1</span>
             Check your Draft Agreement
           </h3>
@@ -744,7 +759,7 @@ export default function BookingDetailsModal({
         <div className="bg-white border-2 border-gray-100 rounded-2xl p-5 shadow-sm relative overflow-hidden">
           <div className="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-bl-full -z-10"></div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-gray-900 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-bold">2</span>
               Submit the Signed Agreement
             </h3>
@@ -848,7 +863,7 @@ export default function BookingDetailsModal({
       <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-300">
         {/* Final Documents */}
         <div className={`bg-white border-2 border-gray-100 rounded-2xl p-5 shadow-sm ${!isApproved ? 'opacity-70' : ''}`}>
-          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-gray-900 mb-4 flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">1</span>
             Download Final Documents
           </h3>
@@ -917,6 +932,93 @@ export default function BookingDetailsModal({
     );
   };
 
+  if (isBusinessSetup) {
+    const statusConfig = getStatusConfig(booking);
+    const purchasedDate = booking.startDate || booking.createdAt || "";
+    const packageName =
+      booking.plan?.name ||
+      booking.spaceSnapshot?.name ||
+      getWorkspaceDisplayName(booking);
+
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
+        <div className="bg-white rounded-[24px] max-w-lg w-full shadow-2xl overflow-hidden">
+          <div className="bg-[#35503F] px-6 py-5 flex items-start justify-between gap-4">
+            <div>
+              <span className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium text-white">
+                Business Setup
+              </span>
+              <h2
+                style={{ fontFamily: "'Inter', sans-serif" }}
+                className="mt-3 text-2xl font-extrabold text-white"
+              >
+                {packageName}
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="p-6 space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  Booking ID
+                </p>
+                <p className="mt-1 text-sm font-bold text-gray-900">
+                  {booking.bookingNumber}
+                </p>
+              </div>
+              <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  Status
+                </p>
+                <span
+                  className={`mt-1 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${statusConfig.bg} ${statusConfig.text}`}
+                >
+                  {statusConfig.label}
+                </span>
+              </div>
+              <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  Bought On
+                </p>
+                <p className="mt-1 text-sm font-bold text-gray-900 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                  {formatDate(purchasedDate)}
+                </p>
+              </div>
+              <div className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  Amount
+                </p>
+                <p className="mt-1 text-sm font-bold text-gray-900">
+                  {formatCurrency(booking.plan.price)}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-green-100 bg-green-50 px-4 py-3 flex items-center gap-2 text-green-700">
+              <CheckCircle className="w-4 h-4" />
+              <span className="text-sm font-bold">Lifetime service</span>
+            </div>
+
+            <button
+              onClick={onClose}
+              className="w-full py-3 rounded-xl font-bold bg-[#35503F] text-[#FEF8C3] hover:bg-[#35503F]/90 transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
       <div className="bg-white rounded-[24px] max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
@@ -955,7 +1057,7 @@ export default function BookingDetailsModal({
                     ? "Virtual Office"
                     : "Coworking"}
                 </span>
-                <h2 className="text-2xl font-bold text-white drop-shadow-md">
+                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-bold text-white drop-shadow-md">
                   {getWorkspaceDisplayName(booking)}
                 </h2>
                 <p className="text-white/80 flex items-center gap-1.5 mt-1 text-sm font-medium">

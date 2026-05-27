@@ -1,4 +1,7 @@
+import { ClientHeaderActions } from "./ClientHeaderActions";
 import React, { useState, useEffect } from "react";
+import { NotificationBell } from "@/components/NotificationBell";
+import { useAuth } from "@/contexts/AuthContext";
 import userDashboardService from "@/services/userDashboard.service";
 import { VisitRecord } from "@/types/services";
 import {
@@ -25,6 +28,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 
 export default function VisitRecords() {
+  const { user } = useAuth();
   const [visits, setVisits] = useState<VisitRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -120,39 +124,33 @@ export default function VisitRecords() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
-              Visit Records
+            <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-[#1A1A1A] tracking-tight">
+              Visit <span className="text-[#36503F] italic">Records</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Track all visits made to your registered virtual office
             </p>
           </div>
-          <a
-            href="/services/virtual-office"
-            className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
-          >
-            <span className="text-xl">+</span>
-            Book New Space
-          </a>
+          <ClientHeaderActions />
         </div>
 
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-white py-8 px-6 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Visits</p>
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Total Visits</p>
             <p className="text-3xl font-extrabold text-[#35503F]">{totalVisits}</p>
           </div>
-          <div className="bg-white py-8 px-6 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-[#35503F]">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Official Visits</p>
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Official Visits</p>
             <p className="text-3xl font-extrabold text-[#35503F]">{officialVisits}</p>
           </div>
-          <div className="bg-white py-8 px-6 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-blue-400">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Deliveries</p>
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Deliveries</p>
             <p className="text-3xl font-extrabold text-[#35503F]">{deliveryVisits}</p>
           </div>
         </div>

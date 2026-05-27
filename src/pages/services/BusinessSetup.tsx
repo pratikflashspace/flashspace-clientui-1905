@@ -1,15 +1,36 @@
-import { Building, MapPin, Mail, Phone, FileText, CheckCircle, Star, Users, Award, ChevronDown, Shield, FileCheck, Clock } from "lucide-react";
+import { Building, MapPin, Phone, CheckCircle, Star, Users, Award, ChevronDown, Shield, FileCheck, Clock, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import hotToast from "react-hot-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  createPaymentOrder,
+  openRazorpayCheckout,
+  reportPaymentFailure,
+  simulatePayment,
+  verifyPayment,
+} from "@/services/payment.service";
+import {
+  clearCheckoutState,
+  getLoginRedirectUrl,
+  persistCheckoutState,
+} from "@/utils/checkoutSession";
 import {
   BusinessSolution,
   BusinessSetupFeature,
@@ -21,8 +42,11 @@ import {
 const BusinessSetup = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { user, isAuthenticated } = useAuth();
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [selectedService, setSelectedService] = useState<BusinessSetupService | null>(null);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
 
   useEffect(() => {
     const city = searchParams.get('city') || 'Delhi';
@@ -60,6 +84,127 @@ const BusinessSetup = () => {
 
   const handleNavigation = (href: string): void => {
     navigate(href);
+  };
+
+  const parsePrice = (price: string) => {
+    const match = price.match(/[\d,]+/);
+    return match ? Number(match[0].replace(/,/g, "")) : 0;
+  };
+
+  const checkoutReturnTo = `/services/business-setup?${searchParams.toString()}`;
+
+  const persistBusinessSetupCheckout = (service: BusinessSetupService) => {
+    persistCheckoutState(
+      {
+        page: "business-setup",
+        path: checkoutReturnTo,
+        serviceId: service.id,
+        serviceName: service.name,
+      },
+      checkoutReturnTo,
+    );
+  };
+
+  const handleBuyNow = async () => {
+    if (!selectedService) return;
+
+    if (!isAuthenticated || !user) {
+      hotToast.error("Please login to continue with your purchase");
+      persistBusinessSetupCheckout(selectedService);
+      navigate(getLoginRedirectUrl(checkoutReturnTo), {
+        state: { redirectTo: checkoutReturnTo },
+      });
+      return;
+    }
+
+    const basePrice = parsePrice(selectedService.price);
+    if (!basePrice) {
+      hotToast.error("Package price is not available");
+      return;
+    }
+
+    const gstAmount = Math.round(basePrice * 0.18);
+    const totalAmount = basePrice + gstAmount;
+    setIsPaymentLoading(true);
+
+    try {
+      const order = await createPaymentOrder({
+        userId: user.id || (user as any)._id,
+        userEmail: user.email,
+        userName: user.fullName || user.email,
+        userPhone: (user as any).phoneNumber,
+        spaceName: selectedService.name,
+        planName: selectedService.name,
+        planKey: `business_setup_${selectedService.id}`,
+        tenure: 0,
+        yearlyPrice: basePrice,
+        totalAmount,
+        discountPercent: 0,
+        discountAmount: 0,
+        paymentType: "business_setup",
+      });
+
+      if (order.devMode) {
+        hotToast.loading("Simulating payment...", { id: "business-setup-payment" });
+        const result = await simulatePayment(order.orderId);
+        hotToast.dismiss("business-setup-payment");
+        clearCheckoutState();
+        setSelectedService(null);
+        navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(selectedService.name)}&planName=${encodeURIComponent(selectedService.name)}&amount=${totalAmount}`);
+        return;
+      }
+
+      await openRazorpayCheckout({
+        orderId: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        keyId: order.keyId,
+        userEmail: user.email,
+        userName: user.fullName || user.email,
+        userPhone: (user as any).phoneNumber,
+        spaceName: selectedService.name,
+        planName: selectedService.name,
+        onSuccess: async (response) => {
+          try {
+            const result = await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            clearCheckoutState();
+            setSelectedService(null);
+            navigate(`/payment/success?orderId=${result.orderId}&paymentId=${result.paymentId}&spaceName=${encodeURIComponent(selectedService.name)}&planName=${encodeURIComponent(selectedService.name)}&amount=${totalAmount}`);
+          } catch (error) {
+            hotToast.error("Payment verification failed. Please contact support.");
+          }
+        },
+        onFailure: (error) => {
+          reportPaymentFailure(order.orderId, error.code, error.description);
+          navigate(`/payment/failed?orderId=${order.orderId}`);
+        },
+        onDismiss: () => hotToast("Payment cancelled"),
+      });
+    } catch (error: any) {
+      hotToast.error(error?.message || "Failed to start payment. Please try again.");
+    } finally {
+      setIsPaymentLoading(false);
+    }
+  };
+
+  const openFeatureCheckout = (feature: BusinessSetupFeature, index: number) => {
+    setSelectedService({
+      id: 1000 + index,
+      name: feature.title,
+      description: feature.description,
+      price: feature.price.replace(/^Starting\s+/i, ""),
+      timeline: feature.timeline,
+      features: [
+        feature.title,
+        "Documentation Support",
+        "Expert Consultation",
+        "Application Filing",
+      ],
+    });
   };
 
   const features: BusinessSetupFeature[] = [
@@ -246,6 +391,12 @@ const BusinessSetup = () => {
                     <CardDescription className="text-gray-600 leading-relaxed">
                       {feature.description}
                     </CardDescription>
+                    <Button
+                      className="mt-5 w-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26]"
+                      onClick={() => openFeatureCheckout(feature, index)}
+                    >
+                      Buy Now
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
@@ -373,8 +524,11 @@ const BusinessSetup = () => {
                       ))}
                     </div>
                     <div className="flex gap-2">
-                      <Button className="flex-1 btn-hero">
-                        Get Started
+                      <Button
+                        className="flex-1 btn-hero"
+                        onClick={() => setSelectedService(service)}
+                      >
+                        Buy Now
                       </Button>
                       <Button
                         variant="outline"
@@ -395,6 +549,79 @@ const BusinessSetup = () => {
           </div>
         </div>
       </main>
+
+      <Dialog open={!!selectedService} onOpenChange={(open) => !open && setSelectedService(null)}>
+        <DialogContent className="max-w-2xl rounded-2xl p-0 overflow-hidden">
+          {selectedService && (
+            <>
+              <DialogHeader className="bg-[#36503F] px-6 py-5 text-left">
+                <DialogTitle className="text-2xl font-bold text-white">
+                  {selectedService.name}
+                </DialogTitle>
+                <DialogDescription className="text-[#FEF8C5]/90">
+                  {selectedService.description}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Package</p>
+                    <p className="mt-1 text-xl font-bold text-[#36503F]">{selectedService.price}</p>
+                  </div>
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">GST</p>
+                    <p className="mt-1 text-xl font-bold text-[#36503F]">18%</p>
+                  </div>
+                  <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Timeline</p>
+                    <p className="mt-1 text-xl font-bold text-[#36503F]">{selectedService.timeline}</p>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-gray-900">
+                    Included Details
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {selectedService.features.map((feature, index) => (
+                      <div key={index} className="flex items-center gap-2 rounded-lg border border-gray-100 bg-white p-3 text-sm text-gray-700">
+                        <CheckCircle className="h-4 w-4 shrink-0 text-green-600" />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-[#36503F]/15 bg-[#36503F]/5 p-4 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Shield className="h-5 w-5 shrink-0 text-[#36503F]" />
+                    <p className="text-sm text-gray-700">
+                      Payment Razorpay se securely process hoga. Payment complete hone ke baad confirmation user dashboard me reflect hoga.
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  className="w-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26]"
+                  size="lg"
+                  onClick={handleBuyNow}
+                  disabled={isPaymentLoading}
+                >
+                  {isPaymentLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Buy Now"
+                  )}
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

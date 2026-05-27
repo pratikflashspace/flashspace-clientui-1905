@@ -112,27 +112,27 @@ export default function RevenueForecast() {
   };
 
   return (
-    <div className="bg-white rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 p-6 md:p-8 overflow-hidden relative">
-      <div className="absolute top-0 left-0 w-64 h-64 bg-[#35503F]/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/3 pointer-events-none"></div>
+    <div className="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 p-6 md:p-8 overflow-hidden relative">
+      <div className="absolute top-0 left-0 w-64 h-64 bg-[#36503F]/5 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/3 pointer-events-none"></div>
       
       <div className="relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-8">
         
         {/* Left Column: Inputs */}
         <div className="xl:col-span-4 space-y-8">
           <div>
-            <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-              <TrendingUp className="w-6 h-6 text-[#35503F]" />
-              Revenue <span className="text-[#35503F] italic">Forecast</span>
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-extrabold text-gray-900 tracking-tight flex items-center gap-2">
+              <TrendingUp className="w-6 h-6 text-[#36503F]" />
+              Revenue <span className="text-[#36503F] italic">Forecast</span>
             </h2>
             <p className="text-gray-500 text-sm mt-1 font-medium">Project your earnings based on your deal volume.</p>
           </div>
 
-          <div className="space-y-6 bg-gray-50 p-6 rounded-3xl border border-gray-100">
+          <div className="space-y-6 bg-gray-50 p-6 rounded-xl border border-gray-100">
             {/* Deals Per Month */}
             <div className="space-y-3">
               <div className="flex justify-between items-end">
                 <label className="text-sm font-bold text-gray-700">Expected Deals per Month</label>
-                <span className="text-lg font-black text-[#35503F]">{dealsPerMonth}</span>
+                <span className="text-lg font-bold text-[#36503F]">{dealsPerMonth}</span>
               </div>
               <input 
                 type="range" min="1" max="100" step="1" 
@@ -164,7 +164,7 @@ export default function RevenueForecast() {
             <div className="space-y-3 pt-4 border-t border-gray-200">
               <div className="flex justify-between items-end">
                 <label className="text-sm font-bold text-gray-700">MoM Deal Growth Rate</label>
-                <span className="text-lg font-black text-emerald-600">+{momGrowth}%</span>
+                <span className="text-lg font-bold text-emerald-600">+{momGrowth}%</span>
               </div>
               <p className="text-xs text-gray-500 font-medium leading-relaxed">
                 Estimated monthly growth in your deal volume.
@@ -184,12 +184,12 @@ export default function RevenueForecast() {
           
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-[#f8f8f8] p-5 rounded-2xl border border-gray-100 flex flex-col justify-center">
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 flex flex-col justify-center">
               <div className="flex items-center gap-2 text-gray-500 mb-2">
                 <Calendar className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider">{timeframe} Total Deals</span>
               </div>
-              <span className="text-2xl font-black text-gray-900">{Math.round(data.reduce((sum, d) => sum + d.deals, 0))}</span>
+              <span className="text-2xl font-extrabold text-gray-900">{Math.round(data.reduce((sum, d) => sum + d.deals, 0))}</span>
             </div>
             
             <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 flex flex-col justify-center relative overflow-hidden">
@@ -201,23 +201,23 @@ export default function RevenueForecast() {
                   <Calculator className="w-4 h-4" />
                   <span className="text-xs font-bold uppercase tracking-wider">{timeframe} Commission</span>
                 </div>
-                <span className="text-2xl font-black text-emerald-900">{formatCurrency(totalCumulative)}</span>
+                <span className="text-2xl font-extrabold text-emerald-900">{formatCurrency(totalCumulative)}</span>
               </div>
             </div>
 
-            <div className="bg-[#f8f8f8] p-5 rounded-2xl border border-gray-100 flex flex-col justify-center">
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 flex flex-col justify-center">
               <div className="flex items-center gap-2 text-gray-500 mb-2">
                 <TrendingUp className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider">Monthly Avg (in {timeframe})</span>
               </div>
-              <span className="text-2xl font-black text-gray-900">{formatCurrency(monthlyAverage)}</span>
+              <span className="text-2xl font-extrabold text-gray-900">{formatCurrency(monthlyAverage)}</span>
             </div>
           </div>
 
           {/* Chart Container */}
-          <div className="flex-1 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col min-h-[400px]">
+          <div className="flex-1 bg-white p-6 rounded-xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] flex flex-col min-h-[400px]">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <h3 className="text-lg font-bold text-gray-900">Commission Growth</h3>
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900">Commission Growth</h3>
               
               {/* Timeframe Tabs */}
               <div className="flex items-center gap-1 bg-gray-50 p-1.5 rounded-xl border border-gray-100">
@@ -227,7 +227,7 @@ export default function RevenueForecast() {
                     onClick={() => setTimeframe(tf.label)}
                     className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                       timeframe === tf.label 
-                        ? 'bg-white text-[#35503F] shadow-sm ring-1 ring-black/5' 
+                        ? 'bg-white text-[#36503F] shadow-sm ring-1 ring-black/5' 
                         : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >

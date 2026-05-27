@@ -149,7 +149,7 @@ const ViewDetails: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -160,7 +160,7 @@ const ViewDetails: React.FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-xl md:text-2xl font-bold  text-gray-900">
+                  <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-xl md:text-2xl font-bold  text-gray-900">
                     {bookingData.workspace.name}
                   </h1>
                   <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold uppercase">
@@ -188,7 +188,7 @@ const ViewDetails: React.FC = () => {
 
         {/* Subscription Timeline */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Subscription Timeline</h2>
+          <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-6">Subscription Timeline</h2>
           <div className="relative">
             <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200 rounded"></div>
             <div className="relative flex justify-between">
@@ -246,7 +246,7 @@ const ViewDetails: React.FC = () => {
           <div className="space-y-6">
             {/* Client Details */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <User className="w-5 h-5 text-yellow-500" /> Client Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -301,7 +301,7 @@ const ViewDetails: React.FC = () => {
 
             {/* Plan Details */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-yellow-500" /> Plan Details
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
@@ -338,7 +338,7 @@ const ViewDetails: React.FC = () => {
             {/* Subscription History */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Subscription History</h3>
+                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900">Subscription History</h3>
                 <button
                   onClick={() => setShowHistory(!showHistory)}
                   className="text-yellow-600 text-sm font-medium hover:text-yellow-700 flex items-center gap-1"
@@ -374,7 +374,7 @@ const ViewDetails: React.FC = () => {
                 {/* KYC Status */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                       <Shield className="w-5 h-5 text-yellow-500" /> KYC Verification
                     </h3>
                     <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Verified</span>
@@ -396,7 +396,7 @@ const ViewDetails: React.FC = () => {
 
                 {/* Agreement */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                     <FileText className="w-5 h-5 text-yellow-500" /> Client Agreement
                   </h3>
                   <div className="p-4 border border-gray-200 rounded-lg flex items-center justify-between">
@@ -425,11 +425,11 @@ const ViewDetails: React.FC = () => {
                   <ArrowLeft className="w-5 h-5" /> Back to KYC Overview
                 </button>
 
-                <h2 className="text-xl font-bold text-gray-900 mb-6">KYC Details Review</h2>
+                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-xl font-bold text-gray-900 mb-6">KYC Details Review</h2>
 
                 {/* Company Details */}
                 <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Company Information</h3>
+                  <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Company Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {[
                       { label: "Legal Name", value: bookingData.companyName },
@@ -447,7 +447,7 @@ const ViewDetails: React.FC = () => {
 
                 {/* Directors */}
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Directors / Partners</h3>
+                  <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Directors / Partners</h3>
                   <div className="space-y-3">
                     {partners.map((partner) => (
                       <div key={partner.id} className="p-4 border border-gray-200 rounded-lg">
@@ -495,7 +495,7 @@ const ViewDetails: React.FC = () => {
         {activeTab === "documents" && (
           <div className="space-y-4">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-yellow-500" /> Available Documents
               </h3>
               <p className="text-sm text-gray-500 mb-6">

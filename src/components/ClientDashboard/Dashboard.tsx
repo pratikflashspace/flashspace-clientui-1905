@@ -1,8 +1,13 @@
-import { useState, useEffect } from "react";
+import { ClientHeaderActions } from "./ClientHeaderActions";
+import { NotificationBell } from "@/components/NotificationBell";
+import {
+  useState,
+  useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import userDashboardService, {
+import userDashboardService,
+  {
   DashboardData,
-} from "@/services/userDashboard.service";
+  } from "@/services/userDashboard.service";
 import {
   Package,
   Clock,
@@ -22,6 +27,8 @@ import {
   Eye,
   CheckCircle2,
   Download,
+  User,
+  Bell
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Booking } from "@/types/services";
@@ -249,6 +256,15 @@ export default function Dashboard() {
   };
 
   const getStatusConfig = (booking: Booking) => {
+    if (isBusinessSetupBooking(booking)) {
+      return {
+        bg: "bg-green-100",
+        text: "text-green-700",
+        icon: CheckCircle2,
+        label: "Active",
+      };
+    }
+
     const status = booking.status;
     switch (status) {
       case "active":
@@ -309,7 +325,28 @@ export default function Dashboard() {
     return `/${unit}`;
   };
 
+  const isBusinessSetupBooking = (booking?: Booking | null) => {
+    if (!booking) return false;
+    const values = [
+      booking.type,
+      (booking as any).bookingType,
+      (booking as any).paymentType,
+      booking.plan?.name,
+      booking.spaceSnapshot?.name,
+    ]
+      .filter(Boolean)
+      .map((value) => String(value).toLowerCase().replace(/[\s-]+/g, "_"));
+
+    return values.some(
+      (value) => value.includes("business_setup") || value.includes("businesssetup"),
+    );
+  };
+
   function getWorkspaceDisplayName(booking?: Booking | null) {
+    if (isBusinessSetupBooking(booking)) {
+      return booking?.plan?.name || booking?.spaceSnapshot?.name || "Business Setup";
+    }
+
     const normalizeSpaceCode = (value?: string) => {
       const trimmed = value?.trim();
       if (!trimmed) return "";
@@ -381,7 +418,7 @@ export default function Dashboard() {
   );
 
   const nextRenewalDate = dashboardData?.nextBookingDate;
-  const nextRenewalDisplay = nextRenewalDate ? formatDate(nextRenewalDate) : "No upcoming";
+  const nextRenewalDisplay = nextRenewalDate ? formatDate(nextRenewalDate) : "-";
   const nextRenewalColor = nextRenewalDate ? "text-gray-900" : "text-gray-400";
   const isNextRenewalSmall = !nextRenewalDate;
 
@@ -432,25 +469,19 @@ export default function Dashboard() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
-              Welcome back, <span className="text-[#4A6D56] italic">{user?.fullName?.split(" ")[0] || "Customer"}</span>
+            <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+              Welcome back, <span className="text-[#36503F] italic">{user?.fullName?.split(" ")[0] || "Customer"}</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your workspace subscriptions and track your orders
             </p>
           </div>
-          <a
-            href="/services/virtual-office"
-            className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
-          >
-            <span className="text-xl">+</span>
-            Book New Space
-          </a>
+                              <ClientHeaderActions />
         </div>
 
         {/* Stats Cards */}
@@ -458,16 +489,16 @@ export default function Dashboard() {
           {statsCards.map((card, idx) => (
             <div
               key={idx}
-              className="bg-white py-8 px-6 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg flex items-start justify-between"
+              className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg"
             >
-              <div>
-                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">{card.title}</p>
-                <p className={`${card.isSmall ? "text-xl font-bold" : "text-3xl font-extrabold"} ${card.valueColor || "text-[#35503F]"}`}>
-                  {card.value}
-                </p>
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-[#6B8F78]">{card.title}</span>
+                <div className="w-8 h-8 rounded-lg bg-[#36503F]/10 flex items-center justify-center">
+                  <card.icon className="w-4 h-4 text-[#36503F]" />
+                </div>
               </div>
-              <div className="p-2.5 bg-gray-50 rounded-xl text-[#35503F]">
-                <card.icon className="w-5 h-5 opacity-70" />
+              <div className={`${card.isSmall ? 'text-2xl' : 'text-3xl'} font-extrabold text-[#1A1A1A] tracking-tight`}>
+                {card.value}
               </div>
             </div>
           ))}
@@ -476,8 +507,8 @@ export default function Dashboard() {
         {Array.isArray(bookings) && bookings.filter((b) => b.status === "active" || b.status === "pending_payment" || b.status === "pending_kyc" || b.autoRenew).length > 0 && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-[#35503F] tracking-tight">
-                Manage <span className="text-[#4A6D56] italic">Bookings</span>
+              <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-bold text-gray-900 tracking-tight">
+                Manage <span className="text-[#36503F] italic">Bookings</span>
               </h2>
 
             </div>
@@ -492,6 +523,71 @@ export default function Dashboard() {
                 })
                 .map((booking) => {
                   const statusConfig = getStatusConfig(booking);
+                  const isBusinessSetup = isBusinessSetupBooking(booking);
+
+                  if (isBusinessSetup) {
+                    const purchasedDate = booking.startDate || booking.createdAt || "";
+                    const packageName =
+                      booking.plan?.name ||
+                      booking.spaceSnapshot?.name ||
+                      "Business Setup";
+
+                    return (
+                      <button
+                        key={booking._id}
+                        type="button"
+                        onClick={() => setSelectedBooking(booking)}
+                        className="text-left bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative min-h-[250px] flex flex-col"
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-5">
+                          <div className="min-w-0">
+                            <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700">
+                              Business Setup
+                            </span>
+                            <p className="mt-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                              {booking.bookingNumber || "Booking ID"}
+                            </p>
+                          </div>
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${statusConfig.bg} ${statusConfig.text}`}
+                          >
+                            <statusConfig.icon className="w-3 h-3" />
+                            {statusConfig.label}
+                          </span>
+                        </div>
+
+                        <div className="flex-1 space-y-3">
+                          <h3
+                            style={{ fontFamily: "'Inter', sans-serif" }}
+                            className="text-lg font-bold text-gray-900 group-hover:text-[#35503F] transition-colors line-clamp-2"
+                          >
+                            {packageName}
+                          </h3>
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <span className="font-medium">
+                              Bought on {formatDate(purchasedDate)}
+                            </span>
+                          </div>
+                          <div className="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-green-700 border border-green-100">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Lifetime service
+                          </div>
+                        </div>
+
+                        <div className="h-px bg-gray-100 my-4" />
+
+                        <div>
+                          <p className="text-xl font-black text-gray-900">
+                            {formatCurrency(booking.plan.price)}
+                          </p>
+                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                            One-time package
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  }
 
                   return (
                     <div
@@ -514,9 +610,12 @@ export default function Dashboard() {
                             {booking.type === "VirtualOffice" ||
                               booking.type === "virtual_office"
                               ? "Virtual Office"
+                              : booking.type === "BusinessSetup" ||
+                                booking.type === "business_setup"
+                                ? "Business Setup"
                               : booking.type === "MeetingRoom" ||
                                 booking.type === "meeting_room"
-                                ? "On Demand"
+                                ? "Meeting Room"
                                 : "Coworking"}
                           </span>
                         </div>
@@ -530,7 +629,7 @@ export default function Dashboard() {
 
                       {/* Main Content */}
                       <div className="mb-5">
-                        <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
                           {booking.bookingNumber || "Booking ID"}
                         </h3>
                         <div className="flex items-start gap-2 text-gray-500 text-xs mb-3 h-8">

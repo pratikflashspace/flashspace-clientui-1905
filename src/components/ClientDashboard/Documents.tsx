@@ -291,12 +291,12 @@ export default function Documents() {
     };
 
     return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
+            <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-[#1A1A1A] tracking-tight tracking-tight">
               Documents
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
@@ -403,7 +403,7 @@ export default function Documents() {
                                 <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <FileText className="w-8 h-8 text-gray-400" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Service Agreements</h3>
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-2">Service Agreements</h3>
                                 <p className="text-gray-500 max-w-md mx-auto">
                                     Your service agreements will appear here once your booking is confirmed and digitally signed.
                                 </p>
@@ -510,7 +510,7 @@ export default function Documents() {
                                 <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <FileText className="w-8 h-8 text-gray-400" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Invoices Found</h3>
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-2">No Invoices Found</h3>
                                 <p className="text-gray-500">You don't have any invoices yet.</p>
                             </div>
                         ) : (
@@ -620,7 +620,7 @@ export default function Documents() {
                                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <FileText className="w-8 h-8 text-blue-500" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">No KYC Documents Found</h3>
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-2">No KYC Documents Found</h3>
                                 <p className="text-gray-500 max-w-md mx-auto mb-6">
                                     You haven't uploaded any KYC documents yet or they are not available.
                                 </p>
@@ -757,7 +757,7 @@ export default function Documents() {
                                 <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <FileText className="w-8 h-8 text-gray-400" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Supporting Documents</h3>
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-2">Supporting Documents</h3>
                                 <p className="text-gray-500 max-w-md mx-auto">
                                     Additional documents like NOC or Utility Bills uploaded by your space partner will appear here.
                                 </p>
@@ -854,7 +854,7 @@ export default function Documents() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm mt-24">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
                         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                            <h3 className="text-lg font-semibold text-gray-900">{previewDocument.title}</h3>
+                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900">{previewDocument.title}</h3>
                             <button
                                 onClick={() => setPreviewDocument(null)}
                                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"

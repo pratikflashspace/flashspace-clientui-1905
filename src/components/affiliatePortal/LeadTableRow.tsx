@@ -44,7 +44,7 @@ const StatusBadge = ({ status }: { status: Lead['status'] }) => {
     };
 
     return (
-        <span className={`flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border ${styles[status]}`}>
+        <span className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider border ${styles[status]}`}>
             <span className={`w-2 h-2 rounded-full ${dotColors[status]}`} />
             {status}
         </span>
@@ -72,22 +72,22 @@ const LeadTableRow = (props: LeadTableRowProps) => {
                             <User2 size={18} />
                         </div>
                         <div>
-                            <p className="font-black text-[#1a2d1d] text-[15px] tracking-tight">{name}</p>
-                            <p className="text-[13px] text-[#64748b] font-medium">{phone}</p>
+                            <p className="font-bold text-[#1a2d1d] text-sm tracking-tight">{name}</p>
+                            <p className="text-sm text-[#64748b] font-medium">{phone}</p>
                         </div>
                     </div>
                 </td>
 
                 {/* Company Column */}
                 <td className="px-6 py-6">
-                    <p className="text-[15px] font-black text-[#1a2d1d] tracking-tight">
+                    <p className="text-sm font-bold text-[#1a2d1d] tracking-tight">
                         {company}
                     </p>
                 </td>
 
                 {/* Interest Column */}
                 <td className="px-6 py-6">
-                    <span className="bg-[#f8f9fa] text-[#1a2d1d] px-3 py-1 rounded-lg text-[11px] font-black uppercase tracking-tight border border-gray-100">
+                    <span className="bg-[#f8f9fa] text-[#1a2d1d] px-3 py-1 rounded-lg text-sm font-bold uppercase tracking-tight border border-gray-100">
                         {interest}
                     </span>
                 </td>
@@ -99,7 +99,7 @@ const LeadTableRow = (props: LeadTableRowProps) => {
 
                 {/* Last Contact Column */}
                 <td className="px-6 py-6">
-                    <p className="text-[14px] text-[#64748b] font-medium">
+                    <p className="text-sm text-[#64748b] font-medium">
                         {lastContact}
                     </p>
                 </td>
@@ -110,7 +110,7 @@ const LeadTableRow = (props: LeadTableRowProps) => {
                         {/* View */}
                         <button
                             onClick={() => setIsDetailsOpen(true)}
-                            className="p-2.5 bg-[#f8f9fa] text-[#64748b] rounded-xl hover:bg-[#334D3D] hover:text-white transition-all shadow-sm border border-gray-100"
+                            className="p-2.5 bg-[#FAFAF7] text-[#6B8F78] rounded-lg hover:bg-[#36503F] hover:text-[#fef8c5] transition-all shadow-sm border border-[#D4E0D0]"
                             title="View Details"
                         >
                             <Eye size={16} />
@@ -148,16 +148,16 @@ const LeadTableRow = (props: LeadTableRowProps) => {
                                 align="end"
                             >
                                 <div className="space-y-1">
-                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-black text-white bg-[#334D3D] rounded-xl hover:bg-[#1a2d1d] transition-all">
+                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-sm font-bold text-white bg-[#334D3D] rounded-xl hover:bg-[#1a2d1d] transition-all">
                                         <FileText className="w-4 h-4" /> Send Quotation
                                     </button>
-                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-medium text-[#64748b] hover:bg-[#f8f9fa] hover:text-[#1a2d1d] rounded-xl transition-all">
+                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-[#64748b] hover:bg-[#f8f9fa] hover:text-[#1a2d1d] rounded-xl transition-all">
                                         <Calendar className="w-4 h-4" /> Schedule Follow-up
                                     </button>
-                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-medium text-[#64748b] hover:bg-[#f8f9fa] hover:text-[#1a2d1d] rounded-xl transition-all">
+                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-[#64748b] hover:bg-[#f8f9fa] hover:text-[#1a2d1d] rounded-xl transition-all">
                                         <StickyNote className="w-4 h-4" /> Add Note
                                     </button>
-                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-[13px] font-medium text-[#10b981] hover:bg-emerald-50 rounded-xl transition-all border border-emerald-50">
+                                    <button className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-[#10b981] hover:bg-emerald-50 rounded-xl transition-all border border-emerald-50">
                                         <CheckCircle className="w-4 h-4" /> Mark as Converted
                                     </button>
                                 </div>

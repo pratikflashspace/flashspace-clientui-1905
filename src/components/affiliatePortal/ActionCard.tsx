@@ -9,7 +9,7 @@ interface ActionCardProps {
 const ActionCard: React.FC<ActionCardProps> = ({ title, description, badge }) => (
     <div className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-5 hover:border-[#36503F]/60 hover:shadow-md transition-all group relative h-full flex flex-col cursor-pointer">
         <div className="flex justify-between items-start mb-2">
-            <h3 className="text-lg font-bold text-[#1A1A1A] leading-tight">
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A] leading-tight">
                 {title}
             </h3>
             {badge && (

@@ -46,9 +46,10 @@ interface ProfileDataState {
 interface ProfileProps {
   hideCompanyDetails?: boolean;
   isCompact?: boolean;
+  drawerMode?: boolean;
 }
 
-const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact = false }) => {
+const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact = false, drawerMode = false }) => {
   const { user, updateUser, refreshProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState<"personal" | "company" | "kyc">(
@@ -431,8 +432,8 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
   const [imagePreview, setImagePreview] = useState<{ url: string; title: string } | null>(null);
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isCompact ? 'py-4 px-3' : 'py-8 px-4 md:px-8'}`}>
-      <div className={`mx-auto ${isCompact ? 'max-w-3xl space-y-5' : 'max-w-4xl space-y-8'}`}>
+ <div className={`min-h-screen bg-gray-50 ${drawerMode ? 'p-2 text-[12px] [&_button]:text-xs [&_input]:h-8 [&_input]:text-xs [&_label]:text-[11px] [&_p]:text-xs [&_select]:h-8 [&_select]:text-xs [&_textarea]:text-xs' : isCompact ? 'py-4 px-3' : 'p-4 md:p-6 lg:p-8'}`}> 
+      <div className={`mx-auto ${drawerMode ? 'max-w-none space-y-3' : isCompact ? 'max-w-3xl space-y-5' : 'max-w-4xl space-y-8'}`}>
         {/* Image Preview Modal */}
         {imagePreview && (
           <div 
@@ -486,8 +487,8 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
             {/* Header Section */}
             <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-6 ${isCompact ? 'hidden' : ''}`}>
               <div className="space-y-1">
-                <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
-                  My Profile
+                <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="font-sans text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                    My <span className="text-[#36503F] italic">Profile</span>
                 </h1>
                 <p className="text-sm md:text-base text-gray-500 font-medium">
                   Manage your personal information and company details
@@ -498,7 +499,7 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
             {/* Profile Info Card */}
             <div className={`bg-white shadow-sm border border-gray-100 overflow-hidden ${isCompact ? 'rounded-2xl' : 'rounded-3xl'}`}>
             {/* Cover Image */}
-            <div className={`${isCompact ? 'h-32' : 'h-48'} relative group/cover cursor-pointer overflow-hidden`}>
+            <div className={`${drawerMode ? 'h-20' : isCompact ? 'h-32' : 'h-48'} relative group/cover cursor-pointer overflow-hidden`}>
               {user?.coverImage ? (
                 <img 
                   src={user.coverImage.startsWith('http') ? user.coverImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${user.coverImage}`} 
@@ -545,12 +546,12 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                 />
               </label>
             </div>
-              <div className={`px-4 sm:px-8 pb-4 sm:pb-8`}>
-                <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 sm:gap-6 relative z-10 mt-2">
+              <div className={`${drawerMode ? 'px-3 pb-3' : 'px-4 sm:px-8 pb-4 sm:pb-8'}`}>
+                <div className={`flex flex-col sm:flex-row items-center sm:items-end relative z-10 mt-2 ${drawerMode ? 'gap-2 sm:gap-3' : 'gap-4 sm:gap-6'}`}>
                   {/* Profile Image */}
-                  <div className={`relative group ${isCompact ? '-mt-12' : '-mt-16'}`}>
+                  <div className={`relative group ${drawerMode ? '-mt-8' : isCompact ? '-mt-12' : '-mt-16'}`}>
                     <div 
-                      className={`${isCompact ? 'w-24 h-24' : 'w-32 h-32'} rounded-3xl bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02] relative cursor-pointer`}
+                      className={`${drawerMode ? 'w-16 h-16 rounded-2xl' : isCompact ? 'w-24 h-24 rounded-3xl' : 'w-32 h-32 rounded-3xl'} bg-white border-4 border-white shadow-xl overflow-hidden transition-transform group-hover:scale-[1.02] relative cursor-pointer`}
                       onClick={() => profileImage && setImagePreview({ 
                         url: profileImage.startsWith('http') ? profileImage : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}${profileImage}`, 
                         title: "Profile Picture" 
@@ -590,7 +591,7 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                   {/* Name and ID */}
                   <div className="text-center sm:text-left flex-1 pb-2">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-1">
-                      <h2 className={`${isCompact ? 'text-xl' : 'text-2xl'} font-extrabold text-[#35503F]`}>
+                      <h2 style={{ fontFamily: "'Inter', sans-serif" }} className={`font-sans ${drawerMode ? 'text-lg' : isCompact ? 'text-xl' : 'text-2xl'} font-extrabold text-[#35503F]`}>
                         {user?.fullName || "User Name"}
                       </h2>
                       {getKYCBadge((kycData as any)?.status || "not_submitted")}
@@ -610,16 +611,25 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
             </div>
 
             {/* Navigation Tabs and Actions */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <div className="relative flex p-1 rounded-2xl shadow-inner bg-gray-200/60 w-fit max-w-full overflow-x-auto no-scrollbar whitespace-nowrap scroll-smooth h-auto border border-gray-300/30">
-                {/* Sliding Indicator */}
-                <div 
-                  className="absolute inset-y-1 transition-all duration-300 ease-out bg-white rounded-xl shadow-lg ring-1 ring-black/5"
-                  style={{
-                    left: activeTab === "personal" ? "4px" : activeTab === "kyc" ? `calc(${100 / tabs.length}% + 4px)` : `calc(${100 / tabs.length * 2}% + 4px)`,
-                    width: `calc(${100 / tabs.length}% - 8px)`
-                  }}
-                />
+            <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center ${isCompact ? 'gap-2' : 'gap-4'}`}>
+              <div
+                className={`relative p-1 shadow-inner bg-gray-200/60 max-w-full whitespace-nowrap h-auto border border-gray-300/30 overflow-hidden ${drawerMode ? 'grid w-full max-w-[560px]' : 'flex w-fit'} ${isCompact ? 'rounded-xl' : 'rounded-2xl'}`}
+                style={drawerMode ? { gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` } : undefined}
+              >
+                {drawerMode && (
+                  <div 
+                    className="absolute inset-y-1 left-1 z-0 rounded-xl bg-white shadow-lg ring-1 ring-black/5 transition-transform duration-300 ease-out"
+                    style={{
+                      width: `calc((100% - 8px) / ${tabs.length})`,
+                      transform:
+                        activeTab === "personal"
+                          ? "translateX(0)"
+                          : activeTab === "kyc"
+                            ? "translateX(100%)"
+                            : "translateX(200%)",
+                    }}
+                  />
+                )}
                 
                 {tabs.map((tab) => (
                   <button
@@ -628,14 +638,14 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                       setActiveTab(tab.id as typeof activeTab);
                       setIsEditing(false);
                     }}
-                    className={`relative z-10 flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
+                    className={`relative z-10 flex min-w-0 items-center justify-center gap-2 rounded-xl font-bold transition-colors duration-300 whitespace-nowrap ${isCompact ? 'px-2 py-1.5 text-xs' : 'px-6 py-2.5 text-sm'} ${
                       activeTab === tab.id
-                        ? "text-[#35503F] font-black"
+                        ? drawerMode ? "text-[#35503F] font-black" : "bg-white text-[#35503F] font-black shadow-sm"
                         : "text-gray-500 hover:text-gray-700"
                     }`}
                   >
-                    <tab.icon className="w-4 h-4" />
-                    {tab.label}
+                    <tab.icon className="h-4 w-4 shrink-0" />
+                    <span className="truncate">{tab.label}</span>
                   </button>
                 ))}
               </div>
@@ -669,16 +679,16 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
             </div>
 
             {/* Content */}
-            <div className={`bg-white shadow-sm border border-gray-100 ${isCompact ? 'rounded-2xl p-4 sm:p-5' : 'rounded-xl p-6'}`}>
+            <div className={`bg-white shadow-sm border border-gray-100 ${isCompact ? 'rounded-2xl p-3' : 'rounded-xl p-6'}`}>
               {/* Personal Info Tab */}
               {activeTab === "personal" && (
-                <div className="space-y-6">
-                  <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                <div className={isCompact ? "space-y-3" : "space-y-6"}>
+                  <h2 style={{ fontFamily: "'Inter', sans-serif" }} className={`font-sans font-semibold text-gray-900 flex items-center gap-2 ${isCompact ? 'text-sm' : 'text-lg'}`}>
                     <User className="w-5 h-5 text-[#35503F]" /> Personal
                     Information
                   </h2>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className={`grid grid-cols-1 md:grid-cols-2 ${isCompact ? 'gap-3' : 'gap-6'}`}>
                     <div>
                       <label className="block text-sm text-gray-500 mb-1">
                         Full Name
@@ -769,12 +779,12 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                   </div>
 
                   {/* Address Section */}
-                  <div className="pt-4 border-t border-gray-100">
-                    <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className={`${isCompact ? 'pt-3' : 'pt-4'} border-t border-gray-100`}>
+                    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`font-sans font-semibold text-gray-900 flex items-center gap-2 ${isCompact ? 'mb-2 text-sm' : 'mb-4 text-md'}`}>
                       <MapPin className="w-4 h-4 text-[#35503F]" /> Address
                       Details
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className={`grid grid-cols-1 md:grid-cols-2 ${isCompact ? 'gap-3' : 'gap-6'}`}>
                       <div className="md:col-span-2">
                         <label className="block text-sm text-gray-500 mb-1">
                           Registered Address
@@ -912,15 +922,15 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
 
               {/* Company Tab */}
               {activeTab === "company" && (
-                <div className="space-y-6">
-                  <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                <div className={isCompact ? "space-y-3" : "space-y-6"}>
+                  <h2 style={{ fontFamily: "'Inter', sans-serif" }} className={`font-sans font-semibold text-gray-900 flex items-center gap-2 ${isCompact ? 'text-sm' : 'text-lg'}`}>
                     <Building2 className="w-5 h-5 text-[#35503F]" /> Company
                     Information
                   </h2>
 
                   {kycData ? (
                     <>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className={`grid grid-cols-1 md:grid-cols-2 ${isCompact ? 'gap-3' : 'gap-6'}`}>
                         <div>
                           <label className="block text-sm text-gray-500 mb-1">
                             Company Name
@@ -1012,13 +1022,13 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                       </div>
 
                       {/* Legal Documents */}
-                      <div className="pt-4 border-t border-gray-100">
-                        <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <div className={`${isCompact ? 'pt-3' : 'pt-4'} border-t border-gray-100`}>
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`font-sans font-semibold text-gray-900 flex items-center gap-2 ${isCompact ? 'mb-2 text-sm' : 'mb-4 text-md'}`}>
                           <Shield className="w-4 h-4 text-[#35503F]" /> Legal &
                           Tax Information
                         </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className={`grid grid-cols-1 md:grid-cols-2 ${isCompact ? 'gap-3' : 'gap-6'}`}>
+                          <div className={`bg-gray-50 rounded-lg ${isCompact ? 'p-3' : 'p-4'}`}>
                             <label className="block text-xs text-gray-500 mb-1">
                               GST Number
                             </label>
@@ -1041,7 +1051,7 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                               </p>
                             )}
                           </div>
-                          <div className="bg-gray-50 p-4 rounded-lg">
+                          <div className={`bg-gray-50 rounded-lg ${isCompact ? 'p-3' : 'p-4'}`}>
                             <label className="block text-xs text-gray-500 mb-1">
                               CIN Number
                             </label>
@@ -1085,7 +1095,7 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
               {/* KYC Tab */}
               {activeTab === "kyc" && (
                 <div className="animate-fade-in">
-                  <KYCVerification hideCompanyDetails={hideCompanyDetails} isCompact={isCompact} />
+                  <KYCVerification hideCompanyDetails={hideCompanyDetails} isCompact={isCompact} drawerMode={drawerMode} />
                 </div>
               )}
 

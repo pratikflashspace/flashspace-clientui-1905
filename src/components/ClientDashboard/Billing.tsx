@@ -307,13 +307,13 @@ export default function Billing() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
-              Billing & Payments
+            <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-[#1A1A1A] tracking-tight">
+              Billing & <span className="text-[#36503F] italic">Payments</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your invoices, active subscriptions, and payment history
@@ -324,21 +324,21 @@ export default function Billing() {
 
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-green-400">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Paid</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">{formatCurrency(stats.totalPaid)}</p>
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <span className="text-sm font-medium text-[#6B8F78]">Total Paid</span>
+            <p className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{formatCurrency(stats.totalPaid)}</p>
           </div>
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-orange-400">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pending Dues</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">{formatCurrency(stats.pendingAmount)}</p>
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <p className="text-sm font-medium text-[#6B8F78]">Pending Dues</p>
+            <p className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{formatCurrency(stats.pendingAmount)}</p>
           </div>
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-blue-400">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Active Subscriptions</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">{stats.activeSubscriptions}</p>
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <p className="text-sm font-medium text-[#6B8F78]">Active Subscriptions</p>
+            <p className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{stats.activeSubscriptions}</p>
           </div>
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-purple-400">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Next Billing</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <p className="text-sm font-medium text-[#6B8F78]">Next Billing</p>
+            <p className="font-extrabold tracking-tight text-2xl text-[#1A1A1A]">
               {stats.nextBilling ? formatDate(stats.nextBilling) : "-"}
             </p>
           </div>
@@ -573,7 +573,7 @@ export default function Billing() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-xl w-full max-w-5xl h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
               <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                <h3 className="text-lg font-semibold text-gray-900">{previewDocument.title}</h3>
+                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900">{previewDocument.title}</h3>
                 <button
                   onClick={() => setPreviewDocument(null)}
                   className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
@@ -616,7 +616,7 @@ export default function Billing() {
                       <div className="flex flex-col justify-between h-full gap-4">
                         <div>
                           <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
+                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900 line-clamp-1">
                               {sub.plan.name}
                             </h3>
                             <span
@@ -689,7 +689,7 @@ export default function Billing() {
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CreditCard className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-2">
                 Payment Methods
               </h3>
               <p className="text-gray-500 mb-6 max-w-sm mx-auto text-sm">

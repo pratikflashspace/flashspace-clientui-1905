@@ -174,12 +174,19 @@ export default function Coupons() {
     }
   };
 
+  const getEffectiveStatus = (coupon: Coupon): CouponStatus => {
+    if (coupon.status === CouponStatus.ACTIVE && coupon.usedBy && coupon.usedBy.length > 0) {
+      return CouponStatus.USED;
+    }
+    return coupon.status;
+  };
+
   const filteredCoupons = coupons.filter((coupon) => {
     const matchesSearch = coupon.code
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     const matchesFilter =
-      filterStatus === "all" ? true : coupon.status === filterStatus;
+      filterStatus === "all" ? true : getEffectiveStatus(coupon) === filterStatus;
     return matchesSearch && matchesFilter;
   });
 
@@ -305,7 +312,14 @@ export default function Coupons() {
                               </div>
                             </td>
                             <td className="px-6 py-4">
-                              {getStatusBadge(coupon.status)}
+                              <div className="flex flex-col items-start gap-1.5">
+                                {getStatusBadge(getEffectiveStatus(coupon))}
+                                {!!coupon.usedBy?.length && (
+                                  <span className="text-xs font-bold text-primary/80">
+                                    Used {coupon.usedBy.length} time{coupon.usedBy.length === 1 ? "" : "s"}
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
@@ -398,7 +412,12 @@ export default function Coupons() {
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-2">
-                            {getStatusBadge(coupon.status)}
+                            {getStatusBadge(getEffectiveStatus(coupon))}
+                            {!!coupon.usedBy?.length && (
+                              <span className="text-xs font-bold text-primary/80">
+                                Used {coupon.usedBy.length} time{coupon.usedBy.length === 1 ? "" : "s"}
+                              </span>
+                            )}
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <button className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">

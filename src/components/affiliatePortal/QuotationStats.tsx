@@ -59,7 +59,7 @@ const QuotationStats = ({ data }: QuotationStatsProps) => {
                         <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
                             {stat.label}
                         </p>
-                        <p className="text-xl font-bold text-slate-900 mt-1">
+                        <p className="text-lg font-bold text-slate-900 mt-1">
                             {stat.value}
                         </p>
                     </div>

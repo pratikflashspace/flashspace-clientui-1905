@@ -354,21 +354,21 @@ const QuotationGenerator = () => {
             Viewed: "bg-blue-50 text-blue-600",
             Accepted: "bg-emerald-50 text-emerald-600",
         };
-        return <span className={`text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap ${map[status] || map.Sent}`}>{status}</span>;
+        return <span className={`text-sm font-bold px-3 py-1 rounded-full whitespace-nowrap ${map[status] || map.Sent}`}>{status}</span>;
     };
 
     return (
-        <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-700">
+ <div className="mx-auto min-h-screen p-4 md:p-6 lg:p-8 space-y-8 animate-in fade-in duration-700"> 
 
             {/* ===== VIEW ALL MODAL ===== */}
             {showAllModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAllModal(false)} />
-                    <div className="relative bg-[#f8f8f8] w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+                    <div className="relative bg-white w-full max-w-5xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
                         {/* Modal Header */}
                         <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
                             <div>
-                                <h2 className="text-xl font-bold text-gray-900">All Quotations</h2>
+                                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900">All Quotations</h2>
                                 <p className="text-sm text-gray-500 mt-0.5">{filteredAll.length} quotation{filteredAll.length !== 1 ? 's' : ''} found</p>
                             </div>
                             <button onClick={() => setShowAllModal(false)} className="p-2.5 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
@@ -409,29 +409,29 @@ const QuotationGenerator = () => {
                                 <table className="w-full text-sm">
                                     <thead className="sticky top-0 bg-gray-50/80 backdrop-blur-sm">
                                         <tr className="text-left">
-                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Quotation ID</th>
-                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Client</th>
-                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Space</th>
-                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Location</th>
-                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Price</th>
-                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Date</th>
-                                            <th className="px-6 py-3.5 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                                            <th className="px-6 py-3.5 text-sm font-bold text-gray-400 uppercase tracking-wider">Quotation ID</th>
+                                            <th className="px-6 py-3.5 text-sm font-bold text-gray-400 uppercase tracking-wider">Client</th>
+                                            <th className="px-6 py-3.5 text-sm font-bold text-gray-400 uppercase tracking-wider">Space</th>
+                                            <th className="px-6 py-3.5 text-sm font-bold text-gray-400 uppercase tracking-wider">Location</th>
+                                            <th className="px-6 py-3.5 text-sm font-bold text-gray-400 uppercase tracking-wider">Price</th>
+                                            <th className="px-6 py-3.5 text-sm font-bold text-gray-400 uppercase tracking-wider">Date</th>
+                                            <th className="px-6 py-3.5 text-sm font-bold text-gray-400 uppercase tracking-wider">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-50">
                                         {pagedAll.map((q) => (
                                             <tr key={q.id} className="hover:bg-gray-50/50 transition-colors group">
                                                 <td className="px-6 py-4">
-                                                    <span className="text-[11px] font-bold text-[#5bb09c] uppercase tracking-wider">{q.id}</span>
+                                                    <span className="text-sm font-bold text-[#5bb09c] uppercase tracking-wider">{q.id}</span>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <p className="font-semibold text-gray-900">{q.clientName}</p>
-                                                    <p className="text-[11px] text-gray-400">{q.company}</p>
+                                                    <p className="text-sm text-gray-400">{q.company}</p>
                                                 </td>
                                                 <td className="px-6 py-4 text-gray-600 max-w-[160px] truncate">{q.spaceDetails}</td>
-                                                <td className="px-6 py-4 text-gray-500 text-[12px] max-w-[140px] truncate">{q.location}</td>
+                                                <td className="px-6 py-4 text-gray-500 text-sm max-w-[140px] truncate">{q.location}</td>
                                                 <td className="px-6 py-4 font-bold text-gray-900">{q.price}</td>
-                                                <td className="px-6 py-4 text-gray-400 text-[12px] whitespace-nowrap">{q.date}</td>
+                                                <td className="px-6 py-4 text-gray-400 text-sm whitespace-nowrap">{q.date}</td>
                                                 <td className="px-6 py-4">{statusBadge(q.status)}</td>
                                             </tr>
                                         ))}
@@ -487,8 +487,8 @@ const QuotationGenerator = () => {
             )}
             {/* Header Section */}
             <div className="mb-10">
-                <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-                    Quotation <span className="text-[#4A6D56] italic">Generator</span>
+                <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                    Quotation <span className="text-[#36503F] italic">Generator</span>
                 </h1>
                 <p className="text-[#6b7280] mt-2 text-lg font-medium">
                     Create instant quotations with FlashSpace and your affiliate branding
@@ -498,12 +498,12 @@ const QuotationGenerator = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* LEFT COLUMN: FORM AREA (7/12) */}
                 <div className="lg:col-span-7 animate-slide-up">
-                    <div className="bg-[#f8f8f8] p-6 md:p-10 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-10">
+                    <div className="bg-white p-6 md:p-10 rounded-xl border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 space-y-10">
                         <div className="flex items-center gap-3 pb-6 border-b border-gray-100">
                             <div className="p-2.5 bg-gray-50 rounded-xl text-gray-600">
                                 <FileText className="w-6 h-6" />
                             </div>
-                            <h2 className="text-2xl font-bold text-[#1a1a1a]">
+                            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-extrabold text-[#1A1A1A]">
                                 Create New Quotation
                             </h2>
                         </div>
@@ -511,7 +511,7 @@ const QuotationGenerator = () => {
                         {/* Client Details */}
                         <div className="space-y-6">
                             <div className="mb-4">
-                                <h3 className="text-base font-bold text-[#1a1a1a]">
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1a1a1a]">
                                     Client Details
                                 </h3>
                             </div>
@@ -562,7 +562,7 @@ const QuotationGenerator = () => {
                         {/* Space Requirements */}
                         <div className="space-y-6">
                             <div className="mb-4">
-                                <h3 className="text-base font-bold text-[#1a1a1a]">
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1a1a1a]">
                                     Space Requirements
                                 </h3>
                             </div>
@@ -573,7 +573,7 @@ const QuotationGenerator = () => {
                                         <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.spaceType ? "bg-red-50" : ""}`}>
                                             <SelectValue placeholder="Select space type" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                        <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                             <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" value="Virtual Office">Virtual Office</SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -585,7 +585,7 @@ const QuotationGenerator = () => {
                                         <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.city ? "bg-red-50" : ""}`}>
                                             <SelectValue placeholder="Select city" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                        <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                             {AFFILIATE_PRICING_CITIES.map((city) => (
                                                 <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" key={city} value={city}>{city}</SelectItem>
                                             ))}
@@ -621,7 +621,7 @@ const QuotationGenerator = () => {
                                             <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.location ? "bg-red-50" : ""}`}>
                                                 <SelectValue placeholder="Choose an office from results" />
                                             </SelectTrigger>
-                                            <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                            <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                                 {availableSpaces.map(space => (
                                                     <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#5bb09c]/10 focus:text-[#5bb09c] font-semibold transition-colors py-3 pr-3 pl-10" key={space._id} value={space._id}>
                                                         {space.name} ({space.area})
@@ -641,7 +641,7 @@ const QuotationGenerator = () => {
                                                 <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.discountPercent ? "bg-red-50" : ""}`}>
                                                     <SelectValue placeholder="Select discount" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                                <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                                     {AFFILIATE_DISCOUNTS.map((discount) => {
                                                         const option = selectedSpace.discounts?.[discount];
                                                         return option ? (
@@ -660,7 +660,7 @@ const QuotationGenerator = () => {
                                                 <SelectTrigger className={`bg-[#f9fafb] border-0 hover:bg-gray-100 transition-colors focus:ring-1 focus:ring-gray-200 h-14 rounded-xl text-[#374151] ${errors.duration ? "bg-red-50" : ""}`}>
                                                     <SelectValue placeholder="Select duration" />
                                                 </SelectTrigger>
-                                                <SelectContent className="bg-[#f8f8f8] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
+                                                <SelectContent className="bg-white rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] border border-gray-100 z-50 w-[var(--radix-select-trigger-width)]">
                                                     {[1, 2, 3, 6, 12, 24].map(m => (
                                                         <SelectItem className="rounded-lg cursor-pointer my-1 hover:bg-gray-50 focus:bg-[#2d5a4c]/10 focus:text-[#2d5a4c] font-semibold transition-colors py-3 pr-3 pl-10" key={m} value={m.toString()}>{m} {m === 1 ? 'Month' : 'Months'}</SelectItem>
                                                     ))}
@@ -695,7 +695,7 @@ const QuotationGenerator = () => {
                         </div>
 
                         {/* Price Calculation Block */}
-                        <div className="bg-[#f9fafb] p-8 rounded-[2rem] space-y-3 relative overflow-hidden group">
+                        <div className="bg-[#f9fafb] p-8 rounded-xl space-y-3 relative overflow-hidden group">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center relative z-10 gap-4">
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-[#2d5a4c]">
@@ -712,8 +712,8 @@ const QuotationGenerator = () => {
                                         )}
                                     </p>
                                 </div>
-                                <div className="bg-white px-6 py-4 rounded-3xl shadow-sm border border-gray-100/60">
-                                    <span className="text-3xl font-black text-gray-900 tracking-tight">
+                                <div className="bg-white px-6 py-4 rounded-xl shadow-sm border border-gray-100/60">
+                                    <span className="text-3xl font-extrabold text-gray-900 tracking-tight">
                                         ₹{calculatePrice().toLocaleString("en-IN")}
                                     </span>
                                 </div>
@@ -737,8 +737,8 @@ const QuotationGenerator = () => {
                 {/* RIGHT COLUMN: SIDEBAR (5/12) */}
                 <div className="lg:col-span-5 space-y-8 animate-slide-up">
                     {/* Recent Quotations Section */}
-                    <div className="bg-[#f8f8f8] p-6 md:p-8 rounded-[2rem] border border-gray-200 shadow space-y-6">
-                        <h3 className="font-bold text-[#1a1a1a] text-xl">
+                    <div className="bg-white p-6 md:p-8 rounded-xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] space-y-6">
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A]">
                             Recent Quotations
                         </h3>
                         <button
@@ -762,9 +762,9 @@ const QuotationGenerator = () => {
                     </div>
 
                     {/* Fixed Performance Section */}
-                    <div className="bg-[#f8f8f8] p-6 md:p-8 rounded-[2rem] border border-gray-200 shadow space-y-6">
+                    <div className="bg-white p-6 md:p-8 rounded-xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] space-y-6">
                         <div className="pb-4 border-b border-gray-100/50">
-                            <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A] flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-[#ffb020]"></span>
                                 Quotation Stats
                             </h3>

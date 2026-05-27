@@ -426,15 +426,15 @@ const Notifications = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] items-start gap-8">
           <section className="space-y-8">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="space-y-1">
-                <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
-                  My <span className="text-[#4A6D56] italic">Notifications</span>
+                <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-[#1A1A1A] tracking-tight tracking-tight">
+                  My <span className="text-[#36503F] italic">Notifications</span>
                 </h1>
                 <p className="text-sm md:text-base text-gray-500 font-medium">
                   Stay updated with all your workspace activities
@@ -465,7 +465,7 @@ const Notifications = () => {
 
             <div className="flex items-center justify-between">
               <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-2xl font-bold text-[#35503F]">
+                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-bold text-[#35503F]">
                   {activeView === "deleted" ? "Deleted Notifications" : "Recent Notifications"}
                 </h2>
                 <div className="inline-flex rounded-2xl border border-gray-200 bg-white p-1 shadow-sm">
@@ -538,7 +538,7 @@ const Notifications = () => {
           </section>
 
           <aside className="h-fit rounded-2xl border border-[#d8e3df] bg-white p-4 shadow-sm sm:p-5">
-            <h3 className="text-xl font-semibold leading-none text-[#13282b]">Notification Preferences</h3>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-xl font-semibold leading-none text-[#13282b]">Notification Preferences</h3>
 
             <div className="mt-4 space-y-4">
               {preferenceItems.map((item) => (

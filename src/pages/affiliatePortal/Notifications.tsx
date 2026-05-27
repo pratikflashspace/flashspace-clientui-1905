@@ -314,15 +314,15 @@ const Notifications = () => {
 
 
   return (
-    <div className="min-h-screen bg-[#f7f7f6] py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#f7f7f6] ">
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col items-start gap-8">
           <section className="space-y-8 w-full">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="space-y-1">
-                <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-                  My <span className="text-[#4A6D56] italic">Notifications</span>
+                <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                  My <span className="text-[#36503F] italic">Notifications</span>
                 </h1>
                 <p className="text-sm md:text-base text-gray-500 font-medium">
                   Stay updated with all your workspace activities
@@ -353,7 +353,7 @@ const Notifications = () => {
 
             <div className="flex items-center justify-between">
               <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-2xl font-bold text-[#35503F]">
+                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="font-sans text-2xl font-bold text-[#35503F]">
                   {activeView === "deleted" ? "Deleted Notifications" : "Recent Notifications"}
                 </h2>
                 <div className="inline-flex rounded-2xl border border-gray-200 bg-white p-1 shadow-sm">

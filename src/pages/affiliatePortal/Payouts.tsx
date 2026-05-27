@@ -82,27 +82,30 @@ const getNextSundayDateTime = () => {
         year: "numeric"
     });
     
-    return `${formattedDate} at 7 PM`;
+    return formattedDate;
 };
 
 const StatCard = ({
     label,
     value,
     subValue,
-    colorClass = "text-slate-900",
+    colorClass = "text-[#1A1A1A]",
     delay,
 }: {
     label: string;
-    value: number | string;
+    value: number | string | React.ReactNode;
     subValue?: string;
     colorClass?: string;
     delay: number;
 }) => (
     <div
-        className="bg-[#f8f8f8] p-7 rounded-[2rem] border border-gray-200 shadow transition-all duration-300 group animate-fade-in-up"
+        className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg animate-fade-in-up"
         style={{ animationDelay: `${delay}ms` }}
     >
-        <h3 className={`text-3xl font-bold ${colorClass} mb-1 flex items-baseline gap-1`}>
+        <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-[#6B8F78]">{label}</span>
+        </div>
+        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-3xl font-extrabold ${colorClass} tracking-tight flex items-baseline gap-1`}>
             {typeof value === "number" ? (
                 <AnimatedCounter
                     value={value}
@@ -114,7 +117,6 @@ const StatCard = ({
                 value
             )}
         </h3>
-        <p className="text-gray-500 font-medium text-sm">{label}</p>
     </div>
 );
 
@@ -214,13 +216,13 @@ const Payouts = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans w-full relative">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#f7f7f6] font-sans w-full relative"> 
             <div className="w-full space-y-8 animate-fade-in">
                 {/* 1. Header */}
                 <div className="space-y-2">
-                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
                         Payout{" "}
-                        <span className="text-[#4A6D56] italic">
+                        <span className="text-[#36503F] italic">
                             Management
                         </span>
                     </h1>
@@ -251,7 +253,12 @@ const Payouts = () => {
                     {/* Static value for date */}
                     <StatCard
                         label="Next Auto Payout"
-                        value={getNextSundayDateTime()}
+                        value={
+                            <div className="flex flex-col">
+                                <span>{getNextSundayDateTime()}</span>
+                                <span className="text-[10px] sm:text-xs font-bold text-gray-400 mt-0.5 uppercase tracking-wide">(at 7 PM)</span>
+                            </div>
+                        }
                         colorClass="text-[1.2rem] text-[#35503F]"
                         delay={300}
                     />
@@ -312,7 +319,7 @@ const Payouts = () => {
                                                 </span>
                                                 <StatusBadge status={"Pending"} />
                                             </div>
-                                            <h3 className="text-xl font-bold text-slate-900">
+                                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-xl font-bold text-slate-900">
                                                 {formatDate(item.date)}
                                             </h3>
                                             <p className="text-sm text-gray-500">
@@ -324,7 +331,7 @@ const Payouts = () => {
                                                 {formatCurrency(item.commission)}
                                             </p>
                                             <div className="w-full md:w-auto px-4 py-2 bg-[#f0f4f3] text-[#35503F] rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
-                                                <Clock size={16} /> Auto Payout: {getNextSundayDateTime()}
+                                                <Clock size={16} /> Auto Payout: {getNextSundayDateTime()} (at 7 PM)
                                             </div>
                                         </div>
                                     </div>
@@ -406,7 +413,7 @@ const Payouts = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in no-print">
                     <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl flex flex-col animate-scale-up relative overflow-hidden">
                         <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white">
-                            <h2 className="font-bold text-lg text-slate-800">Confirm Bank Details</h2>
+                            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-lg text-slate-800">Confirm Bank Details</h2>
                             <button
                                 onClick={() => setShowBankModal(false)}
                                 className="p-2 hover:bg-gray-100 rounded-full transition"
@@ -459,7 +466,7 @@ const Payouts = () => {
                         <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-5 ring-8 ring-green-50">
                             <CheckCircle2 size={40} />
                         </div>
-                        <h2 className="font-bold text-2xl text-slate-900 mb-2">Payout Initiated!</h2>
+                        <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-2xl text-slate-900 mb-2">Payout Initiated!</h2>
                         <p className="text-sm text-gray-500 mb-8 px-2 font-medium">
                             Your payout request has been successfully submitted. The amount will reflect in your account within 2-3 business days.
                         </p>

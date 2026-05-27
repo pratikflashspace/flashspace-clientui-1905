@@ -175,10 +175,10 @@ const CommissionCalculator = () => {
   }
 
   return (
-    <div className="bg-[#f8f8f8] rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 p-6 md:p-8 mb-10 relative">
+    <div className="bg-white rounded-xl border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 p-6 md:p-8 mb-10 relative">
       {/* Decorative background element safely clipped */}
-      <div className="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#35503F]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+      <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-[#36503F]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
       </div>
       
       <div className="relative z-10 flex flex-col lg:flex-row gap-8">
@@ -186,10 +186,10 @@ const CommissionCalculator = () => {
         {/* Left side: Inputs */}
         <div className="flex-1 space-y-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2.5 bg-white shadow-sm rounded-xl text-[#35503F]">
+            <div className="p-2.5 bg-white shadow-sm rounded-xl text-[#36503F]">
               <Calculator className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-extrabold text-[#1a1a1a]">Commission Calculator</h2>
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1a1a1a]">Commission Calculator</h2>
           </div>
           <p className="text-sm font-medium text-gray-500 mb-6">
             See exactly how much your client pays and how much you earn based on the discount you provide.
@@ -244,7 +244,7 @@ const CommissionCalculator = () => {
                     <button
                       key={year}
                       onClick={() => setDuration(year)}
-                      className={`flex-1 py-2 px-4 rounded-xl text-sm font-bold transition-all ${duration === year ? 'bg-[#35503F] text-[#FEF8C5] shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
+                      className={`flex-1 py-2 px-4 rounded-xl text-sm font-bold transition-all ${duration === year ? 'bg-[#36503F] text-[#FEF8C5] shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
                     >
                       {year} Year{year > 1 ? 's' : ''}
                     </button>
@@ -259,7 +259,7 @@ const CommissionCalculator = () => {
                     <Percent className="w-4 h-4 text-gray-400" />
                     Discount Range
                   </label>
-                  <div className="bg-emerald-50 text-[#35503F] px-3 py-1 rounded-lg font-black text-sm border border-emerald-100 shadow-sm">
+                  <div className="bg-emerald-50 text-[#36503F] px-3 py-1 rounded-lg font-bold text-sm border border-emerald-100 shadow-sm">
                     {effectiveDiscount}%
                   </div>
                 </div>
@@ -291,14 +291,14 @@ const CommissionCalculator = () => {
         {/* Right side: Results */}
         <div className="flex-1 lg:pl-8 lg:border-l border-gray-200 flex flex-col justify-center gap-4">
           {/* Listed Price */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex justify-between items-center group hover:shadow-md transition-all">
+          <div className="bg-white p-5 rounded-2xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] flex justify-between items-center group hover:shadow-md transition-all">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-1">Listed Price</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-1">Listed Price</p>
               <p className="text-xs text-gray-500 font-medium">{selectedSpace?.planName || "Plan"}</p>
             </div>
             <div className="flex items-center gap-1">
               <IndianRupee className="w-4 h-4 text-gray-400" />
-              <span className="text-xl font-bold text-gray-400 line-through decoration-2 decoration-red-400/50">
+              <span className="text-3xl font-extrabold text-gray-400 line-through decoration-2 decoration-red-400/50">
                 {listedPrice.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </span>
             </div>
@@ -307,14 +307,14 @@ const CommissionCalculator = () => {
           {/* Customer Pays */}
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-6 rounded-2xl shadow-lg flex justify-between items-center transform transition-transform hover:-translate-y-1">
             <div>
-              <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 mb-1">Customer Pays</p>
-              <div className="inline-block bg-white/10 text-white text-[10px] px-2 py-0.5 rounded font-bold backdrop-blur-sm">
+              <p className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-1">Customer Pays</p>
+              <div className="inline-block bg-white/10 text-white text-sm px-2 py-0.5 rounded font-bold backdrop-blur-sm">
                 After {discount}% OFF
               </div>
             </div>
             <div className="flex items-center gap-1 text-white">
               <IndianRupee className="w-6 h-6 text-emerald-400" />
-              <span className="text-3xl font-black tracking-tight">
+              <span className="text-3xl font-extrabold tracking-tight">
                 {customerPays.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </span>
             </div>
@@ -324,12 +324,12 @@ const CommissionCalculator = () => {
           <div className="bg-gradient-to-br from-[#35503F] to-[#23382b] p-6 rounded-2xl shadow-[0_8px_30px_rgba(53,80,63,0.2)] flex justify-between items-center relative overflow-hidden transform transition-transform hover:-translate-y-1">
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
             <div className="relative z-10">
-              <p className="text-[11px] font-black uppercase tracking-widest text-emerald-200/70 mb-1">Your Commission</p>
+              <p className="text-sm font-bold uppercase tracking-widest text-emerald-200/70 mb-1">Your Commission</p>
               <p className="text-xs text-emerald-100/60 font-medium">Margin based payout</p>
             </div>
             <div className="relative z-10 flex items-center gap-1 text-[#FEF8C3]">
               <IndianRupee className="w-8 h-8 opacity-80" />
-              <span className="text-4xl font-black tracking-tight drop-shadow-sm">
+              <span className="text-3xl font-extrabold tracking-tight drop-shadow-sm">
                 {commission.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </span>
             </div>

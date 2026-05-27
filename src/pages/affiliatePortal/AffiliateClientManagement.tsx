@@ -24,6 +24,8 @@ interface ClientBooking {
     commissionAmount: number; // ← replaces revenue
     couponCode: string;
     status: string;
+    partnerKycStatus: string;
+    partnerReviewStatus: string;
     startDate?: string;
     createdAt?: string;
 }
@@ -39,6 +41,7 @@ interface ClientStats {
 const statusColors: Record<string, string> = {
     active: "bg-green-100 text-green-700 border-green-200",
     pending_kyc: "bg-yellow-100 text-yellow-700 border-yellow-200",
+    pending_partner: "bg-blue-100 text-blue-700 border-blue-200",
     pending_payment: "bg-orange-100 text-orange-700 border-orange-200",
     expired: "bg-gray-100 text-gray-500 border-gray-200",
     cancelled: "bg-red-100 text-red-600 border-red-200",
@@ -187,10 +190,11 @@ const AffiliateClientManagement: React.FC = () => {
 
     // ─── Render ───────────────────────────────────────────────────────────────
     return (
-        <div className="p-6 md:p-8 max-w-7xl mx-auto space-y-8">
+        <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#FAFAF7] font-sans relative w-full">
+            <div className="max-w-7xl mx-auto space-y-8">
             {/* Header */}
             <div>
-                <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Client Management</h1>
+                <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">Client Management</h1>
                 <p className="text-gray-500 text-sm mt-1">
                     Clients who booked through your affiliate coupon code.{" "}
                     <span className="font-medium text-[#5aa39c]">{stats.commissionRate}% commission</span> on paid amount.
@@ -204,7 +208,7 @@ const AffiliateClientManagement: React.FC = () => {
                         <Users2 className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                        <p className="text-2xl font-bold text-slate-900">{stats.totalClients}</p>
+                        <p className="text-2xl font-extrabold text-slate-900">{stats.totalClients}</p>
                         <p className="text-xs text-gray-500">Total Clients</p>
                     </div>
                 </div>
@@ -214,7 +218,7 @@ const AffiliateClientManagement: React.FC = () => {
                         <BadgePercent className="w-5 h-5 text-emerald-600" />
                     </div>
                     <div>
-                        <p className="text-2xl font-bold text-slate-900">{formatCurrency(stats.totalCommission)}</p>
+                        <p className="text-2xl font-extrabold text-slate-900">{formatCurrency(stats.totalCommission)}</p>
                         <p className="text-xs text-gray-500">Total Commission Earned</p>
                     </div>
                 </div>
@@ -273,7 +277,7 @@ const AffiliateClientManagement: React.FC = () => {
                                 </label>
                                 <div className="space-y-2">
                                     <div>
-                                        <label className="text-[11px] text-gray-400 mb-0.5 block">From</label>
+                                        <label className="text-sm text-gray-400 mb-0.5 block">From</label>
                                         <input
                                             type="date"
                                             value={pendingDateFrom}
@@ -283,7 +287,7 @@ const AffiliateClientManagement: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-[11px] text-gray-400 mb-0.5 block">To</label>
+                                        <label className="text-sm text-gray-400 mb-0.5 block">To</label>
                                         <input
                                             type="date"
                                             value={pendingDateTo}
@@ -347,7 +351,7 @@ const AffiliateClientManagement: React.FC = () => {
             {filtered.length === 0 ? (
                 <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
                     <BookOpen className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                    <h3 className="text-gray-700 font-semibold mb-1">
+                    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-sans text-gray-700 font-semibold mb-1">
                         {clients.length === 0 ? "No clients yet" : "No results found"}
                     </h3>
                     <p className="text-sm text-gray-400 max-w-sm mx-auto">
@@ -357,7 +361,7 @@ const AffiliateClientManagement: React.FC = () => {
                     </p>
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="bg-white rounded-2xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
@@ -427,9 +431,17 @@ const AffiliateClientManagement: React.FC = () => {
 
                                         {/* Status */}
                                         <td className="px-5 py-4">
-                                            <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold border uppercase tracking-wider ${statusColors[c.status] || "bg-gray-50 text-gray-500 border-gray-200"}`}>
-                                                {c.status.replace(/_/g, " ")}
-                                            </span>
+                                            {(() => {
+                                                let displayStatus = c.status;
+                                                if (displayStatus === "active" && c.partnerKycStatus !== "approved") {
+                                                    displayStatus = "pending_partner";
+                                                }
+                                                return (
+                                                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold border uppercase tracking-wider ${statusColors[displayStatus] || "bg-gray-50 text-gray-500 border-gray-200"}`}>
+                                                        {displayStatus.replace(/_/g, " ")}
+                                                    </span>
+                                                );
+                                            })()}
                                         </td>
 
                                         {/* Date */}
@@ -483,6 +495,7 @@ const AffiliateClientManagement: React.FC = () => {
                     </div>
                 </div>
             )}
+        </div>
         </div>
     );
 };

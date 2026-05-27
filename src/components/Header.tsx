@@ -23,15 +23,10 @@ interface HeaderProps {
 }
 
 const navItems = [
-  { label: "Solutions", href: "/solutions/virtual-office", hasDropdown: true },
-  { label: "Workspaces", href: "/services/virtual-office" },
+  { label: "Virtual Office", href: "/services/virtual-office" },
+  { label: "Coworking Space", href: "/services/coworking-space" },
   { label: "Business Setup", href: "/services/business-setup" },
   { label: "Partners", href: "/partner" },
-];
-
-const solutionItems = [
-  { label: "Virtual Office", href: "/solutions/virtual-office" },
-  { label: "Coworking Space", href: "/solutions/coworking-space" },
 ];
 
 const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
@@ -40,14 +35,12 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
   const { isAuthenticated, user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSolutionsOpen, setIsSolutionsOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
   const [isSignupOpen, setIsSignupOpen] = useState(openSignup);
   const [isPartnerChoiceOpen, setIsPartnerChoiceOpen] = useState(false);
   const [signupRole, setSignupRole] = useState<"user" | "partner" | "affiliate">("user");
-  const solutionsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const currentRoute = `${location.pathname}${location.search}${location.hash}`;
   const loginRedirectTo = (() => {
@@ -83,9 +76,6 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (solutionsRef.current && !solutionsRef.current.contains(event.target as Node)) {
-        setIsSolutionsOpen(false);
-      }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
       }
@@ -265,52 +255,15 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex">
-            {navItems.map((item) =>
-              item.hasDropdown ? (
-                <div
-                  key={item.label}
-                  ref={solutionsRef}
-                  className="relative"
-                  onMouseEnter={() => setIsSolutionsOpen(true)}
-                  onMouseLeave={() => setIsSolutionsOpen(false)}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setIsSolutionsOpen((value) => !value)}
-                    className="flex items-center gap-1 text-sm font-medium text-[#36503F] transition-colors hover:text-[#1F2E26]"
-                  >
-                    {item.label}
-                    <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", isSolutionsOpen && "rotate-180")} />
-                  </button>
-
-                  <div className={cn(
-                    "absolute left-1/2 top-full w-56 -translate-x-1/2 pt-4 transition-all duration-200",
-                    isSolutionsOpen ? "visible opacity-100" : "invisible opacity-0"
-                  )}>
-                    <div className="rounded-xl border border-white/15 bg-[#36503F]/95 p-2 shadow-[0_14px_34px_rgba(0,0,0,0.22)] backdrop-blur-xl">
-                      {solutionItems.map((solution) => (
-                        <Link
-                          key={solution.label}
-                          to={solution.href}
-                          onClick={() => setIsSolutionsOpen(false)}
-                          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-white/85 transition-colors hover:bg-white/10 hover:text-white"
-                        >
-                          {solution.label}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  className="text-sm font-medium text-[#36503F] transition-colors hover:text-[#1F2E26]"
-                >
-                  {item.label}
-                </Link>
-              )
-            )}
+            {navItems.map((item) => (
+              <Link
+                key={item.label}
+                to={item.href}
+                className="text-sm font-medium text-[#36503F] transition-colors hover:text-[#1F2E26]"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="flex items-center gap-3">
@@ -391,32 +344,14 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
           </div>
           <nav className="flex flex-col gap-1">
             {navItems.map((item, index) => (
-              item.hasDropdown ? (
-                <div key={item.label} className="rounded-lg px-2 py-3">
-                  <p className="mb-3 text-base font-medium text-[#FEF8C5]">{item.label}</p>
-                  <div className="space-y-1">
-                    {solutionItems.map((solution) => (
-                      <Link
-                        key={solution.label}
-                        to={solution.href}
-                        onClick={closeDrawer}
-                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold text-white/85 hover:bg-white/10 hover:text-white"
-                      >
-                        {solution.label}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <Link
-                  key={item.label}
-                  to={item.href}
-                  onClick={closeDrawer}
-                  className={cn("rounded-lg px-2 py-3 text-base font-medium text-white", index === 0 && "text-[#FEF8C5]")}
-                >
-                  {item.label}
-                </Link>
-              )
+              <Link
+                key={item.label}
+                to={item.href}
+                onClick={closeDrawer}
+                className={cn("rounded-lg px-2 py-3 text-base font-medium text-white", index === 0 && "text-[#FEF8C5]")}
+              >
+                {item.label}
+              </Link>
             ))}
           </nav>
           <button onClick={() => { closeDrawer(); setIsContactOpen(true); }} className="mt-8 w-full rounded-full border border-[#FEF8C5]/70 bg-[#36503F] px-5 py-3 text-sm font-bold text-[#FEF8C5] hover:bg-[#1F2E26]">

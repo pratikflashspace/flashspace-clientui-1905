@@ -23,7 +23,7 @@ export interface CreateOrderPayload {
   userEmail: string;
   userName: string;
   userPhone?: string;
-  spaceId: string;
+  spaceId?: string;
   spaceName: string;
   planName: string;
   planKey: string;
@@ -36,7 +36,8 @@ export interface CreateOrderPayload {
   | "virtual_office"
   | "coworking_space"
   | "meeting_room"
-  | "seat_booking";
+  | "seat_booking"
+  | "business_setup";
   startDate?: string; // ISO date string for booking start
   holdId?: string;
   couponCode?: string; // Coupon code applied by user (for affiliate attribution)

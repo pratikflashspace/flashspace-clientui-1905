@@ -74,7 +74,7 @@ const LeadManagementAffiliate = () => {
         <div className="mx-auto w-full p-6 lg:p-10 pb-2 lg:pb-4 space-y-8 animate-in fade-in duration-500">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Lead Management</h1>
+                <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">Lead Management</h1>
 
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>
@@ -141,7 +141,7 @@ const LeadManagementAffiliate = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse min-w-[800px]">
                                 <thead>
-                                    <tr className="border-b border-gray-50 text-gray-400 text-[11px] uppercase tracking-widest font-bold">
+                                    <tr className="border-b border-gray-50 text-gray-400 text-sm uppercase tracking-widest font-bold">
                                         <th className="px-6 py-4">Lead</th>
                                         <th className="px-6 py-4">Company</th>
                                         <th className="px-6 py-4">Interest</th>

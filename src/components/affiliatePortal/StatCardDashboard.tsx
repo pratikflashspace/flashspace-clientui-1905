@@ -2,7 +2,7 @@ import { TrendingUp } from "lucide-react";
 
 const StatCardDashboard = ({ label, value, trend, icon: Icon, delay }: any) => (
     <div
-        className="bg-[#f8f8f8] px-8 py-7 rounded-2xl border border-gray-200 shadow transition-all duration-300 animate-fade-in-up"
+        className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg"
         style={{ animationDelay: `${delay}ms` }}
     >
         <div className="flex items-center justify-between mb-4">

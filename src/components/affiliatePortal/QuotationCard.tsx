@@ -349,7 +349,7 @@ const QuotationCard = ({
                         {/* Sticky Header */}
                         <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-10 flex-shrink-0">
                             <div className="flex items-center gap-3">
-                                <h2 className="font-bold text-lg text-slate-800">{id}</h2>
+                                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-800">{id}</h2>
                                 <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusStyles[status]}`}>{status}</span>
                             </div>
                             <button onClick={() => setShowPreview(false)} className="p-2 hover:bg-gray-100 rounded-full transition">
@@ -364,7 +364,7 @@ const QuotationCard = ({
                                 {/* Header Row */}
                                 <div className="flex justify-between items-start mb-8">
                                     <div>
-                                        <h1 className="text-2xl font-bold text-[#5bb09c] mb-1">FlashSpace</h1>
+                                        <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-extrabold text-[#5bb09c] mb-1">FlashSpace</h1>
                                         <p className="text-sm text-gray-500 font-medium">Virtual Office Solutions</p>
                                         <div className="mt-3 text-xs text-gray-500 leading-relaxed">
                                             <p>123 Business Hub, Connaught Place</p>
@@ -374,7 +374,7 @@ const QuotationCard = ({
                                     </div>
                                     <div className="text-right">
                                         <div className="flex flex-col items-end gap-1">
-                                            <h2 className="text-lg font-bold text-slate-900">Quotation</h2>
+                                            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-900">Quotation</h2>
                                             <span className="text-sm font-mono text-[#5bb09c] font-bold">{id}</span>
                                         </div>
                                         <div className="mt-4 text-xs text-right space-y-1">
@@ -394,7 +394,7 @@ const QuotationCard = ({
                                 <div className="mb-8">
                                     <p className="text-xs font-bold text-gray-500 uppercase mb-2">Prepared For</p>
                                     <div className="text-sm text-slate-900">
-                                        <p className="font-bold text-base">{clientName}</p>
+                                        <p className="font-bold text-sm">{clientName}</p>
                                         <p className="text-gray-500 mt-0.5">{location}</p>
                                     </div>
                                 </div>
@@ -499,14 +499,14 @@ const QuotationCard = ({
                 </div>
             )}
 
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow relative transition-all group">
+            <div className="bg-white p-6 rounded-2xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] relative transition-all group">
                 {/* Top Row: ID and Status Badge */}
                 <div className="flex justify-between items-start mb-4">
                     <span className="text-xs font-medium text-gray-400">
                         {id}
                     </span>
                     <span
-                        className={`text-[11px] font-bold px-3 py-1 rounded-full ${statusStyles[status]}`}
+                        className={`text-sm font-bold px-3 py-1 rounded-full ${statusStyles[status]}`}
                     >
                         {status}
                     </span>
@@ -514,7 +514,7 @@ const QuotationCard = ({
 
                 {/* Info Section */}
                 <div className="mb-6">
-                    <h4 className="font-bold text-[#1a1a1a] text-lg mb-1">
+                    <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A] mb-1">
                         {clientName}
                     </h4>
                     <div className="text-sm text-gray-500 font-medium leading-relaxed">

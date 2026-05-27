@@ -207,6 +207,8 @@ export interface AffiliateBookingDto {
     amount: number;
     commission: number;
     status: string;
+    partnerKycStatus?: string;
+    partnerReviewStatus?: string;
     couponCode: string;
     startDate?: string;
     endDate?: string;

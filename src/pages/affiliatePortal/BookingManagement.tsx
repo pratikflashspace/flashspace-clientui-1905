@@ -4,6 +4,8 @@ import {
     Building2,
     Calendar,
     CheckCircle,
+    Clock,
+    RefreshCw,
     Download,
     Eye,
     Loader2,
@@ -85,20 +87,25 @@ const mapBooking = (booking: AffiliateBookingDto): Booking => {
 const StatCard = ({
     value,
     label,
-    colorClass,
+    icon: Icon,
     delay,
 }: {
     value: string;
     label: string;
-    colorClass: string;
+    icon: any;
     delay: number;
 }) => (
     <div
-        className="bg-[#f8f8f8] px-8 py-7 rounded-2xl border border-gray-200 shadow transition-all duration-300 animate-fade-in-up"
+        className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg"
         style={{ animationDelay: `${delay}ms` }}
     >
-        <h3 className={`text-[2rem] font-black ${colorClass} leading-none mb-2`} style={{ fontFamily: "'Inter Tight', sans-serif" }}>{value}</h3>
-        <p className="text-[#64748b] font-medium text-sm tracking-tight">{label}</p>
+        <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-[#6B8F78]">{label}</span>
+            <div className="w-8 h-8 rounded-lg bg-[#36503F]/10 flex items-center justify-center">
+                <Icon className="w-4 h-4 text-[#36503F]" />
+            </div>
+        </div>
+        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{value}</h3>
     </div>
 );
 
@@ -131,7 +138,7 @@ const BookingDetailsModal = ({
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
         <div className="relative w-full max-w-[500px] bg-white rounded-2xl shadow-2xl overflow-hidden animate-scale-up flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-6 pb-2">
-                <h2 className="text-xl font-bold text-slate-900">Booking Details</h2>
+                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-xl font-bold text-slate-900">Booking Details</h2>
                 <div className="flex items-center gap-3">
                     <StatusBadge status={booking.status} />
                     <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
@@ -167,7 +174,7 @@ const BookingDetailsModal = ({
                 </div>
 
                 <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-3">Plan Details</h3>
+                    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-sm font-bold text-slate-900 mb-3">Plan Details</h3>
                     <div className="bg-[#f8f9fa] p-5 rounded-xl space-y-3 border border-gray-100">
                         <div className="flex justify-between items-center gap-4">
                             <span className="text-sm text-gray-500 font-medium">Plan Type</span>
@@ -185,7 +192,7 @@ const BookingDetailsModal = ({
                 </div>
 
                 <div>
-                    <h3 className="text-sm font-bold text-slate-900 mb-3">Contact Information</h3>
+                    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-sm font-bold text-slate-900 mb-3">Contact Information</h3>
                     <div className="bg-[#f8f9fa] p-5 rounded-xl space-y-3 border border-gray-100">
                         <div className="flex items-center gap-3">
                             <Mail size={16} className="text-[#334D3D]" />
@@ -279,7 +286,7 @@ const BookingManagement = () => {
     });
 
     return (
-        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-12 font-sans w-full relative">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#f7f7f6] font-sans w-full relative"> 
             <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
             {selectedBooking && (
                 <BookingDetailsModal 
@@ -294,19 +301,19 @@ const BookingManagement = () => {
 
             <div className="w-full space-y-8 animate-fade-in">
                 <div className="animate-fade-in-down mb-10">
-                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-                        Booking <span className="text-[#4A6D56] italic">Management</span>
+                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                        Booking <span className="text-[#36503F] italic">Management</span>
                     </h1>
                     <p className="mt-2 text-lg font-medium text-[#6B8F78] tracking-tight">
                         Track all your referred clients and their bookings
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <StatCard value={`${activeBookings.length + pendingBookings.length + renewalBookings.length}`} label="Total Bookings" colorClass="text-[#1a2d1d]" delay={0} />
-                    <StatCard value={`${activeBookings.length}`} label="Active Bookings" colorClass="text-[#1a2d1d]" delay={100} />
-                    <StatCard value={`${pendingBookings.length}`} label="Pending Activation" colorClass="text-[#1a2d1d]" delay={200} />
-                    <StatCard value={`${renewalBookings.length}`} label="Renewals Due" colorClass="text-[#1a2d1d]" delay={300} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <StatCard value={`${activeBookings.length + pendingBookings.length + renewalBookings.length}`} label="Total Bookings" icon={Calendar} delay={0} />
+                    <StatCard value={`${activeBookings.length}`} label="Active Bookings" icon={CheckCircle} delay={100} />
+                    <StatCard value={`${pendingBookings.length}`} label="Pending Activation" icon={Clock} delay={200} />
+                    <StatCard value={`${renewalBookings.length}`} label="Renewals Due" icon={RefreshCw} delay={300} />
                 </div>
 
                 <div className="space-y-4">

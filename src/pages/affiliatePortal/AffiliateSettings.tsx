@@ -104,7 +104,7 @@ export default function SpacePortalSettings() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-2">
             <Bell size={18} className="text-slate-500" />
-            <h2 className="text-lg font-bold text-slate-900">
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-900">
               Notification Preferences
             </h2>
           </div>
@@ -132,7 +132,7 @@ export default function SpacePortalSettings() {
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-2">
             <ShieldCheck size={18} className="text-slate-500" />
-            <h2 className="text-lg font-bold text-slate-900">
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-900">
               Security Overview
             </h2>
           </div>

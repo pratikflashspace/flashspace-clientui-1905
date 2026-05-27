@@ -92,11 +92,11 @@ const LeaderBoard: React.FC = () => {
   }, [page]);
 
   return (
-    <div className="min-h-screen bg-[#FAFAF7] p-4 font-sans md:p-6 lg:p-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#FAFAF7] font-sans "> 
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
+            <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
               Affiliate <span className="italic text-[#36503F]">Leaderboard</span>
             </h1>
             <p className="mt-2 text-sm font-medium text-[#6B8F78] md:text-base">
@@ -113,7 +113,7 @@ const LeaderBoard: React.FC = () => {
                 {currentUser.rank ? `#${currentUser.rank}` : "-"}
               </div>
               <div className="min-w-0">
-                <h2 className="text-base font-extrabold leading-tight">Your Position</h2>
+                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-base font-extrabold leading-tight">Your Position</h2>
                 <p className="mt-1 truncate text-sm font-semibold leading-tight text-white/70">
                   {currentUser.rank
                     ? `Ranked #${currentUser.rank} of ${pagination.totalEntries} affiliates`
@@ -124,16 +124,16 @@ const LeaderBoard: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-8 text-center md:ml-auto md:w-[280px] md:gap-10">
               <div className="min-w-0">
-                <p className="text-[22px] font-black leading-none">{currentUser.successfulBookings}</p>
-                <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
+                <p className="text-2xl font-extrabold leading-none">{currentUser.successfulBookings}</p>
+                <p className="mt-1.5 text-xs font-bold uppercase tracking-[0.16em] text-white/45">
                   Bookings
                 </p>
               </div>
               <div className="min-w-0">
-                <p className="text-[22px] font-black leading-none text-[#FEF8C5]">
+                <p className="text-2xl font-extrabold leading-none text-[#FEF8C5]">
                   {formatCurrency(currentUser.totalCommission)}
                 </p>
-                <p className="mt-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/45">
+                <p className="mt-1.5 text-xs font-bold uppercase tracking-[0.16em] text-white/45">
                   Commission
                 </p>
               </div>
@@ -174,7 +174,7 @@ const LeaderBoard: React.FC = () => {
                   <col className="w-32" />
                 </colgroup>
                 <thead>
-                  <tr className="border-b border-[#DDE6DD] bg-[#FBFCFA] text-[10px] font-black uppercase tracking-[0.16em] text-[#6B8F78]">
+                  <tr className="border-b border-[#DDE6DD] bg-[#FBFCFA] text-xs font-bold uppercase tracking-[0.16em] text-[#6B8F78]">
                     <th className="px-6 py-4">#</th>
                     <th className="px-2 py-4 text-[#36503F]">
                       <div className="grid grid-cols-[44px_minmax(0,1fr)] items-center gap-4">
@@ -219,10 +219,10 @@ const LeaderBoard: React.FC = () => {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-4 text-center text-sm font-black text-[#1A1A1A]">
+                      <td className="px-4 py-4 text-center text-xs font-bold text-[#1A1A1A]">
                         {entry.successfulBookings}
                       </td>
-                      <td className="px-4 py-4 text-center text-sm font-black text-[#1A1A1A]">
+                      <td className="px-4 py-4 text-center text-xs font-bold text-[#1A1A1A]">
                         {formatCurrency(entry.totalCommission)}
                       </td>
                     </tr>

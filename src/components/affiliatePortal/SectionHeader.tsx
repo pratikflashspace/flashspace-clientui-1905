@@ -13,7 +13,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({ icon: Icon, title, subtit
             <Icon className="w-6 h-6" strokeWidth={2} />
         </div>
         <div className="space-y-0.5">
-            <h2 className="text-2xl font-extrabold tracking-tight text-[#1A1A1A]">{title}</h2>
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-extrabold tracking-tight text-[#1A1A1A]">{title}</h2>
             <p className="text-sm font-medium text-[#6B8F78]">{subtitle}</p>
         </div>
     </div>

@@ -172,12 +172,12 @@ export default function Support() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
-              Help & <span className="text-[#4A6D56] italic">Support</span>
+            <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-[#1A1A1A] tracking-tight tracking-tight">
+              Help & <span className="text-[#36503F] italic">Support</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Get help with your virtual office and coworking services
@@ -201,7 +201,7 @@ export default function Support() {
                 <div className={`w-14 h-14 rounded-2xl ${option.color} flex items-center justify-center mb-6`}>
                   <option.icon className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-bold text-[#35503F] mb-1">{option.title}</h3>
+                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-xl font-bold text-[#35503F] mb-1">{option.title}</h3>
                 <p className="text-sm text-gray-500 font-medium mb-4">{option.description}</p>
                 <div className="flex items-center gap-2 text-[#35503F] font-extrabold group-hover:gap-3 transition-all">
                   {option.value}
@@ -253,12 +253,12 @@ export default function Support() {
         {activeTab === "help" && (
           <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-[#35503F]" /> Frequently Asked Questions
               </h2>
               {faqs.map((category, catIdx) => (
                 <div key={catIdx} className="mb-6 last:mb-0">
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
+                  <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
                     {category.category === "Virtual Office" && <Building2 className="w-4 h-4" />}
                     {category.category === "Billing & Payments" && <CreditCard className="w-4 h-4" />}
                     {category.category === "KYC & Documents" && <FileText className="w-4 h-4" />}
@@ -291,7 +291,7 @@ export default function Support() {
 
         {activeTab === "contact" && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Send us a Message</h2>
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold text-gray-900 mb-6">Send us a Message</h2>
             {contactSubmitted ? <div className="text-center py-12">Message Sent!</div> : (
               <form onSubmit={handleContactSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

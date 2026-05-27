@@ -47,10 +47,10 @@ const LeaderboardRow = ({
 
                 {/* Name and Location */}
                 <div>
-                    <h4 className="font-bold text-gray-900 flex items-center gap-2">
+                    <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="font-sans font-bold text-gray-900 flex items-center gap-2">
                         {name}
                         {isUser && (
-                            <span className="bg-[#5bb09c] text-white text-[10px] px-2 py-0.5 rounded-full">
+                            <span className="bg-[#5bb09c] text-white text-sm px-2 py-0.5 rounded-full">
                                 You
                             </span>
                         )}
@@ -64,26 +64,26 @@ const LeaderboardRow = ({
             {/* Stats Group */}
             <div className="flex items-center gap-12 text-right">
                 <div className="w-20">
-                    <p className="text-xl font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900">
                         {referrals}
                     </p>
-                    <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">
+                    <p className="text-sm text-gray-400 uppercase font-bold tracking-tighter">
                         Referrals
                     </p>
                 </div>
                 <div className="w-24">
-                    <p className="text-xl font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900">
                         {earnings}
                     </p>
-                    <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">
+                    <p className="text-sm text-gray-400 uppercase font-bold tracking-tighter">
                         Earnings
                     </p>
                 </div>
                 <div className="w-20">
-                    <p className="text-xl font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900">
                         {conversion}
                     </p>
-                    <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">
+                    <p className="text-sm text-gray-400 uppercase font-bold tracking-tighter">
                         Conversion
                     </p>
                 </div>
