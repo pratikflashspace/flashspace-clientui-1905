@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ListingCardModern from "@/components/services/ListingCardModern";
 import { getAllVirtualOffices } from "@/services/virtualOffice.service";
+import { getAllCoworkingSpaces } from "@/services/coworkingSpace.service";
 import { VirtualOfficeItem } from "@/types/services";
 
 // Using local high-quality assets from the public folder
@@ -21,8 +22,74 @@ const locationMg = "/card-gurgaon.jpg";
 const locationCyber = "/card-hinjewadi.jpg";
 
 const services = [
-    { name: "Popular Spaces" },
+    { id: "virtual-office", name: "Virtual Office" },
+    { id: "coworking", name: "Coworking" },
+    { id: "business-setup", name: "Business Setup" },
 ];
+
+/**
+ * Custom Card for Business Setup
+ */
+const BusinessSetupHomeCard = ({ item, onClick }: { item: any; onClick: () => void }) => {
+    return (
+        <div
+            className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-all duration-200 ease-out shadow-sm hover:shadow-md h-full flex flex-col"
+            onClick={onClick}
+        >
+            <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+                <img
+                    src={item.images[0]}
+                    alt={item.name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                {item.name === "GST Registration" && (
+                    <div className="absolute top-3 left-3 z-10">
+                        <span className="bg-[#FE8A00] text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 uppercase tracking-tight">
+                            <span className="animate-pulse">🔥</span> Popular
+                        </span>
+                    </div>
+                )}
+            </div>
+            
+            <div className="p-4 flex flex-col flex-1">
+                <h4 className="text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1 mb-2">
+                    {item.name}
+                </h4>
+                
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                    {item.features?.map((feature: string, idx: number) => (
+                        <span
+                            key={idx}
+                            className="text-[11px] text-muted-foreground border border-border rounded-full px-2.5 py-0.5"
+                        >
+                            {feature}
+                        </span>
+                    ))}
+                </div>
+                
+                <div className="space-y-2 mb-4 mt-auto">
+                    <p className="text-sm text-muted-foreground">
+                        Starting from <span className="font-bold text-foreground">{item.price}</span>
+                    </p>
+                </div>
+                
+                <div className="flex gap-2">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onClick();
+                        }}
+                        className="w-full bg-[#36503F] text-[#FEF8C5] text-sm font-bold py-2.5 px-4 rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
+                    >
+                        Buy Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 /**
  * Curated list of popular spaces to ensure they always show up correctly.
@@ -32,12 +99,35 @@ const POPULAR_SPACE_IDS = ["FSDL01", "FSBLR05", "FSGUR03", "FSNOD04", "FSHYD01",
 
 
 export const PlanLocationsShowcase = () => {
-    const [activeIndex, setActiveIndex] = useState(0);
+    const [activeServiceId, setActiveServiceId] = useState("virtual-office");
     const [slideIndex, setSlideIndex] = useState(0);
-    const [dynamicSpaces, setDynamicSpaces] = useState<VirtualOfficeItem[]>([]);
+    const [dynamicVirtualOffices, setDynamicVirtualOffices] = useState<any[]>([]);
+    const [dynamicCoworking, setDynamicCoworking] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [screenSize, setScreenSize] = useState<"mobile" | "tablet" | "desktop">("desktop");
     const navigate = useNavigate();
+
+    const demoBusinessSetups = useMemo(() => {
+        return [
+            "GST Registration",
+            "Company Registration",
+            "FSSAI Registration",
+            "Startup India Registration",
+            "MSME Registration",
+        ].map((name, i) => ({
+            _id: `bs-${i}`,
+            name,
+            address: "",
+            area: "Online",
+            price: ["₹2499/yr", "₹11999/yr", "₹2999/yr", "₹1499/yr", "₹1499/yr"][i],
+            rating: 4.8 + (i % 3) * 0.1,
+            reviews: 120 + i * 15,
+            images: [`/business${i+1}.png`],
+            features: ["Expert Support", "Fast Processing", "End-to-end Setup"],
+            popular: true,
+            availability: "Available Now"
+        }));
+    }, []);
 
     // Responsive items per page matching grid: grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
     useEffect(() => {
@@ -56,8 +146,14 @@ export const PlanLocationsShowcase = () => {
     const isSmallScreen = screenSize !== "desktop";
 
     const handleGetBestPrice = (item: any, isDynamic: boolean) => {
-        if (isDynamic) {
-            navigate(`/space/${item._id}`);
+        if (activeServiceId === "business-setup") {
+            navigate(`/services/business-setup?buy=${item._id}`);
+        } else if (isDynamic) {
+            if (activeServiceId === "coworking") {
+                navigate(`/coworking-space/${item._id}`);
+            } else {
+                navigate(`/space/${item._id}`);
+            }
         } else {
             navigate(`/Solutions/virtual-office`);
         }
@@ -67,15 +163,32 @@ export const PlanLocationsShowcase = () => {
         const fetchSpaces = async () => {
             setIsLoading(true);
             try {
-                const response = await getAllVirtualOffices(100);
-                const spaces = response.offices;
-                const filteredSpaces = POPULAR_SPACE_IDS
-                    .map(id => spaces.find(s => s.spaceId === id))
-                    .filter(Boolean) as VirtualOfficeItem[];
+                const [voResponse, cwResponse] = await Promise.allSettled([
+                    getAllVirtualOffices(100),
+                    getAllCoworkingSpaces(100)
+                ]);
 
-                setDynamicSpaces(filteredSpaces);
+                let voFiltered = [];
+                let cwFiltered = [];
+
+                if (voResponse.status === "fulfilled") {
+                    const spaces = voResponse.value.offices;
+                    voFiltered = POPULAR_SPACE_IDS
+                        .map(id => spaces.find((s: any) => s.spaceId === id))
+                        .filter(Boolean);
+                }
+
+                if (cwResponse.status === "fulfilled") {
+                    const spaces = cwResponse.value;
+                    cwFiltered = POPULAR_SPACE_IDS
+                        .map(id => spaces.find((s: any) => s.spaceId === id))
+                        .filter(Boolean);
+                }
+
+                setDynamicVirtualOffices(voFiltered);
+                setDynamicCoworking(cwFiltered);
             } catch (error) {
-                console.error("Error fetching virtual offices for showcase:", error);
+                console.error("Error fetching spaces for showcase:", error);
             } finally {
                 setIsLoading(false);
             }
@@ -84,8 +197,11 @@ export const PlanLocationsShowcase = () => {
         fetchSpaces();
     }, []);
 
-    const active = services[activeIndex];
-    const allCards = dynamicSpaces;
+    const allCards = activeServiceId === "coworking" 
+        ? dynamicCoworking 
+        : activeServiceId === "business-setup"
+        ? demoBusinessSetups
+        : dynamicVirtualOffices;
     const totalPages = Math.ceil(allCards.length / cardsPerPage);
     const visibleCards = allCards.slice(slideIndex * cardsPerPage, (slideIndex + 1) * cardsPerPage);
 
@@ -108,6 +224,28 @@ export const PlanLocationsShowcase = () => {
                         Flexible workspace and business solutions tailored to your needs.
                     </p>
                 </motion.div>
+
+                {/* Tabs */}
+                <div className="flex justify-center mb-8 sm:mb-12">
+                    <div className="inline-flex bg-gray-100/80 p-1.5 rounded-2xl">
+                        {services.map((service) => (
+                            <button
+                                key={service.id}
+                                onClick={() => {
+                                    setActiveServiceId(service.id);
+                                    setSlideIndex(0);
+                                }}
+                                className={`px-5 py-2.5 rounded-xl text-sm sm:text-base font-semibold transition-all ${
+                                    activeServiceId === service.id
+                                        ? "bg-white text-[#1A1A1A] shadow-sm"
+                                        : "text-gray-500 hover:text-gray-900"
+                                }`}
+                            >
+                                {service.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Cards Container */}
                 <div className="relative group">
@@ -135,7 +273,7 @@ export const PlanLocationsShowcase = () => {
 
                     <AnimatePresence mode="wait">
                         <motion.div
-                            key={`${active.name}-${slideIndex}-${screenSize}`}
+                            key={`${activeServiceId}-${slideIndex}-${screenSize}`}
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
@@ -166,11 +304,18 @@ export const PlanLocationsShowcase = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.08, duration: 0.5 }}
                                     >
-                                        <ListingCardModern
-                                            item={loc as any}
-                                            onGetBestPrice={() => handleGetBestPrice(loc, true)}
-                                            onClick={() => handleGetBestPrice(loc, true)}
-                                        />
+                                        {activeServiceId === "business-setup" ? (
+                                            <BusinessSetupHomeCard
+                                                item={loc as any}
+                                                onClick={() => handleGetBestPrice(loc, true)}
+                                            />
+                                        ) : (
+                                            <ListingCardModern
+                                                item={loc as any}
+                                                onGetBestPrice={() => handleGetBestPrice(loc, true)}
+                                                onClick={() => handleGetBestPrice(loc, true)}
+                                            />
+                                        )}
                                     </motion.div>
                                 ))
                             )}

@@ -158,6 +158,7 @@ const Dashboard = () => {
     // ── Dynamic stat state ────────────────────────────────────────────────
     const [totalCommission, setTotalCommission] = useState<number | null>(null);
     const [totalClients, setTotalClients] = useState<number | null>(null);
+    const [pendingPayout, setPendingPayout] = useState(0);
 
     useEffect(() => {
         axiosInstance
@@ -171,6 +172,27 @@ const Dashboard = () => {
                 }
             })
             .catch(() => {/* silently ignore — stats stay null (shown as —) */ });
+
+        axiosInstance.get("/api/affiliate/invoices")
+            .then((res) => {
+                if (res.data.success && res.data.data) {
+                    const invoices = res.data.data.invoices || [];
+                    const stored = localStorage.getItem("affiliate_paid_payouts");
+                    let paidInvoiceIds: string[] = [];
+                    if (stored) {
+                        try {
+                            paidInvoiceIds = JSON.parse(stored);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+                    const validInvoices = invoices.filter((inv: any) => inv.commission && inv.commission > 0);
+                    const pendingInvoices = validInvoices.filter((inv: any) => !paidInvoiceIds.includes(inv._id || inv.invoiceNumber));
+                    const calculatedPending = pendingInvoices.reduce((sum: number, inv: any) => sum + inv.commission, 0);
+                    setPendingPayout(calculatedPending);
+                }
+            })
+            .catch(() => {});
     }, []);
 
     // Handle opening the modal
@@ -219,7 +241,7 @@ const Dashboard = () => {
         },
         {
             label: "Pending Payout",
-            value: formatFullINR(0),
+            value: formatFullINR(pendingPayout),
             trend: null,
             icon: Wallet,
         },
@@ -322,21 +344,21 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-[#FAFAF7] p-4 md:p-6 lg:p-8 font-sans animate-fade-in relative">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#FAFAF7] font-sans relative">
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* 1. Page Header */}
-                <div className="animate-fade-in-down">
-                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                <div className="space-y-1">
+                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight">
                         <span className="text-[#1A1A1A]">Affiliate </span>
-                        <span className="text-[#4A6D56] italic">Dashboard</span>
+                        <span className="text-[#36503F] italic">Dashboard</span>
                     </h1>
-                    <p className="mt-2 text-lg font-medium text-[#6B8F78] tracking-tight">
+                    <p className="text-sm md:text-base font-medium text-[#6B8F78]">
                         Track your referrals, revenue, and performance
                     </p>
                 </div>
 
                 {/* 2. Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {stats.map((stat, idx) => (
                         <StatCardDashboard
                             key={idx}
@@ -348,7 +370,7 @@ const Dashboard = () => {
 
                 <div className="space-y-6 pt-6">
                     <div className="space-y-0.5">
-                        <h2 className="text-2xl font-extrabold tracking-tight text-[#1A1A1A]">
+                        <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-extrabold tracking-tight text-[#1A1A1A]">
                             AI-Powered Insights
                         </h2>
                         <p className="text-sm font-medium text-[#6B8F78]">
@@ -428,11 +450,11 @@ const Dashboard = () => {
                                     size={18}
                                     className="text-[#36503F] fill-[#36503F]"
                                 />
-                                <h3 className="font-bold text-[#1A1A1A] text-lg">
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A]">
                                     {INSIGHT_DATA[selectedInsight].title}
                                 </h3>
-                                <span className="px-2 py-0.5 bg-[#F0F4EE] rounded text-[10px] font-bold text-[#36503F] uppercase tracking-wider ml-1">
-                                    AI Powered
+                                <span className="px-2.5 py-0.5 bg-[#F0F4EE] rounded-full text-xs font-semibold text-[#36503F] ml-1">
+                                    Ai Powered
                                 </span>
                             </div>
                             <button
@@ -500,7 +522,7 @@ const Dashboard = () => {
                                                                 {metric.value}
                                                             </span>
                                                             {metric.trend && (
-                                                                <span className="bg-[#F0F4EE] text-[#36503F] text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#D4E0D0] flex items-center gap-0.5">
+                                                                <span className="bg-[#F0F4EE] text-[#36503F] text-sm font-bold px-1.5 py-0.5 rounded border border-[#D4E0D0] flex items-center gap-0.5">
                                                                     <ArrowUpRight
                                                                         size={
                                                                             10

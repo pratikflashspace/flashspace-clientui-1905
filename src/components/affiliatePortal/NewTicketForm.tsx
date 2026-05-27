@@ -25,7 +25,7 @@ const NewTicketForm = ({ onCancel }: NewTicketFormProps) => {
         {/* Sticky Header with X Icon */}
         <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
           <div>
-            <h2 className="text-xl font-bold text-gray-800">Create New Ticket</h2>
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-800">Create New Ticket</h2>
             <p className="text-gray-500 text-xs">Submit a new support request.</p>
           </div>
           <button

@@ -23,7 +23,7 @@ export default function Logout() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8 px-4">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 flex items-center justify-center "> 
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
           {/* Icon */}
@@ -32,7 +32,7 @@ export default function Logout() {
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold  text-gray-900 mb-2">
+          <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-bold  text-gray-900 mb-2">
             Sign Out
           </h1>
           <p className="text-gray-500 mb-8">

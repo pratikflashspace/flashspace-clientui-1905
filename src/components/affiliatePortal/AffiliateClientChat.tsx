@@ -273,7 +273,7 @@ export default function AffiliateClientChat() {
         return (
             <div className="bg-white rounded-[24px] border border-gray-100 p-16 text-center shadow-sm">
                 <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-600 mb-2">No client queries yet</h3>
+                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-600 mb-2">No client queries yet</h3>
                 <p className="text-gray-400 max-w-sm mx-auto text-sm">
                     When a client books a space using your coupon code and raises a query to the space partner, it will appear here.
                     You can <strong>Tap In</strong> to join the conversation.
@@ -323,7 +323,7 @@ export default function AffiliateClientChat() {
                                             {ticket.user?.fullName?.substring(0, 2).toUpperCase() || 'US'}
                                         </div>
                                         <div className="overflow-hidden">
-                                            <h4 className={`text-sm font-bold truncate ${isActive ? 'text-amber-900' : 'text-gray-900'}`}>
+                                            <h4 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-sm font-bold truncate ${isActive ? 'text-amber-900' : 'text-gray-900'}`}>
                                                 {ticket.user?.fullName || 'Client'}
                                             </h4>
                                             <p className={`text-xs truncate max-w-[140px] mt-0.5 ${isActive ? 'text-amber-600' : 'text-gray-500'}`}>
@@ -331,31 +331,31 @@ export default function AffiliateClientChat() {
                                             </p>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] text-gray-400 font-medium ml-2 shrink-0">
+                                    <span className="text-sm text-gray-400 font-medium ml-2 shrink-0">
                                         {format(new Date(ticket.updatedAt || ticket.createdAt), 'h:mm a')}
                                     </span>
                                 </div>
 
                                 {ticket.bookingId?.spaceSnapshot?.name && (
-                                    <p className="text-[10px] text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full w-fit mt-1 ml-[52px] font-medium truncate max-w-[180px]">
+                                    <p className="text-sm text-teal-600 bg-teal-50 px-2 py-0.5 rounded-full w-fit mt-1 ml-[52px] font-medium truncate max-w-[180px]">
                                         {ticket.bookingId.spaceSnapshot.name}
                                     </p>
                                 )}
 
                                 {lastMsg && (
-                                    <p className="text-[10px] text-gray-400 ml-[52px] mt-1 truncate max-w-[180px]">
+                                    <p className="text-sm text-gray-400 ml-[52px] mt-1 truncate max-w-[180px]">
                                         {lastMsg.sender === 'affiliate' ? 'You: ' : `${lastMsg.sender}: `}{lastMsg.message}
                                     </p>
                                 )}
 
                                 <div className="flex justify-between items-center mt-2 pl-[52px]">
-                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border ${getStatusColor(ticket.status)}`}>
+                                    <span className={`text-sm font-bold px-2 py-0.5 rounded-full uppercase tracking-wide border ${getStatusColor(ticket.status)}`}>
                                         {getStatusLabel(ticket.status)}
                                     </span>
                                     {tapped ? (
-                                        <span className="text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-bold">JOINED</span>
+                                        <span className="text-sm bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full font-bold">JOINED</span>
                                     ) : (
-                                        <span className="text-[9px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full font-bold">OBSERVER</span>
+                                        <span className="text-sm bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded-full font-bold">OBSERVER</span>
                                     )}
                                 </div>
                             </div>
@@ -375,7 +375,7 @@ export default function AffiliateClientChat() {
                                     {activeTicket.user?.fullName?.substring(0, 2).toUpperCase() || 'US'}
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-gray-900">{activeTicket.user?.fullName || 'Client'}</h2>
+                                    <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900">{activeTicket.user?.fullName || 'Client'}</h2>
                                     <p className="text-xs text-gray-500 mt-0.5">
                                         {activeTicket.ticketNumber}
                                         {activeTicket.bookingId?.spaceSnapshot?.name && (
@@ -388,7 +388,7 @@ export default function AffiliateClientChat() {
                             <div className="flex items-center gap-3">
                                 {/* tapped-in count */}
                                 {activeTicket.tappedIn.length > 0 && (
-                                    <span className="text-[10px] text-amber-700 bg-amber-100 px-2 py-1 rounded-full font-bold flex items-center gap-1">
+                                    <span className="text-sm text-amber-700 bg-amber-100 px-2 py-1 rounded-full font-bold flex items-center gap-1">
                                         <Users className="w-3 h-3" />
                                         {activeTicket.tappedIn.length} joined
                                     </span>
@@ -406,7 +406,7 @@ export default function AffiliateClientChat() {
                                     </button>
                                 )}
 
-                                <span className={`text-[10px] font-bold px-3 py-1.5 rounded-full border ${getStatusColor(activeTicket.status)}`}>
+                                <span className={`text-sm font-bold px-3 py-1.5 rounded-full border ${getStatusColor(activeTicket.status)}`}>
                                     {getStatusLabel(activeTicket.status)}
                                 </span>
                             </div>
@@ -419,7 +419,7 @@ export default function AffiliateClientChat() {
                             </div>
                         )}
                         {isTappedIn && (
-                            <div className="px-6 py-2 bg-amber-50/60 border-b border-amber-100 text-[11px] text-amber-600 font-semibold flex items-center gap-1.5">
+                            <div className="px-6 py-2 bg-amber-50/60 border-b border-amber-100 text-sm text-amber-600 font-semibold flex items-center gap-1.5">
                                 <Zap className="w-3 h-3" /> You have joined — this is now a group conversation
                             </div>
                         )}
@@ -466,7 +466,7 @@ export default function AffiliateClientChat() {
                                 if (isSystem) {
                                     return (
                                         <div key={idx} className="flex justify-center">
-                                            <span className="text-[10px] text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
+                                            <span className="text-sm text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
                                                 {msg.message.replace(/\[|\]/g, '')}
                                             </span>
                                         </div>
@@ -479,11 +479,11 @@ export default function AffiliateClientChat() {
                                             <div className={`p-4 rounded-2xl shadow-sm ${getBubble()}`}>
                                                 {/* Badge row */}
                                                 <div className={`flex items-center gap-1.5 mb-2 ${isRightSide ? 'flex-row-reverse' : ''}`}>
-                                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${badge.bg} ${badge.text}`}>
+                                                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-sm font-bold uppercase tracking-wider ${badge.bg} ${badge.text}`}>
                                                         <span className={`w-1 h-1 rounded-full shrink-0 ${badge.dot}`} />
                                                         {badge.label}
                                                     </span>
-                                                    <span className={`text-[10px] font-medium truncate max-w-[140px] ${(isMe || isPartner) ? 'text-white/60' : 'text-gray-400'}`}>
+                                                    <span className={`text-sm font-medium truncate max-w-[140px] ${(isMe || isPartner) ? 'text-white/60' : 'text-gray-400'}`}>
                                                         {getIdentifier()}
                                                     </span>
                                                 </div>
@@ -499,7 +499,7 @@ export default function AffiliateClientChat() {
                                                                     {isImg ? (
                                                                         <img src={`${import.meta.env.VITE_API_URL || ''}${url}`} alt="attachment" className="w-20 h-20 object-cover rounded-lg border border-white/20" />
                                                                     ) : (
-                                                                        <div className="flex items-center gap-2 bg-black/10 p-2 rounded-lg text-[10px] font-bold">
+                                                                        <div className="flex items-center gap-2 bg-black/10 p-2 rounded-lg text-sm font-bold">
                                                                             <FileText className="w-3 h-3" /> File {i+1}
                                                                         </div>
                                                                     )}
@@ -509,7 +509,7 @@ export default function AffiliateClientChat() {
                                                     </div>
                                                  )}
                                             </div>
-                                            <span className={`text-[10px] text-gray-400 block px-1 ${isRightSide ? 'text-right' : ''}`}>
+                                            <span className={`text-sm text-gray-400 block px-1 ${isRightSide ? 'text-right' : ''}`}>
                                                 {format(new Date(msg.createdAt), 'h:mm a')}
                                             </span>
                                         </div>
@@ -525,7 +525,7 @@ export default function AffiliateClientChat() {
                                             <div className="w-1.5 h-1.5 bg-amber-500 rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.2s' }} />
                                             <div className="w-1.5 h-1.5 bg-amber-500 rounded-full" style={{ animation: 'typing-bounce 1s infinite 0.4s' }} />
                                         </div>
-                                        <span className="text-[10px] font-black text-amber-700/60 uppercase tracking-widest">
+                                        <span className="text-sm font-bold text-amber-700/60 uppercase tracking-widest">
                                             {typingUser} is typing...
                                         </span>
                                     </div>
@@ -567,7 +567,7 @@ export default function AffiliateClientChat() {
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400">
                         <MessageSquare className="w-16 h-16 mb-4 opacity-20" />
-                        <h3 className="text-xl font-bold text-gray-600">Select a query</h3>
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-600">Select a query</h3>
                         <p>Choose a query from the left to view</p>
                     </div>
                 )}

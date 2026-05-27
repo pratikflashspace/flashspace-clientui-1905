@@ -83,18 +83,18 @@ const REGIONAL_DATA = [
 
 const LeaderBoard = () => {
     return (
-        <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
+ <div className="mx-auto min-h-screen p-4 md:p-6 lg:p-8 space-y-8 animate-in fade-in duration-500"> 
             {/* Header */}
             {/* Header Removed */}
 
             {/* User Position Hero Card */}
             <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between animate-scale-up">
                 <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 bg-[#5bb09c]/10 text-[#5bb09c] rounded-full flex items-center justify-center text-2xl font-bold">
+                    <div className="w-16 h-16 bg-[#5bb09c]/10 text-[#5bb09c] rounded-full flex items-center justify-center text-2xl font-extrabold">
                         #8
                     </div>
                     <div>
-                        <h3 className="text-xl font-bold text-gray-900">
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900">
                             Your Position (National)
                         </h3>
                         <p className="text-gray-400 font-medium">
@@ -103,7 +103,7 @@ const LeaderBoard = () => {
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="text-3xl font-bold text-gray-900">₹2.8L</p>
+                    <p className="text-3xl font-extrabold text-gray-900">₹2.8L</p>
                     <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">
                         Total Earnings
                     </p>

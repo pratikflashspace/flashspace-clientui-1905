@@ -58,20 +58,19 @@ const AnimatedCounter = ({
 
 const StatCard = ({ label, value, trend, icon: Icon, delay }: any) => (
     <div
-        className="bg-[#f8f8f8] p-7 rounded-[2rem] border border-gray-200 shadow transition-all duration-300 group animate-fade-in-up"
+        className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg group"
         style={{ animationDelay: `${delay}ms` }}
     >
-        <div className="flex justify-between items-start mb-4">
-            <span className="text-[#64748b] font-medium text-[14px] tracking-tight">{label}</span>
-            <div className="w-10 h-10 flex items-center justify-center bg-[#f1f5f9] rounded-full transition-colors group-hover:bg-[#e2e8f0]">
+        <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-[#6B8F78]">{label}</span>
+            <div className="w-8 h-8 rounded-lg bg-[#36503F]/10 flex items-center justify-center">
                 <Icon
-                    size={20}
-                    className="text-[#64748b]"
+                    className="w-4 h-4 text-[#36503F]"
                 />
             </div>
         </div>
         <div className="space-y-2">
-            <h3 className="text-[2rem] font-black text-[#1a2d1d] leading-none" style={{ fontFamily: "'Inter Tight', sans-serif" }}>{value}</h3>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{value}</h3>
             {trend && (
                 <div className={`flex items-center gap-1.5 text-xs font-bold ${trend.startsWith('-') ? 'text-red-500' : 'text-[#10b981]'}`}>
                     <ArrowUpRight size={14} className={trend.startsWith('-') ? 'rotate-90' : ''} />
@@ -85,17 +84,17 @@ const StatCard = ({ label, value, trend, icon: Icon, delay }: any) => (
 const TrendBar = ({ label, value, subValue, percentage, color = "bg-[#334D3D]" }: any) => (
     <div className="group mb-6 last:mb-0">
         <div className="flex justify-between items-end mb-2.5">
-            <span className="text-[14px] font-bold text-[#1a2d1d] tracking-tight">{label}</span>
+            <span className="text-sm font-bold text-[#1A1A1A]">{label}</span>
             <div className="flex items-center gap-2">
-                <span className="text-[15px] font-black text-[#1a2d1d]">{value}</span>
+                <span className="text-sm font-bold text-[#1A1A1A]">{value}</span>
                 {subValue && (
-                    <span className="px-2 py-0.5 bg-gray-100 rounded-full text-[11px] font-extrabold text-[#64748b] border border-gray-200">
+                    <span className="px-2.5 py-0.5 bg-[#F0F4EE] rounded-full text-xs font-semibold text-[#6B8F78] border border-[#D4E0D0]">
                         {subValue}
                     </span>
                 )}
             </div>
         </div>
-        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-2 w-full bg-[#F0F4EE] rounded-full overflow-hidden">
             <div
                 className={`h-full ${color} rounded-full transition-all duration-1000 ease-out`}
                 style={{ width: `${percentage}%` }}
@@ -106,14 +105,36 @@ const TrendBar = ({ label, value, subValue, percentage, color = "bg-[#334D3D]" }
 
 const DashboardRevenue = () => {
     const [stats, setStats] = useState<RevenueDashboardStats | null>(null);
+    const [pendingPayout, setPendingPayout] = useState(0);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await affiliatePortalService.getRevenueDashboardStats();
-                if (res.success && res.data) {
-                    setStats(res.data);
+                const [res, invoicesRes] = await Promise.allSettled([
+                    affiliatePortalService.getRevenueDashboardStats(),
+                    affiliatePortalService.getInvoices(),
+                ]);
+
+                if (res.status === 'fulfilled' && res.value?.success && res.value?.data) {
+                    setStats(res.value.data);
+                }
+
+                if (invoicesRes.status === 'fulfilled' && invoicesRes.value?.success && invoicesRes.value?.data) {
+                    const invoices = invoicesRes.value.data.invoices || [];
+                    const stored = localStorage.getItem("affiliate_paid_payouts");
+                    let paidInvoiceIds: string[] = [];
+                    if (stored) {
+                        try {
+                            paidInvoiceIds = JSON.parse(stored);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+                    const validInvoices = invoices.filter((inv: any) => inv.commission && inv.commission > 0);
+                    const pendingInvoices = validInvoices.filter((inv: any) => !paidInvoiceIds.includes(inv._id || inv.invoiceNumber));
+                    const calculatedPending = pendingInvoices.reduce((sum: number, inv: any) => sum + inv.commission, 0);
+                    setPendingPayout(calculatedPending);
                 }
             } catch (error) {
                 console.error("Failed to load dashboard stats", error);
@@ -126,10 +147,10 @@ const DashboardRevenue = () => {
 
     if (loading || !stats) {
         return (
-            <div className="min-h-screen bg-[#f7f7f6] flex items-center justify-center">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#FAFAF7] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-10 h-10 animate-spin text-[#334D3D]" />
-                    <p className="text-[#64748b] font-medium">Loading your revenue dashboard...</p>
+                    <Loader2 className="w-10 h-10 animate-spin text-[#36503F]" />
+                    <p className="text-[#6B8F78] font-medium">Loading your revenue dashboard...</p>
                 </div>
             </div>
         );
@@ -169,7 +190,7 @@ const DashboardRevenue = () => {
         },
         {
             label: "Pending Payout",
-            value: formatShortINR(stats.pendingPayout),
+            value: formatShortINR(pendingPayout),
             icon: Banknote,
         },
         {
@@ -198,20 +219,21 @@ const DashboardRevenue = () => {
     })) || [];
 
     return (
-        <div className="min-h-screen bg-[#f7f7f6] p-8 lg:p-12 font-sans w-full animate-fade-in">
-            <div className="max-w-[1400px] mx-auto space-y-12">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#FAFAF7] font-sans w-full">
+            <div className="max-w-7xl mx-auto space-y-8">
                 {/* 1. Header */}
-                <div className="animate-fade-in-down">
-                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-                        Revenue <span className="text-[#4A6D56] italic">Dashboard</span>
+                <div className="space-y-1">
+                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight">
+                        <span className="text-[#1A1A1A]">Revenue </span>
+                        <span className="text-[#36503F] italic">Dashboard</span>
                     </h1>
-                    <p className="mt-2 text-lg font-medium text-[#6B8F78] tracking-tight">
+                    <p className="text-sm md:text-base font-medium text-[#6B8F78]">
                         Track your earnings and commission trends
                     </p>
                 </div>
 
                 {/* 2. Top Stats Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {topCards.map((stat, idx) => (
                         <StatCard
                             key={idx}
@@ -222,10 +244,10 @@ const DashboardRevenue = () => {
                 </div>
 
                 {/* 3. Trends Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Monthly Earnings Trend */}
-                    <div className="bg-[#f8f8f8] p-10 rounded-[2.5rem] border border-gray-200 shadow">
-                        <h3 className="text-[1.25rem] font-black text-[#1a2d1d] mb-10 tracking-tight">
+                    <div className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 space-y-5">
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A]">
                             Monthly Earnings Trend
                         </h3>
                         <div className="space-y-1">
@@ -234,14 +256,14 @@ const DashboardRevenue = () => {
                                     <TrendBar key={idx} {...trend} />
                                 ))
                             ) : (
-                                <p className="text-[#64748b] text-center py-10 font-medium">No earnings data available.</p>
+                                <p className="text-[#6B8F78] text-center py-10 font-medium">No earnings data available.</p>
                             )}
                         </div>
                     </div>
 
                     {/* Revenue by Product */}
-                    <div className="bg-[#f8f8f8] p-10 rounded-[2.5rem] border border-gray-200 shadow">
-                        <h3 className="text-[1.25rem] font-black text-[#1a2d1d] mb-10 tracking-tight">
+                    <div className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 space-y-5">
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A]">
                             Revenue by Product
                         </h3>
                         <div className="space-y-1">
@@ -250,7 +272,7 @@ const DashboardRevenue = () => {
                                     <TrendBar key={idx} {...product} />
                                 ))
                             ) : (
-                                <p className="text-[#64748b] text-center py-10 font-medium">No product breakdown available.</p>
+                                <p className="text-[#6B8F78] text-center py-10 font-medium">No product breakdown available.</p>
                             )}
                         </div>
                     </div>

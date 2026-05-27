@@ -154,7 +154,7 @@ const revenueByProduct = [
 // --- Main Component ---
 const RevenueDashboard = () => {
     return (
-        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans w-full animate-fade-in">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#f7f7f6] font-sans w-full animate-fade-in"> 
             <div className="w-full space-y-8">
                 {/* 1. Header */}
                 {/* Header Removed */}
@@ -180,7 +180,7 @@ const RevenueDashboard = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <h3 className="text-4xl font-bold text-slate-900">
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-slate-900">
                                     <AnimatedCounter
                                         value={stat.value}
                                         prefix={stat.prefix}
@@ -203,7 +203,7 @@ const RevenueDashboard = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Left Chart: Monthly Earnings Trend */}
                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-                        <h3 className="font-bold text-slate-900 mb-6">
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-900 mb-6">
                             Monthly Earnings Trend
                         </h3>
                         <div className="space-y-6">
@@ -231,7 +231,7 @@ const RevenueDashboard = () => {
 
                     {/* Right Chart: Revenue by Product */}
                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300">
-                        <h3 className="font-bold text-slate-900 mb-6">
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-900 mb-6">
                             Revenue by Product
                         </h3>
                         <div className="space-y-6">

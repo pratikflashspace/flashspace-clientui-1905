@@ -223,24 +223,25 @@ const CouponsAndVouchers = () => {
   });
 
   return (
-    <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
-      <div className="mb-10">
-        <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-          Coupons & <span className="text-[#4A6D56] italic">Vouchers</span>
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#FAFAF7] font-sans">
+      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="space-y-1">
+        <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight">
+          <span className="text-[#1A1A1A]">Coupons</span>
         </h1>
-        <p className="text-[#6b7280] mt-2 text-lg font-medium">Generate and manage your affiliate coupons</p>
+        <p className="text-sm md:text-base text-[#6B8F78] font-medium">Generate and manage your affiliate coupons</p>
       </div>
+
 
       
 
         {/* --- COUPONS TAB --- */}
-        <div className="space-y-10 animate-slide-up">
+        <div className="space-y-8">
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h3 className="font-bold text-[#1a1a1a] text-xl">Your Coupons</h3>
+            <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center gap-4">
               <Button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="w-full sm:w-auto h-12 px-6 rounded-2xl bg-[#2d5a4c] hover:bg-[#1a3a3a] text-white shadow-lg shadow-[#2d5a4c]/10 flex justify-center items-center gap-2 font-bold"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#36503F] text-[#fef8c5] hover:bg-[#2a3d30] rounded-lg h-10 px-4 text-sm font-bold transition-all shadow-md active:scale-95"
               >
                 <Plus className="w-5 h-5" />
                 Create Coupon
@@ -248,24 +249,24 @@ const CouponsAndVouchers = () => {
             </div>
 
             {/* Toolbar */}
-            <div className="bg-[#f8f8f8] p-4 md:p-6 rounded-3xl border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 flex flex-col md:flex-row gap-4 justify-between items-center">
+            <div className="bg-white p-4 rounded-xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] flex flex-col md:flex-row gap-4 justify-between items-center">
               <div className="relative flex-1 w-full md:max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B8F78]" />
                 <input
                   type="text"
                   placeholder="Search by code..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:ring-4 focus:ring-[#35503F]/5 focus:border-[#35503F] transition-all text-sm font-medium text-gray-900 placeholder:text-gray-400 h-11"
+                  className="w-full pl-11 pr-4 py-3 bg-white rounded-lg border border-[#D4E0D0] focus:outline-none focus:border-[#36503F] focus:ring-0 transition-all text-sm font-medium text-[#1A1A1A] placeholder:text-[#6B8F78]"
                 />
               </div>
 
               <div className="relative w-full md:w-auto">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B8F78]" />
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full md:w-40 pl-9 pr-8 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-900 focus:ring-4 focus:ring-[#35503F]/5 focus:border-[#35503F] cursor-pointer transition-all appearance-none h-11"
+                  className="w-full md:w-40 pl-9 pr-8 py-2.5 bg-white border border-[#D4E0D0] rounded-lg text-sm font-bold text-[#1A1A1A] focus:outline-none focus:ring-0 focus:border-[#36503F] cursor-pointer transition-all appearance-none h-10"
                 >
                   <option value="all">All Status</option>
                   <option value="active">Active</option>
@@ -277,7 +278,7 @@ const CouponsAndVouchers = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-[#f8f8f8] rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
+            <div className="bg-white rounded-xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] overflow-hidden">
               <div className="min-h-[400px]">
                 {loading ? (
                   <div className="p-8">
@@ -296,34 +297,34 @@ const CouponsAndVouchers = () => {
                       <table className="w-full text-left">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-8 py-6 text-xs font-black text-gray-500 uppercase tracking-widest">
+                            <th className="px-6 py-5 text-sm font-bold text-[#6B8F78] tracking-wider">
                               Coupon Code
                             </th>
-                            <th className="px-8 py-6 text-xs font-black text-gray-500 uppercase tracking-widest">
+                            <th className="px-6 py-5 text-sm font-bold text-[#6B8F78] tracking-wider">
                               Discount
                             </th>
-                            <th className="px-8 py-6 text-xs font-black text-gray-500 uppercase tracking-widest">
+                            <th className="px-6 py-5 text-sm font-bold text-[#6B8F78] tracking-wider">
                               Space
                             </th>
-                            <th className="px-8 py-6 text-xs font-black text-gray-500 uppercase tracking-widest">
+                            <th className="px-6 py-5 text-sm font-bold text-[#6B8F78] tracking-wider">
                               Status
                             </th>
-                            <th className="px-8 py-6 text-xs font-black text-gray-500 uppercase tracking-widest">
+                            <th className="px-6 py-5 text-sm font-bold text-[#6B8F78] tracking-wider">
                               Expiry
                             </th>
-                            <th className="px-8 py-6 text-xs font-black text-gray-500 uppercase tracking-widest text-right">
+                            <th className="px-6 py-5 text-sm font-bold text-[#6B8F78] tracking-wider text-right">
                               Actions
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100 bg-white">
+                        <tbody className="divide-y divide-gray-200/60 bg-white">
                           {filteredCoupons.map((coupon) => (
                             <tr
                               key={coupon._id}
                               className="group hover:bg-gray-50 transition-all duration-200"
                             >
                               <td className="px-8 py-6">
-                                <div className="font-mono font-black text-sm text-[#1a1a1a] bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 inline-block shadow-sm">
+                                <div className="font-mono font-bold text-sm text-[#1a1a1a] bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200 inline-block shadow-sm">
                                   {coupon.code}
                                 </div>
                               </td>
@@ -332,7 +333,7 @@ const CouponsAndVouchers = () => {
                                   <div className="p-1.5 bg-[#35503F]/10 rounded-md">
                                     <Percent className="w-3.5 h-3.5 text-[#35503F]" />
                                   </div>
-                                  <span className="font-black text-gray-900 text-base">
+                                  <span className="font-bold text-gray-900 text-sm">
                                     {coupon.discountValue}%
                                   </span>
                                 </div>
@@ -349,7 +350,7 @@ const CouponsAndVouchers = () => {
                                 <div className="flex flex-col items-start gap-1.5">
                                   {getStatusBadge(getEffectiveStatus(coupon))}
                                   {!!coupon.usedBy?.length && (
-                                    <span className="text-[10px] font-bold text-[#677E73]">
+                                    <span className="text-sm font-bold text-[#677E73]">
                                       Used {coupon.usedBy.length} time{coupon.usedBy.length === 1 ? "" : "s"}
                                     </span>
                                   )}
@@ -375,7 +376,7 @@ const CouponsAndVouchers = () => {
                               <td className="px-8 py-6 text-right">
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
-                                    <button className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-100 hover:shadow-sm transition-all opacity-0 group-hover:opacity-100">
+                                  <button className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F0F4EE] text-[#36503F] hover:bg-[#36503F] hover:text-[#fef8c5] transition-all border border-[#D4E0D0] opacity-0 group-hover:opacity-100">
                                       <MoreVertical className="w-5 h-5" />
                                     </button>
                                   </DropdownMenuTrigger>
@@ -400,15 +401,15 @@ const CouponsAndVouchers = () => {
                     </div>
 
                     {/* Mobile/Tablet Card View */}
-                    <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-white rounded-b-3xl">
+                    <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-white">
                       {filteredCoupons.map((coupon) => (
                         <div
                           key={coupon._id}
-                          className="bg-white border border-gray-200 rounded-3xl p-6 space-y-5 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#35503F]"
+                          className="bg-white border border-[#D4E0D0] rounded-xl p-5 space-y-5 shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] hover:shadow-md transition-all"
                         >
                           <div className="flex justify-between items-start">
                             <div>
-                              <div className="font-mono font-black text-sm text-[#35503F] bg-[#35503F]/5 px-3 py-1.5 rounded-lg border border-[#35503F]/10 inline-block mb-3">
+                              <div className="font-mono font-bold text-sm text-[#35503F] bg-[#35503F]/5 px-3 py-1.5 rounded-lg border border-[#35503F]/10 inline-block mb-3">
                                 {coupon.code}
                               </div>
                               <div className="flex items-center gap-1.5 text-gray-700 font-bold text-sm mb-3">
@@ -419,7 +420,7 @@ const CouponsAndVouchers = () => {
                             <div className="flex flex-col items-end gap-2">
                               {getStatusBadge(getEffectiveStatus(coupon))}
                               {!!coupon.usedBy?.length && (
-                                <span className="text-[10px] font-bold text-[#677E73]">
+                                <span className="text-sm font-bold text-[#677E73]">
                                   Used {coupon.usedBy.length} time{coupon.usedBy.length === 1 ? "" : "s"}
                                 </span>
                               )}
@@ -447,14 +448,14 @@ const CouponsAndVouchers = () => {
 
                           <div className="grid grid-cols-2 gap-4 py-4 border-t border-gray-100 mt-2">
                             <div>
-                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1.5">Discount</p>
+                              <p className="text-sm uppercase font-bold text-gray-400 tracking-widest mb-1.5">Discount</p>
                               <div className="flex items-end gap-1">
-                                <span className="text-2xl font-black text-gray-900 leading-none">{coupon.discountValue}</span>
+                                <span className="text-2xl font-extrabold text-gray-900 leading-none">{coupon.discountValue}</span>
                                 <span className="text-sm font-bold text-[#35503F] mb-0.5">% OFF</span>
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest mb-1.5">Expires On</p>
+                              <p className="text-sm uppercase font-bold text-gray-400 tracking-widest mb-1.5">Expires On</p>
                               <div className="flex items-center justify-end gap-2 text-gray-900 font-bold">
                                 <Calendar className="w-3.5 h-3.5 text-gray-400" />
                                 <span className="text-xs">
@@ -488,7 +489,7 @@ const CouponsAndVouchers = () => {
             {/* Modal Header */}
             <div className="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-[2rem]">
               <div>
-                <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
+                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900 tracking-tight">
                   Create New <span className="text-[#4A6D56] italic">Coupon</span>
                 </h2>
                 <p className="text-xs md:text-sm text-gray-500 font-medium">
@@ -627,7 +628,7 @@ const CouponsAndVouchers = () => {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-[2] h-14 bg-[#35503F] text-[#FEF8C3] rounded-2xl hover:opacity-90 font-black transition-all duration-200 shadow-xl shadow-[#35503F]/10 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                  className="flex-[2] h-14 bg-[#35503F] text-[#FEF8C3] rounded-2xl hover:opacity-90 font-bold transition-all duration-200 shadow-xl shadow-[#35503F]/10 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                 >
                   {isSubmitting ? (
                     <>Generating...</>
@@ -643,6 +644,7 @@ const CouponsAndVouchers = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

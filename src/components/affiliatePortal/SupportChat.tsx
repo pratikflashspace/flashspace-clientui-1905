@@ -88,15 +88,15 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
   };
 
   return (
-    <div className="flex flex-col h-[600px] md:h-[650px] lg:h-[700px] bg-white rounded-[1.5rem] md:rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
+    <div className="flex flex-col h-[600px] md:h-[650px] lg:h-[700px] bg-white rounded-[1.5rem] md:rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
       {/* Chat Header */}
-      <div className="bg-[#f8f8f8] p-4 md:p-6 border-b border-gray-100 flex items-center justify-between">
+      <div className="bg-white p-4 md:p-6 border-b border-gray-100 flex items-center justify-between">
         <div className="flex items-center gap-3 md:gap-4">
           <div className="w-10 h-10 md:w-12 md:h-12 bg-[#f9fafb] rounded-xl md:rounded-2xl flex items-center justify-center text-[#2d5a4c] ring-1 ring-black/5">
             <Bot className="w-5 h-5 md:w-6 md:h-6" />
           </div>
           <div>
-            <h4 className="font-black text-[#1a1a1a]">
+            <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="font-sans font-bold text-[#1a1a1a]">
               FlashSpace AI Assistant
             </h4>
             <p className="text-xs text-[#16a34a] font-bold flex items-center gap-1.5">
@@ -105,7 +105,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
             </p>
           </div>
         </div>
-        <div className="hidden xs:flex items-center gap-1.5 px-3 md:px-4 py-1.5 bg-[#2d5a4c] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
+        <div className="hidden xs:flex items-center gap-1.5 px-3 md:px-4 py-1.5 bg-[#2d5a4c] text-white rounded-full text-sm font-bold uppercase tracking-widest shadow-sm">
           <Sparkles className="w-3 h-3 fill-white" />
           AI Powered
         </div>
@@ -142,7 +142,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
               >
                 {msg.text}
               </div>
-              <p className="text-[10px] text-[#9ca3af] font-bold px-2 uppercase tracking-tight">
+              <p className="text-sm text-[#9ca3af] font-bold px-2 uppercase tracking-tight">
                 {msg.time}
               </p>
             </div>
@@ -163,7 +163,7 @@ const SupportChat = ({ messages, setMessages }: SupportChatProps) => {
       {/* Input Area */}
       <form
         onSubmit={handleSendMessage}
-        className="p-4 md:p-6 bg-[#f8f8f8] border-t border-gray-100"
+        className="p-4 md:p-6 bg-white border-t border-gray-100"
       >
         <div className="flex gap-3">
           <Input

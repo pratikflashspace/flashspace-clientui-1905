@@ -27,7 +27,7 @@ const AddLeadForm = ({ onCancel }: AddLeadFormProps) => {
       {/* Sticky Header with X Icon - Matching Invoice Modal Style */}
       <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-10">
         <div>
-          <h2 className="text-xl font-bold text-gray-800">Add New Lead</h2>
+          <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-800">Add New Lead</h2>
           <p className="text-gray-500 text-xs">Fill in the details to track a new potential client.</p>
         </div>
         <button

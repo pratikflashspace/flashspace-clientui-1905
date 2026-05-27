@@ -6,6 +6,7 @@ import {
     Wallet,
     FileText,
     Target,
+    Ticket,
     FileOutput,
     Send,
     Trophy,
@@ -89,8 +90,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             path: "/affiliate-portal/payouts",
         },
         {
-            name: "Coupons and Vouchers",
-            icon: Target,
+            name: "Coupons",
+            icon: Ticket,
             path: "/affiliate-portal/coupons",
         },
         {
@@ -146,7 +147,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </div>
 
                     <div className={`mt-[17px] overflow-hidden transition-all duration-300 flex flex-col gap-1 ${isDesktopCollapsed ? "h-0 opacity-0" : "h-auto opacity-100"}`}>
-                        <h2 className="w-[239px] h-[20px] text-[14px] font-bold text-[#1a2d1d] whitespace-nowrap leading-none flex items-center">
+                        <h2 className="w-[239px] h-[20px] text-[14px] font-bold text-[#1a2d1d] whitespace-nowrap leading-none flex items-center" style={{ fontFamily: "'Inter', sans-serif" }}>
                             Affiliate Portal
                         </h2>
                         <p className="w-[239px] h-[16px] text-[12px] text-[#64748b] whitespace-nowrap font-medium leading-none flex items-center">
@@ -208,7 +209,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         onClick={() => setIsDesktopCollapsed(!isDesktopCollapsed)}
                         className={`
               hidden xl:flex items-center transition-colors text-[#677e73] hover:text-[#1a2d1d] py-2 mx-auto
-              ${isDesktopCollapsed ? "justify-center w-full" : "justify-center gap-3 w-[255px] h-[36px] px-[12px]"}
+              ${isDesktopCollapsed ? "justify-center w-full" : "justify-start gap-4 w-[263px] h-[40px] px-[12px]"}
             `}
                     >
                         {isDesktopCollapsed ? (
@@ -238,7 +239,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                         onClick={() => navigate("/")}
                         className={`
               flex items-center rounded-lg shadow-sm font-bold transition-all border border-gray-200 text-[#677e73] bg-white hover:bg-gray-50 hover:shadow-md mx-auto
-              ${isDesktopCollapsed ? "justify-center w-full h-14" : "justify-center gap-3 w-[255px] h-[36px] px-[12px] text-[14px]"}
+              ${isDesktopCollapsed ? "justify-center w-full h-14" : "justify-start gap-4 w-[263px] h-[40px] px-[12px] text-[14px]"}
             `}
                     >
                         <Home size={20} />

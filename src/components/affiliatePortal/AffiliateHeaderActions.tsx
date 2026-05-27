@@ -52,7 +52,7 @@ export function AffiliateHeaderActions() {
       >
         <div className="flex shrink-0 items-center justify-between border-b border-white/10 p-6">
           <div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-white">
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-extrabold tracking-tight text-white">
               Profile & <span className="italic text-[#fef8c5]">KYC</span>
             </h2>
             <p className="mt-1 text-sm font-medium text-[#fef8c5]/80">

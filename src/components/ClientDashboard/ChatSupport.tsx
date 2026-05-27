@@ -381,7 +381,7 @@ export default function ChatSupport() {
 
     if (loading && tickets.length === 0) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 flex items-center justify-center"> 
                 <Loader2 className="w-10 h-10 animate-spin text-[#35503F]" />
             </div>
         );
@@ -392,7 +392,7 @@ export default function ChatSupport() {
             {/* Main Header */}
             <div className="bg-white border-b border-gray-100 px-8 py-10 shrink-0 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm z-10">
                 <div>
-                    <h2 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight text-center md:text-left">Support <span className="text-[#4A6D56] italic">& Tickets</span></h2>
+                    <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight text-center md:text-left">Support <span className="text-[#36503F] italic">& Tickets</span></h2>
                     <p className="text-gray-500 font-medium text-sm mt-1 text-center md:text-left">Manage your support queries and interactions.</p>
                 </div>
 
@@ -452,7 +452,7 @@ export default function ChatSupport() {
                         </button>
 
                         <div className="mb-8">
-                            <h3 className="text-2xl font-black text-[#35503F] tracking-tight">Create Support Ticket</h3>
+                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-black text-[#35503F] tracking-tight">Create Support Ticket</h3>
                             <p className="text-gray-500 text-sm mt-1">Tell us what you need help with.</p>
                         </div>
 
@@ -567,7 +567,7 @@ export default function ChatSupport() {
                                             <MessageCircle className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <h3 className="font-extrabold text-lg text-[#35503F] leading-tight">{activeTicket.subject}</h3>
+                                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-extrabold text-lg text-[#35503F] leading-tight">{activeTicket.subject}</h3>
                                             <div className="flex items-center gap-2 mt-0.5">
                                                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-0.5 rounded border border-gray-100">
                                                     ID: #{activeTicket.ticketNumber}
@@ -670,7 +670,7 @@ export default function ChatSupport() {
                                     {/* Feedback Section - Mini Style */}
                                     {(activeTicket.status === 'closed' || activeTicket.status === 'resolved') && (
                                         <div className="mt-8 py-8 border-t border-gray-100 max-w-sm mx-auto text-center space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                                            <h4 className="text-2xl font-black text-[#35503F] tracking-tighter">
+                                            <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-black text-[#35503F] tracking-tighter">
                                                 {userRating === 5 ? "LOVED IT!" : userRating >= 1 ? "TELL US MORE!" : "RATE YOUR EXPERIENCE"}
                                             </h4>
 
@@ -796,7 +796,7 @@ export default function ChatSupport() {
                                 <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-6">
                                     <CheckCircle2 className="w-10 h-10 text-green-500" />
                                 </div>
-                                <h3 className="text-2xl font-black text-[#35503F] tracking-tight">Everything Sorted!</h3>
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-black text-[#35503F] tracking-tight">Everything Sorted!</h3>
                                 <p className="text-gray-500 font-medium max-w-xs mt-2">You don't have any pending tickets or feedback. Great job!</p>
                                 <div className="flex flex-col sm:flex-row gap-3 mt-8">
                                     <button 

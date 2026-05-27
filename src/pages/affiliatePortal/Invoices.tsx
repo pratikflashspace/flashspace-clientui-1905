@@ -180,7 +180,7 @@ const InvoicePaper = ({ data }: { data: Invoice }) => {
             {/* Header Row */}
             <div className="flex justify-between items-start mb-8">
                 <div>
-                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
                         FlashSpace
                     </h1>
                     <p className="text-sm text-gray-500 font-medium">
@@ -194,7 +194,7 @@ const InvoicePaper = ({ data }: { data: Invoice }) => {
                 </div>
                 <div className="text-right">
                     <div className="flex flex-col items-end gap-1">
-                        <h2 className="text-lg font-bold text-slate-900">
+                        <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-900">
                             Invoice {data.id}
                         </h2>
                         <StatusBadge status={data.status} />
@@ -220,7 +220,7 @@ const InvoicePaper = ({ data }: { data: Invoice }) => {
                     Bill To
                 </p>
                 <div className="text-sm text-slate-900">
-                    <p className="font-bold text-base">{data.client}</p>
+                    <p className="font-bold text-sm">{data.client}</p>
                     {data.clientAddress.map((line, i) => (
                         <p key={i}>{line}</p>
                     ))}
@@ -368,7 +368,7 @@ const Invoices = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans w-full relative">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#f7f7f6] font-sans w-full relative"> 
             {/* --- HIDDEN PRINT AREA --- 
           This is what will be printed. It is hidden from screen but visible to print.
       */}
@@ -382,7 +382,7 @@ const Invoices = () => {
             <div className="w-full space-y-8 no-print animate-slide-up">
                 {/* Header */}
                 <div>
-                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
                         Invoices
                     </h1>
                     <p className="text-gray-500 text-lg">
@@ -574,7 +574,7 @@ const Invoices = () => {
                         {/* Modal Header (Sticky) */}
                         <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-10">
                             <div className="flex items-center gap-3">
-                                <h2 className="font-bold text-lg text-slate-800">
+                                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-800">
                                     {selectedInvoice.id}
                                 </h2>
                                 <StatusBadge status={selectedInvoice.status} />

@@ -83,7 +83,7 @@ const MarketingTools = () => {
         {/* --- REFERRAL LINKS TAB --- */}
         <TabsContent value="referral" className="space-y-8 outline-none animate-slide-up">
           <div className="bg-[#f8f8f8] p-6 rounded-2xl border border-gray-200 shadow space-y-6">
-            <h3 className="font-bold text-gray-800 text-lg">Your Unique Referral Link</h3>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A]">Your Unique Referral Link</h3>
             <div className="flex flex-col xl:flex-row gap-4">
               <div className="flex-1 bg-gray-50/80 px-4 py-3.5 rounded-xl border border-gray-100 font-mono text-sm text-gray-600 flex items-center min-w-0">
                 <span className="truncate">{referralLink}</span>
@@ -146,7 +146,7 @@ const MarketingTools = () => {
 
           <div className="bg-[#f8f8f8] rounded-2xl border border-gray-200 shadow overflow-hidden">
             <div className="p-6 border-b border-gray-50">
-              <h3 className="font-bold text-gray-800 text-lg">Link Performance</h3>
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A]">Link Performance</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
@@ -214,12 +214,12 @@ const MarketingTools = () => {
                     <div className="p-3 bg-gray-50 rounded-xl text-gray-400 group-hover:text-[#5bb09c] transition-colors">
                       <FileText className="w-6 h-6" />
                     </div>
-                    <span className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-1 rounded-md uppercase tracking-wider">
+                    <span className="text-sm font-bold bg-gray-100 text-gray-500 px-2 py-1 rounded-md uppercase tracking-wider">
                       {asset.type}
                     </span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900 text-lg leading-tight">{asset.title}</h4>
+                    <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A] leading-tight">{asset.title}</h4>
                     <p className="text-gray-400 text-xs mt-1 font-medium">
                       {asset.size !== "N/A" && `${asset.size} • `}{asset.downloads} downloads
                     </p>
@@ -258,7 +258,7 @@ const MarketingTools = () => {
 
                 {/* Info Section */}
                 <div className="text-center mb-4">
-                  <h4 className="font-bold text-gray-900 text-base leading-tight">{qr.title}</h4>
+                  <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900 leading-tight">{qr.title}</h4>
                 </div>
 
                 {/* Download Button (Reduced py) */}

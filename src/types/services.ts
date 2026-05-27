@@ -354,9 +354,11 @@ export type BookingType =
   | "coworking_space"
   | "seat_booking"
   | "meeting_room"
+  | "business_setup"
   | "VirtualOffice"
   | "CoworkingSpace"
-  | "MeetingRoom";
+  | "MeetingRoom"
+  | "BusinessSetup";
 export type BookingStatus =
   | "pending_payment"
   | "pending_kyc"

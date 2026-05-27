@@ -119,7 +119,7 @@ const StatCard = ({
         className="bg-[#f8f8f8] p-6 rounded-2xl border border-gray-200 shadow transition-all duration-300 hover:-translate-y-1 group animate-fade-in-up"
         style={{ animationDelay: `${delay}ms` }}
     >
-        <h3 className={`text-3xl font-bold ${colorClass} mb-1`}>
+        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-3xl font-extrabold ${colorClass} mb-1`}>
             {typeof value === "number" ? (
                 <AnimatedCounter
                     value={value}
@@ -244,7 +244,7 @@ const Payouts = () => {
                                                     status={item.status}
                                                 />
                                             </div>
-                                            <h3 className="text-xl font-bold text-slate-900">
+                                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-900">
                                                 {item.period}
                                             </h3>
                                             <p className="text-sm text-gray-500">
@@ -252,7 +252,7 @@ const Payouts = () => {
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-2xl font-bold text-slate-900">
+                                            <p className="text-2xl font-extrabold text-slate-900">
                                                 {item.amount}
                                             </p>
                                         </div>

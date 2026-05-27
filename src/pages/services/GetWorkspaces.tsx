@@ -25,15 +25,38 @@ import {
   Phone,
   Flame,
   Map as MapIcon,
+  Loader2,
 } from "lucide-react";
+import hotToast from "react-hot-toast";
 import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import MapLibreMap from "@/components/Map/MapLibreMap";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  createPaymentOrder,
+  openRazorpayCheckout,
+  reportPaymentFailure,
+  simulatePayment,
+  verifyPayment,
+} from "@/services/payment.service";
+import {
+  clearCheckoutState,
+  getLoginRedirectUrl,
+  persistCheckoutState,
+} from "@/utils/checkoutSession";
 import {
   getVirtualOfficesByCity,
   getAvailableCities,
 } from "@/services/virtualOffice.service";
 import { getCoworkingSpacesByCity } from "@/services/coworkingSpace.service";
 import { getMeetingRoomsByCity } from "@/services/meetingRoom.service";
+import { validateCoupon } from "@/services/coupon.service";
 
 import { ListingItem } from "@/components/services/ListingCardModern";
 import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
@@ -67,6 +90,13 @@ interface UnifiedWorkspace {
 
 const DEFAULT_WORKSPACE_IMAGE = "/hero-illustrated.jpg";
 const PAGE_SIZE = 20;
+
+const formatInr = (amount: number) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(amount);
 
 type PaginationMeta = {
   total: number;
@@ -194,10 +224,12 @@ const WorkspaceCard = ({
   ws,
   view,
   type,
+  onBusinessSetupBuy,
 }: {
   ws: UnifiedWorkspace;
   view: ViewMode;
   type: string;
+  onBusinessSetupBuy?: (workspace: UnifiedWorkspace) => void;
 }) => {
   const { toast } = useToast();
   const [liked, setLiked] = useState(false);
@@ -390,12 +422,29 @@ const WorkspaceCard = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                if (type === "business-setup") {
+                  onBusinessSetupBuy?.(ws);
+                } else {
+                  window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                }
               }}
-              className={`py-2 px-4 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center justify-center gap-1 whitespace-nowrap ${type === "business-setup" ? "w-full" : "flex-1"}`}
+              className={`py-2 px-4 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center justify-center gap-1 whitespace-nowrap ${type === "business-setup" ? "flex-1" : "flex-1"}`}
             >
-              <Phone className="w-3 h-3" /> {type === "business-setup" ? "Contact Team" : "Contact Sales"}
+              {type === "business-setup" ? <ShoppingCart className="w-3 h-3" /> : <Phone className="w-3 h-3" />}
+              {type === "business-setup" ? "Buy Now" : "Contact Sales"}
             </button>
+            {type === "business-setup" && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                }}
+                className="py-2 px-4 text-xs font-semibold rounded-lg border border-[#36503F] bg-white text-[#36503F] hover:bg-[#36503F]/10 transition-all duration-200 flex flex-1 items-center justify-center gap-1 whitespace-nowrap"
+              >
+                <Phone className="w-3 h-3" />
+                Contact
+              </button>
+            )}
           </div>
         </div>
 
@@ -547,13 +596,29 @@ const WorkspaceCard = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              window.dispatchEvent(new CustomEvent('open-contact-modal'));
+              if (type === "business-setup") {
+                onBusinessSetupBuy?.(ws);
+              } else {
+                window.dispatchEvent(new CustomEvent('open-contact-modal'));
+              }
             }}
-            className={`py-2.5 px-3 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center justify-center gap-1.5 ${type === "business-setup" ? "w-full" : "flex-1"}`}
+            className={`py-2.5 px-3 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center justify-center gap-1.5 ${type === "business-setup" ? "flex-1" : "flex-1"}`}
           >
-            <Phone className="w-3 h-3" />
-            <span>{type === "business-setup" ? "Contact Team" : "Contact Sales"}</span>
+            {type === "business-setup" ? <ShoppingCart className="w-3 h-3" /> : <Phone className="w-3 h-3" />}
+            <span>{type === "business-setup" ? "Buy Now" : "Contact Sales"}</span>
           </button>
+          {type === "business-setup" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                window.dispatchEvent(new CustomEvent('open-contact-modal'));
+              }}
+              className="flex-1 py-2.5 px-3 text-xs font-semibold rounded-lg border border-[#36503F] bg-white text-[#36503F] hover:bg-[#36503F]/10 transition-all duration-200 flex items-center justify-center gap-1.5"
+            >
+              <Phone className="w-3 h-3" />
+              <span>Contact</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -568,8 +633,10 @@ const GetWorkspaces = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const searchParams = new URLSearchParams(location.search);
   const initialCity = searchParams.get("city") || "Delhi";
+  const checkoutReturnTo = `${location.pathname}${location.search}${location.hash}`;
 
   const getInitialType = () => {
     if (location.pathname.includes("coworking")) return "coworking";
@@ -582,6 +649,237 @@ const GetWorkspaces = () => {
   };
   const [activeCity, setActiveCity] = useState(initialCity);
   const [workspaceType, setWorkspaceType] = useState(getInitialType());
+  const [selectedBusinessSetup, setSelectedBusinessSetup] = useState<UnifiedWorkspace | null>(null);
+  const [businessPaymentLoading, setBusinessPaymentLoading] = useState(false);
+  const [businessTestPaymentLoading, setBusinessTestPaymentLoading] = useState(false);
+
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const parseBusinessSetupPrice = (workspace: UnifiedWorkspace) => {
+    const price = workspace.plans?.[0]?.price || "";
+    const match = price.match(/[\d,]+/);
+    return match ? Number(match[0].replace(/,/g, "")) : 0;
+  };
+
+  const redirectToMyBookings = () => {
+    hotToast.success("Payment successful. Redirecting to My Bookings...");
+    setTimeout(() => {
+      navigate("/dashboard/my-bookings");
+    }, 3000);
+  };
+
+  const buildBusinessSetupPaymentPayload = (
+    workspace: UnifiedWorkspace,
+    basePrice: number,
+    totalAmount: number,
+    discountAmount: number,
+    couponCodeString?: string
+  ) => ({
+    userEmail: user!.email,
+    userName: user!.fullName || user!.email,
+    userPhone: (user as any).phoneNumber,
+    spaceName: workspace.name,
+    planName: workspace.name,
+    planKey: `business_setup_${workspace.id}`,
+    tenure: 0,
+    yearlyPrice: basePrice,
+    totalAmount,
+    discountPercent: appliedCoupon?.discountType === 'percentage' ? appliedCoupon.discountValue : 0,
+    discountAmount: discountAmount,
+    couponCode: couponCodeString,
+    paymentType: "business_setup" as const,
+  });
+
+  const handleBusinessSetupPayment = async () => {
+    if (!selectedBusinessSetup) return;
+
+    if (!isAuthenticated || !user) {
+      hotToast.error("Please login to continue with your purchase");
+      persistCheckoutState(
+        {
+          page: "business-setup",
+          path: checkoutReturnTo,
+          serviceId: selectedBusinessSetup.id,
+          serviceName: selectedBusinessSetup.name,
+        },
+        checkoutReturnTo,
+      );
+      navigate(getLoginRedirectUrl(checkoutReturnTo), {
+        state: { redirectTo: checkoutReturnTo },
+      });
+      return;
+    }
+
+    const basePrice = parseBusinessSetupPrice(selectedBusinessSetup);
+    if (!basePrice) {
+      hotToast.error("Package price is not available");
+      return;
+    }
+
+    let couponDiscount = 0;
+    if (appliedCoupon && basePrice > 0) {
+        if (appliedCoupon.discountType === 'percentage') {
+            couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
+            if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
+                couponDiscount = appliedCoupon.maxDiscount;
+            }
+        } else {
+            couponDiscount = appliedCoupon.discountValue;
+        }
+        couponDiscount = Math.round(couponDiscount);
+    }
+
+    const taxableAmount = Math.max(basePrice - couponDiscount, 0);
+    const gstAmount = Math.round(taxableAmount * 0.18);
+    const totalAmount = taxableAmount + gstAmount;
+    setBusinessPaymentLoading(true);
+
+    try {
+      const order = await createPaymentOrder(
+        buildBusinessSetupPaymentPayload(selectedBusinessSetup, basePrice, totalAmount, couponDiscount, appliedCoupon?.code),
+      );
+
+      if (order.devMode) {
+        hotToast.loading("Simulating payment...", { id: "business-setup-payment" });
+        await simulatePayment(order.orderId);
+        hotToast.dismiss("business-setup-payment");
+        clearCheckoutState();
+        setSelectedBusinessSetup(null);
+        redirectToMyBookings();
+        return;
+      }
+
+      await openRazorpayCheckout({
+        orderId: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        keyId: order.keyId,
+        userEmail: user.email,
+        userName: user.fullName || user.email,
+        userPhone: (user as any).phoneNumber,
+        spaceName: selectedBusinessSetup.name,
+        planName: selectedBusinessSetup.name,
+        onSuccess: async (response) => {
+          try {
+            await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            clearCheckoutState();
+            setSelectedBusinessSetup(null);
+            redirectToMyBookings();
+          } catch (error) {
+            hotToast.error("Payment verification failed. Please contact support.");
+          }
+        },
+        onFailure: (error) => {
+          reportPaymentFailure(order.orderId, error.code, error.description);
+          navigate(`/payment/failed?orderId=${order.orderId}`);
+        },
+        onDismiss: () => hotToast("Payment cancelled"),
+      });
+    } catch (error: any) {
+      hotToast.error(error?.message || "Failed to start payment. Please try again.");
+    } finally {
+      setBusinessPaymentLoading(false);
+    }
+  };
+
+  const handleBusinessSetupTestPayment = async () => {
+    if (!selectedBusinessSetup) return;
+
+    if (!isAuthenticated || !user) {
+      hotToast.error("Please login to continue with your purchase");
+      persistCheckoutState(
+        {
+          page: "business-setup",
+          path: checkoutReturnTo,
+          serviceId: selectedBusinessSetup.id,
+          serviceName: selectedBusinessSetup.name,
+        },
+        checkoutReturnTo,
+      );
+      navigate(getLoginRedirectUrl(checkoutReturnTo), {
+        state: { redirectTo: checkoutReturnTo },
+      });
+      return;
+    }
+
+    const basePrice = parseBusinessSetupPrice(selectedBusinessSetup);
+    if (!basePrice) {
+      hotToast.error("Package price is not available");
+      return;
+    }
+
+    let couponDiscount = 0;
+    if (appliedCoupon && basePrice > 0) {
+        if (appliedCoupon.discountType === 'percentage') {
+            couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
+            if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
+                couponDiscount = appliedCoupon.maxDiscount;
+            }
+        } else {
+            couponDiscount = appliedCoupon.discountValue;
+        }
+        couponDiscount = Math.round(couponDiscount);
+    }
+
+    const taxableAmount = Math.max(basePrice - couponDiscount, 0);
+    const gstAmount = Math.round(taxableAmount * 0.18);
+    const totalAmount = taxableAmount + gstAmount;
+    setBusinessTestPaymentLoading(true);
+
+    try {
+      hotToast.loading("Creating test order...", { id: "business-setup-test-payment" });
+      const order = await createPaymentOrder(
+        buildBusinessSetupPaymentPayload(selectedBusinessSetup, basePrice, totalAmount, couponDiscount, appliedCoupon?.code),
+      );
+      hotToast.loading("Simulating payment success...", { id: "business-setup-test-payment" });
+      await simulatePayment(order.orderId);
+      hotToast.dismiss("business-setup-test-payment");
+      clearCheckoutState();
+      setSelectedBusinessSetup(null);
+      redirectToMyBookings();
+    } catch (error: any) {
+      hotToast.dismiss("business-setup-test-payment");
+      hotToast.error(error?.message || "Test payment failed.");
+    } finally {
+      setBusinessTestPaymentLoading(false);
+    }
+  };
+
+  const handleApplyCoupon = async () => {
+      if (!couponCode.trim()) return;
+      if (!isAuthenticated || !user) {
+          hotToast.error('Please log in to apply a coupon.');
+          return;
+      }
+      setCouponLoading(true);
+      try {
+          const result = await validateCoupon(couponCode.trim().toUpperCase(), selectedBusinessSetup?.name);
+          if (result.success && result.data) {
+              setAppliedCoupon(result.data);
+              hotToast.success('Coupon applied successfully!');
+          } else {
+              setAppliedCoupon(null);
+              hotToast.error(result.message || 'Invalid or expired coupon');
+          }
+      } catch (error: any) {
+          setAppliedCoupon(null);
+          hotToast.error(error.message || 'Failed to validate coupon');
+      } finally {
+          setCouponLoading(false);
+      }
+  };
+
+  const handleRemoveCoupon = () => {
+      setAppliedCoupon(null);
+      setCouponCode('');
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -638,6 +936,18 @@ const GetWorkspaces = () => {
   const [citiesLoading, setCitiesLoading] = useState(true);
 
   const [workspaces, setWorkspaces] = useState<UnifiedWorkspace[]>([]);
+
+  // Handle ?buy= query param to auto-open checkout
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const buyId = params.get("buy");
+    if (buyId && workspaces.length > 0 && workspaceType === "business-setup") {
+      const match = workspaces.find((ws) => ws.id === buyId);
+      if (match && (!selectedBusinessSetup || selectedBusinessSetup.id !== match.id)) {
+        setSelectedBusinessSetup(match);
+      }
+    }
+  }, [location.search, workspaces, workspaceType]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
@@ -901,10 +1211,31 @@ const GetWorkspaces = () => {
   const totalResults = pagination?.total ?? sortedWorkspaces.length;
   const currentPage = pagination?.page ?? 1;
   const totalPages = pagination?.totalPages ?? 1;
+  const selectedBusinessBaseAmount = selectedBusinessSetup
+    ? parseBusinessSetupPrice(selectedBusinessSetup)
+    : 0;
+
+  // Coupon discount logic for render
+  let renderCouponDiscount = 0;
+  if (appliedCoupon && selectedBusinessBaseAmount > 0) {
+      if (appliedCoupon.discountType === 'percentage') {
+          renderCouponDiscount = (selectedBusinessBaseAmount * appliedCoupon.discountValue) / 100;
+          if (appliedCoupon.maxDiscount && renderCouponDiscount > appliedCoupon.maxDiscount) {
+              renderCouponDiscount = appliedCoupon.maxDiscount;
+          }
+      } else {
+          renderCouponDiscount = appliedCoupon.discountValue;
+      }
+      renderCouponDiscount = Math.round(renderCouponDiscount);
+  }
+
+  const renderTaxableAmount = Math.max(selectedBusinessBaseAmount - renderCouponDiscount, 0);
+  const selectedBusinessTaxAmount = Math.round(renderTaxableAmount * 0.18);
+  const selectedBusinessTotalAmount = renderTaxableAmount + selectedBusinessTaxAmount;
 
   const typeLabel: Record<string, string> = {
     "virtual-office": "Virtual Office",
-    coworking: "Coworking Space",
+    "coworking-space": "Coworking Space",
     "business-setup": "Business Setup",
   };
 
@@ -922,7 +1253,7 @@ const GetWorkspaces = () => {
             </a>
             <ChevronRight className="w-3 h-3" />
             <span className="hover:text-foreground transition-colors cursor-pointer">
-              {typeLabel[workspaceType]}
+              {typeLabel[workspaceType] || "Workspace"}
             </span>
             {workspaceType !== "business-setup" && (
               <>
@@ -1051,7 +1382,7 @@ const GetWorkspaces = () => {
                 <span className="font-semibold text-foreground">
                   {sortedWorkspaces.length} of {totalResults} result(s)
                 </span>{" "}
-                for {typeLabel[workspaceType].toLowerCase()} in{" "}
+                for {(typeLabel[workspaceType] || "Workspace").toLowerCase()} in{" "}
                 <span className="font-medium text-foreground">
                   {activeCity}
                 </span>
@@ -1126,6 +1457,7 @@ const GetWorkspaces = () => {
                       ws={ws}
                       view={viewMode}
                       type={workspaceType}
+                      onBusinessSetupBuy={setSelectedBusinessSetup}
                     />
                   ))
                 ) : (
@@ -1209,6 +1541,7 @@ const GetWorkspaces = () => {
                     ws={ws}
                     view={viewMode}
                     type={workspaceType}
+                    onBusinessSetupBuy={setSelectedBusinessSetup}
                   />
                 ))
               ) : (
@@ -1266,6 +1599,160 @@ const GetWorkspaces = () => {
           </>
         )}
       </div>
+
+      <Dialog
+        open={!!selectedBusinessSetup}
+        onOpenChange={(open) => !open && setSelectedBusinessSetup(null)}
+      >
+        <DialogContent className="max-w-md rounded-2xl border border-[#D4E0D0] p-0 overflow-hidden bg-white shadow-2xl">
+          {selectedBusinessSetup && (
+            <>
+              <DialogHeader className="sr-only">
+                <DialogTitle>Order Summary</DialogTitle>
+                <DialogDescription>
+                  Business setup order summary and payment
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="p-6">
+                <div className="mb-6 flex items-center gap-3">
+                  <span className="text-2xl font-semibold text-[#EDB003]">
+                    &#8377;
+                  </span>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-950">
+                      Order Summary
+                    </h2>
+                    <p className="mt-1 text-sm font-medium text-[#6B9679]">
+                      {selectedBusinessSetup.name}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3 text-base">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="font-medium text-[#6B9679]">Plan</span>
+                    <span className="text-right font-semibold text-gray-950">
+                      {selectedBusinessSetup.name}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="font-medium text-[#6B9679]">Package</span>
+                    <span className="font-semibold text-gray-950">
+                      {formatInr(selectedBusinessBaseAmount)}
+                    </span>
+                  </div>
+
+                  {renderCouponDiscount > 0 && (
+                    <div className="flex items-center justify-between gap-4 text-green-600">
+                      <span className="font-medium flex items-center gap-2">
+                        Discount <span className="text-xs bg-green-100 px-2 py-0.5 rounded uppercase">{appliedCoupon.code}</span>
+                      </span>
+                      <span className="font-semibold">
+                        -{formatInr(renderCouponDiscount)}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="font-medium text-[#6B9679]">Tax (18%)</span>
+                    <span className="font-semibold text-gray-950">
+                      {formatInr(selectedBusinessTaxAmount)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="my-6 h-px bg-[#D4E0D0]" />
+
+                {/* Coupon Section */}
+                <div className="mb-5">
+                    {appliedCoupon ? (
+                        <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl p-3">
+                            <div className="flex items-center gap-2">
+                                <Bookmark className="w-4 h-4 text-green-600" />
+                                <div>
+                                    <p className="text-sm font-semibold text-green-700">'{appliedCoupon.code}' applied</p>
+                                    <p className="text-xs text-green-600 font-medium">You saved {formatInr(renderCouponDiscount)}!</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={handleRemoveCoupon}
+                                className="text-sm font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center gap-2 relative">
+                            <div className="relative flex-1">
+                                <Bookmark className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <input 
+                                    type="text" 
+                                    placeholder="Enter coupon code" 
+                                    className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-[#D4E0D0] rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#36503F]/20 uppercase"
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                                    disabled={couponLoading}
+                                />
+                            </div>
+                            <button 
+                                onClick={handleApplyCoupon}
+                                disabled={!couponCode.trim() || couponLoading}
+                                className="px-5 py-2.5 bg-[#36503F] text-[#FEF8C5] text-sm font-bold rounded-xl hover:bg-[#1F2E26] disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[80px]"
+                            >
+                                {couponLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Apply'}
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                <div className="mb-5">
+                  <p className="text-sm font-semibold uppercase tracking-wide text-[#6B9679]">
+                    Total Amount
+                  </p>
+                  <p className="mt-1 text-4xl font-extrabold tracking-tight text-gray-950">
+                    {formatInr(selectedBusinessTotalAmount)}
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleBusinessSetupPayment}
+                  disabled={businessPaymentLoading || businessTestPaymentLoading}
+                  className="w-full min-h-14 rounded-xl bg-[#36503F] px-5 text-base font-bold text-[#FEF8C5] hover:bg-[#1F2E26] disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center"
+                >
+                  {businessPaymentLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Proceed to Payment"
+                  )}
+                </button>
+
+                {import.meta.env.DEV && (
+                  <button
+                    onClick={handleBusinessSetupTestPayment}
+                    disabled={businessPaymentLoading || businessTestPaymentLoading}
+                    className="mt-4 w-full min-h-12 rounded-xl bg-[#36503F] px-5 text-sm font-bold text-[#FEF8C5] hover:bg-[#1F2E26] disabled:cursor-not-allowed disabled:opacity-70 flex items-center justify-center"
+                  >
+                    {businessTestPaymentLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Testing...
+                      </>
+                    ) : (
+                      "Test Payment (Dev Only)"
+                    )}
+                  </button>
+                )}
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

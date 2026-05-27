@@ -172,14 +172,14 @@ const PartnerWithUs = () => {
               transition={{ duration: 0.8 }}
               className="max-w-4xl mx-auto text-center"
             >
-              <motion.div
+              {/* <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#FAFAF7] border border-[#D4E0D0] text-[#36503F] text-sm font-semibold mb-8 shadow-sm"
               >
                 
-              </motion.div>
+              </motion.div> */}
 
               <h1 className="text-[40px] sm:text-5xl lg:text-[56px] font-medium tracking-tight mb-8 leading-[1.05] text-[#1A1A1A]">
                 Partner with us. <br />

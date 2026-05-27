@@ -24,7 +24,7 @@ const AffiliateLayout = () => {
         if (path.includes("affiliate-invoices")) return "Invoices";
         if (path.includes("lead-management")) return "Lead Management";
         if (path.includes("quotation-generator")) return "Quotation Generator";
-        if (path.includes("coupons")) return "Coupons and Vouchers";
+        if (path.includes("coupons")) return "Coupons";
         if (path.includes("marketing-tools")) return "Marketing Tools";
         if (path.includes("leaderboard")) return "Leaderboard";
         if (path.includes("support")) return "Support";
@@ -62,7 +62,7 @@ const AffiliateLayout = () => {
             case "Quotation Generator":
                 navigate("/affiliate-portal/quotation-generator");
                 break;
-            case "Coupons and Vouchers":
+            case "Coupons":
                 navigate("/affiliate-portal/coupons");
                 break;
             case "Marketing Tools":

@@ -3,6 +3,7 @@ import {
     Users,
     TrendingUp,
     Wallet,
+    Banknote,
 } from "lucide-react";
 import { StatsSkeleton } from "@/components/ui/skeleton-loaders";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +19,8 @@ import StatCardDashboard from "@/components/affiliatePortal/StatCardDashboard";
 
 const Dashboard = () => {
     const [dashboardStats, setDashboardStats] = useState<RevenueDashboardStats | null>(null);
+    const [pendingPayout, setPendingPayout] = useState(0);
+    const [recentCommission, setRecentCommission] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const { refreshProfile } = useAuth();
 
@@ -28,12 +31,40 @@ const Dashboard = () => {
                 // Refresh profile to get latest KYC status
                 await refreshProfile();
 
-                const [statsRes] = await Promise.allSettled([
+                const [statsRes, invoicesRes, bookingsRes] = await Promise.allSettled([
                     affiliatePortalService.getDashboardStats(),
+                    affiliatePortalService.getInvoices(),
+                    affiliatePortalService.getBookings(),
                 ]);
 
                 if (statsRes.status === 'fulfilled' && statsRes.value?.data) {
                     setDashboardStats(statsRes.value.data as RevenueDashboardStats);
+                }
+
+                if (invoicesRes.status === 'fulfilled' && invoicesRes.value?.data) {
+                    const invoices = invoicesRes.value.data.invoices || [];
+                    const stored = localStorage.getItem("affiliate_paid_payouts");
+                    let paidInvoiceIds: string[] = [];
+                    if (stored) {
+                        try {
+                            paidInvoiceIds = JSON.parse(stored);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
+                    const validInvoices = invoices.filter((inv: any) => inv.commission && inv.commission > 0);
+                    const pendingInvoices = validInvoices.filter((inv: any) => !paidInvoiceIds.includes(inv._id || inv.invoiceNumber));
+                    const calculatedPending = pendingInvoices.reduce((sum: number, inv: any) => sum + inv.commission, 0);
+                    setPendingPayout(calculatedPending);
+                }
+
+                if (bookingsRes.status === 'fulfilled' && bookingsRes.value?.data) {
+                    const bookings = bookingsRes.value.data.bookings || [];
+                    const validBookings = bookings.filter((b: any) => b.commission && b.commission > 0);
+                    const latestBooking = [...validBookings].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
+                    if (latestBooking) {
+                        setRecentCommission(latestBooking.commission);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch dashboard data", error);
@@ -68,8 +99,14 @@ const Dashboard = () => {
             icon: Users,
         },
         {
+            label: "Recent Commission",
+            value: recentCommission > 0 ? formatFullCurrency(recentCommission) : "₹0",
+            trend: null,
+            icon: Banknote,
+        },
+        {
             label: "Pending Payout",
-            value: dashboardStats?.pendingPayout !== undefined ? formatFullCurrency(dashboardStats.pendingPayout) : "₹0",
+            value: formatFullCurrency(pendingPayout),
             trend: null,
             icon: Wallet,
         },
@@ -77,7 +114,7 @@ const Dashboard = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-[#f7f7f6] p-6 lg:p-10 font-sans space-y-10">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#f7f7f6] font-sans space-y-10"> 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-2">
                         <div className="h-10 w-64 bg-gray-200 rounded" />
@@ -90,13 +127,13 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#f7f7f6] p-4 md:p-6 lg:p-10 font-sans animate-fade-in relative">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#f7f7f6] font-sans animate-fade-in relative"> 
             <div className="w-full space-y-10">
                 {/* 1. Page Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-2">
-                        <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-                            Affiliate <span className="text-[#4A6D56] italic">Dashboard</span>
+                        <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                            Affiliate <span className="text-[#36503F] italic">Dashboard</span>
                         </h1>
                         <p className="text-gray-500 text-base md:text-lg">
                             Track your referrals, revenue, and performance

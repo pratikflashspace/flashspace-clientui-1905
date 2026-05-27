@@ -205,6 +205,11 @@
     font-family: "Plus Jakarta Sans", system-ui, sans-serif;
   }
 
+  .client-dashboard-portal,
+  .client-dashboard-portal * {
+    font-family: "Inter", system-ui, sans-serif !important;
+  }
+
   h1 {
     font-weight: 800;
     letter-spacing: -0.03em;

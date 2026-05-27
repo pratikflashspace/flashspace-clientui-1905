@@ -1,4 +1,7 @@
+import { ClientHeaderActions } from "./ClientHeaderActions";
 import React, { useState, useEffect } from "react";
+import { NotificationBell } from "@/components/NotificationBell";
+import { useAuth } from "@/contexts/AuthContext";
 import userDashboardService from "@/services/userDashboard.service";
 import { MailRecord } from "@/types/services";
 import {
@@ -28,6 +31,7 @@ import { mailService } from "@/services/mailService";
 import { getUploadedFileUrl } from "@/utils/fileUrl";
 
 export default function MailRecords() {
+  const { user } = useAuth();
   const [mails, setMails] = useState<MailRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -186,39 +190,33 @@ export default function MailRecords() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
-              Mail Records
+            <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-[#1A1A1A] tracking-tight">
+              Mail <span className="text-[#36503F] italic">Records</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Track all mail and parcels received at your virtual office
             </p>
           </div>
-          <a
-            href="/services/virtual-office"
-            className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-8 py-3.5 rounded-2xl font-bold hover:bg-[#35503F]/90 transition-all shadow-md active:scale-95 text-center"
-          >
-            <span className="text-xl">+</span>
-            Book New Space
-          </a>
+          <ClientHeaderActions />
         </div>
 
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-yellow-400">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Pending Pickup</p>
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Pending Pickup</p>
             <p className="text-3xl font-extrabold text-[#35503F]">{stats.pending}</p>
           </div>
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-blue-400">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Forwarded</p>
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Forwarded</p>
             <p className="text-3xl font-extrabold text-[#35503F]">{stats.forwarded}</p>
           </div>
-          <div className="bg-white p-5 rounded-xl shadow-md border border-gray-200 transition-all hover:shadow-lg border-l-4 border-l-green-400">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Collected</p>
+          <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
+            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Collected</p>
             <p className="text-3xl font-extrabold text-[#35503F]">{stats.collected}</p>
           </div>
         </div>

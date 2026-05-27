@@ -3,11 +3,9 @@ import {
   Calendar,
   CreditCard,
   ShieldCheck,
-  User,
   Building2,
   ChevronRight,
   ChevronLeft,
-  Bell,
   Mail,
   Users,
   FileText,
@@ -15,17 +13,13 @@ import {
   MessageSquare,
   HelpCircle,
   Home,
-  AlertCircle,
   Menu,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNotifications } from "@/contexts/NotificationProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
-
-import userDashboardService from "@/services/userDashboard.service";
 
 // Remove this type definition if useAuth already provides the correct user type
 // type User = {
@@ -37,7 +31,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import MyBookings from "./MyBookings";
 import Billing from "./Billing";
-import KYCVerification from "./KYCVerification";
 import Support from "./Support";
 import Logout from "./Logout";
 import Profile from "./Profile";
@@ -56,33 +49,14 @@ const menuItems = [
   { name: "Payments", icon: CreditCard, section: "main", path: "/dashboard/payments" },
   { name: "Documents", icon: FileText, section: "main", path: "/dashboard/documents" },
   { name: "Ticket and Support", icon: MessageSquare, section: "main", path: "/dashboard/support" },
-  { name: "Notifications", icon: Bell, section: "main", path: "/dashboard/notifications" },
   { name: "Help Center", icon: HelpCircle, section: "main", path: "/dashboard/help" },
-  { name: "Profile & KYC", icon: User, section: "main", path: "/dashboard/profile" },
 ];
 
 export default function ClientDashboard() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState(false);
   const { user } = useAuth();
-  const { unreadCount } = useNotifications();
-  const [kycStatus, setKycStatus] = useState<string | null>(null);
-
-  // Fetch KYC status for indicator
-  useEffect(() => {
-    async function fetchKycStatus() {
-      try {
-        const kycResponse = await userDashboardService.getKYC();
-        if (kycResponse.success && kycResponse.data) {
-          const kyc = Array.isArray(kycResponse.data) ? kycResponse.data[0] : kycResponse.data;
-          setKycStatus(kyc?.overallStatus || null);
-        }
-      } catch (e) {
-        setKycStatus(null);
-      }
-    }
-    fetchKycStatus();
-  }, []);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -103,218 +77,203 @@ export default function ClientDashboard() {
     setIsMobileMenuOpen(false);
   };
 
+  useEffect(() => {
+    const openDrawer = () => setIsProfileDrawerOpen(true);
+    window.addEventListener("client-profile-drawer:open", openDrawer);
+    return () => window.removeEventListener("client-profile-drawer:open", openDrawer);
+  }, []);
+
   // Memoize the main content to prevent re-renders on scroll
   const mainContent = useMemo(() => {
-    switch (activeIndex) {
-      case 0:
+    switch (location.pathname) {
+      case "/dashboard":
         return <Dashboard />;
-      case 1:
+      case "/dashboard/my-bookings":
         return <MyBookings />;
-      case 2:
+      case "/dashboard/mail-records":
         return <MailRecords />;
-      case 3:
+      case "/dashboard/visit-records":
         return <VisitRecords />;
-      case 4: // Payments
+      case "/dashboard/payments":
         return <Billing />; // Using Billing component for Payments for now
-      case 5:
+      case "/dashboard/documents":
         return <Documents />;
-      case 6: // Chat Support
+      case "/dashboard/support":
         return <ChatSupport />;
-      case 7: // Notifications
+      case "/dashboard/notifications":
         return <Notifications />;
-      case 8: // Help Center
+      case "/dashboard/help":
         return <Support />;
-      case 9:
+      case "/dashboard/profile":
         return <Profile />;
-      case 10:
+      case "/dashboard/logout":
         return <Logout />;
-      case 100: // Special case for View Details
+      case "/dashboard/viewdetails":
         return <Viewdetails />;
       default:
         return <Dashboard />;
     }
-  }, [activeIndex]);
+  }, [location.pathname]);
 
   const mainMenuItems = menuItems; // All menu items in single list now
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="client-dashboard-portal min-h-screen bg-gray-50">
 
       <div className="flex h-screen overflow-hidden relative">
         {/* Mobile Sidebar Overlay Backdrop */}
         {isMobileMenuOpen && (
           <div
-            className="lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity"
+            className="xl:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           />
         )}
 
         {/* Sidebar */}
-        <aside
+                <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out shadow-sm",
-            isSidebarCollapsed ? "w-[72px]" : "w-72",
-            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+            "fixed top-0 left-0 z-50 h-screen bg-[#f8f8f8] shadow-xl border-r border-[#edede6] flex flex-col transition-all duration-300 ease-in-out",
+            "w-72",
+            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
+            "xl:relative xl:translate-x-0 xl:shadow-none xl:h-full overflow-hidden",
+            isSidebarCollapsed ? "xl:w-20" : "xl:w-72"
           )}
+          data-lenis-prevent
         >
-          <div className={`flex flex-col h-full`}>
-            {/* Logo */}
-            <div
-              className={cn(
-                "flex flex-col items-start gap-1 cursor-pointer transition-all",
-                isSidebarCollapsed ? "px-2 py-6 items-center" : "p-6 pb-8"
-              )}
-              onClick={() => navigate("/")}
-              title="Back to Home"
-            >
-              <div className="flex items-center justify-between w-full">
-                <img
-                  src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
-                  alt="FlashSpace Logo"
-                  className={`w-auto object-contain ${isSidebarCollapsed ? "h-7" : "h-9"}`}
-                />
-                {!isSidebarCollapsed && (
+          {/* Header branding */}
+          <div className={`flex flex-col shrink-0 transition-all duration-300 ${isSidebarCollapsed ? "p-4 items-center" : "w-[287px] h-[128px] px-[24px] pt-[22px] pb-[20px]"}`}>
+              <div className={`flex items-center w-full ${isSidebarCollapsed ? "justify-center" : "justify-between"}`}>
+                  <img
+                      src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
+                      alt="FlashSpace Logo"
+                      onClick={() => navigate("/")}
+                      className={`w-auto object-contain transition-all duration-300 ml-[-12px] cursor-pointer ${isSidebarCollapsed ? "h-7" : "h-9"}`}
+                  />
                   <button
-                    className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsMobileMenuOpen(false);
-                    }}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="xl:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
                   >
-                    <X className="w-5 h-5" />
+                      <X size={24} />
                   </button>
-                )}
               </div>
-              {!isSidebarCollapsed && (
-                <div className="mt-2 pl-3 space-y-0.5">
-                  <p className="text-sm font-bold text-[#1F2E26] dark:text-white leading-none">Customer Portal</p>
-                  <p className="text-[11px] text-[#677E73] dark:text-gray-400 font-medium leading-tight">Manage your workspace subscriptions</p>
-                </div>
-              )}
-            </div>
 
-            {/* Horizontal Separator Line */}
-            <div className="border-b border-gray-100 w-full" />
-
-          {/* Main Navigation */}
-          <nav className="flex-1 overflow-y-auto scrollbar-hover-only py-4">
-            <ul className={cn("space-y-1", isSidebarCollapsed ? "px-2" : "px-2")}>
-              {mainMenuItems.map((item, idx) => {
-                const isActive = activeIndex === idx;
-                const showKycDot = item.name === "Profile & KYC" && kycStatus !== "approved";
-                const showNotificationBadge =
-                  item.name === "Notifications" && unreadCount > 0;
-
-                return (
-                  <li key={item.name}>
-                    <button
-                      onClick={() => handleNavigation(idx)}
-                      title={isSidebarCollapsed ? item.name : undefined}
-                      className={`relative w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-all ${isSidebarCollapsed ? "justify-center px-2 py-3" : "px-4 py-2.5"
-                        } ${isActive
-                          ? "bg-[#35503F] text-[#FEF8C3] shadow-sm"
-                          : "text-gray-600 hover:bg-gray-100 hover:text-black"
-                        }`}
-                    >
-                      <item.icon className={`w-5 h-5 flex-shrink-0 ${isActive ? "text-[#FEF8C3]" : "text-gray-400"}`} />
-                      {!isSidebarCollapsed && (
-                        <span className="flex items-center gap-1">
-                          {item.name}
-                          {showNotificationBadge && (
-                            <span
-                              className={`ml-2 inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${isActive
-                                ? "bg-[#FEF8C3] text-[#35503F]"
-                                : "bg-[#35503F] text-[#FEF8C3]"
-                                }`}
-                            >
-                              {unreadCount > 99 ? "99+" : unreadCount}
-                            </span>
-                          )}
-                          {showKycDot && (
-                            <span className="flex items-center ml-2 text-xs text-red-600 font-semibold" title="KYC Required">
-                              <AlertCircle className="w-4 h-4 mr-1 text-red-500" />
-                              <span className="text-red-600 font-bold">KYC</span>
-                            </span>
-                          )}
-                        </span>
-                      )}
-                      {isSidebarCollapsed && showNotificationBadge && (
-                        <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-red-500" />
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          {/* Bottom Actions */}
-          <div className={cn("mt-auto pt-4 border-t border-gray-100 space-y-2", isSidebarCollapsed ? "px-2 pb-4" : "px-4 pb-4")}>
-            {/* Collapse Toggle (Desktop) */}
-            <button
-              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-              className={cn(
-                "hidden lg:flex items-center gap-3 px-4 py-2.5 w-full rounded-xl text-gray-400 hover:bg-gray-50 transition-colors",
-                isSidebarCollapsed && "justify-center"
-              )}
-            >
-              <ChevronLeft className={cn("w-5 h-5 transition-transform", isSidebarCollapsed && "rotate-180")} />
-              {!isSidebarCollapsed && (
-                <span className="font-medium text-xs uppercase tracking-wider">Collapse</span>
-              )}
-            </button>
-
-            {!isSidebarCollapsed ? (
-              <>
-                {user?.role && ['super_admin', 'admin', 'sales', 'support', 'affiliate_manager', 'space_partner_manager'].includes(user.role) && (
-                  <button
-                    onClick={() => navigate('/admin')}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl text-sm font-semibold text-purple-700 hover:bg-purple-100 transition-all shadow-sm shadow-purple-900/5 group"
-                  >
-                    <ShieldCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    <span>Admin Portal</span>
-                  </button>
-                )}
-
-                {user?.role === 'partner' && (
-                  <button
-                    onClick={() => navigate('/spaceportal')}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-orange-50 border border-orange-100 rounded-xl text-sm font-semibold text-orange-700 hover:bg-orange-100 transition-all shadow-sm shadow-orange-900/5 group"
-                  >
-                    <Building2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    <span>Partner Portal</span>
-                  </button>
-                )}
-
-                {user?.role === 'affiliate' && (
-                  <button
-                    onClick={() => navigate('/affiliate-portal')}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-cyan-50 border border-cyan-100 rounded-xl text-sm font-semibold text-cyan-700 hover:bg-cyan-100 transition-all shadow-sm shadow-cyan-900/5 group"
-                  >
-                    <Users className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    <span>Affiliate Portal</span>
-                  </button>
-                )}
-
-                <button
-                  onClick={() => navigate('/')}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
-                >
-                  <Home className="w-4 h-4" />
-                  <span>Back to Home</span>
-                </button>
-              </>
-            ) : (
-              /* Collapsed: show only Back to Home icon */
-              <button
-                onClick={() => navigate('/')}
-                title="Back to Home"
-                className="w-full flex items-center justify-center px-2 py-3 rounded-xl text-gray-500 hover:bg-gray-100 transition-all"
-              >
-                <Home className="w-5 h-5" />
-              </button>
-            )}
+              <div className={`mt-3 overflow-hidden transition-all duration-300 flex flex-col gap-1 ${isSidebarCollapsed ? "h-0 opacity-0" : "h-auto opacity-100"}`}>
+                  <h2 className="w-[239px] h-[20px] text-[14px] font-bold text-[#1a2d1d] whitespace-nowrap leading-none flex items-center" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      Customer Portal
+                  </h2>
+                  <p className="w-[239px] h-[16px] text-[12px] text-[#64748b] whitespace-nowrap font-medium leading-none flex items-center">
+                      Manage your workspace subscriptions
+                  </p>
+              </div>
           </div>
+
+          {/* Navigation Menu */}
+          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 space-y-1.5 pb-2" data-lenis-prevent>
+              {mainMenuItems.map((item, idx) => {
+                  const isActive = activeIndex === idx;
+
+                  return (
+                      <button
+                          key={item.name}
+                          onClick={() => handleNavigation(idx)}
+                          title={isSidebarCollapsed ? item.name : ""}
+                          className={`
+            flex items-center transition-all duration-300 rounded-lg group relative
+            ${isSidebarCollapsed ? "justify-center w-12 h-12 mx-auto" : "justify-start w-[263px] h-[40px] px-[12px] gap-4 mx-auto"}
+            ${isActive
+                                  ? "bg-[#334d3d] text-[#FEF8C3] shadow-sm"
+                                  : "text-[#677e73] hover:bg-gray-50 hover:text-[#1a2d1d]"
+                              }
+          `}
+                      >
+                          <item.icon
+                              size={isSidebarCollapsed ? 24 : 22}
+                              strokeWidth={isActive ? 2.5 : 2}
+                              className="shrink-0"
+                          />
+                          <span
+                              className={`text-[14px] font-semibold whitespace-nowrap transition-all duration-200 ${isSidebarCollapsed ? "w-0 opacity-0 overflow-hidden absolute" : "w-auto opacity-100 static"}`}
+                          >
+                              {item.name}
+                          </span>
+                      </button>
+                  );
+              })}
+          </div>
+
+          {/* Footer and Bottom Actions */}
+          <div className="px-5 py-3 border-t border-gray-100 space-y-2 bg-[#f8f9fa]/30 shrink-0">
+              <button
+                  onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                  className={`
+        hidden xl:flex items-center transition-colors text-[#677e73] hover:text-[#1a2d1d] py-1 mx-auto
+        ${isSidebarCollapsed ? "justify-center w-full" : "justify-start gap-4 w-[263px] h-9 px-[12px]"}
+      `}
+              >
+                  {isSidebarCollapsed ? (
+                      <ChevronRight size={22} />
+                  ) : (
+                      <>
+                          <ChevronLeft size={20} />
+                          <span className="text-[15px] font-bold">Collapse</span>
+                      </>
+                  )}
+              </button>
+
+        {user?.role && ['super_admin', 'admin', 'sales', 'support', 'affiliate_manager', 'space_partner_manager'].includes(user.role) && (
+          <button
+            onClick={() => navigate('/admin')}
+            className={`
+              flex items-center rounded-lg shadow-sm font-bold transition-all border border-gray-200 text-purple-700 bg-white hover:bg-gray-50 hover:shadow-md mx-auto
+              ${isSidebarCollapsed ? "justify-center w-full h-14" : "justify-start gap-4 w-[263px] h-[40px] px-[12px] text-[14px]"}
+            `}
+            title={isSidebarCollapsed ? "Admin Portal" : ""}
+          >
+            <ShieldCheck size={20} className="shrink-0" />
+            {!isSidebarCollapsed && <span className="whitespace-nowrap">Admin Portal</span>}
+          </button>
+        )}
+
+        {user?.role === 'partner' && (
+          <button
+            onClick={() => navigate('/spaceportal')}
+            className={`
+              flex items-center rounded-lg shadow-sm font-bold transition-all border border-gray-200 text-orange-700 bg-white hover:bg-gray-50 hover:shadow-md mx-auto
+              ${isSidebarCollapsed ? "justify-center w-full h-14" : "justify-start gap-4 w-[263px] h-[40px] px-[12px] text-[14px]"}
+            `}
+            title={isSidebarCollapsed ? "Partner Portal" : ""}
+          >
+            <Building2 size={20} className="shrink-0" />
+            {!isSidebarCollapsed && <span className="whitespace-nowrap">Partner Portal</span>}
+          </button>
+        )}
+
+        {user?.role === 'affiliate' && (
+          <button
+            onClick={() => navigate('/affiliate-portal')}
+            className={`
+              flex items-center rounded-lg shadow-sm font-bold transition-all border border-gray-200 text-cyan-700 bg-white hover:bg-gray-50 hover:shadow-md mx-auto
+              ${isSidebarCollapsed ? "justify-center w-full h-14" : "justify-start gap-4 w-[263px] h-[40px] px-[12px] text-[14px]"}
+            `}
+            title={isSidebarCollapsed ? "Affiliate Portal" : ""}
+          >
+            <Users size={20} className="shrink-0" />
+            {!isSidebarCollapsed && <span className="whitespace-nowrap">Affiliate Portal</span>}
+          </button>
+        )}
+
+              <button
+                  onClick={() => navigate("/")}
+                  className={`
+        flex items-center rounded-lg shadow-sm font-bold transition-all border border-gray-200 text-[#677e73] bg-white hover:bg-gray-50 hover:shadow-md mx-auto
+        ${isSidebarCollapsed ? "justify-center w-full h-14" : "justify-start gap-4 w-[263px] h-[40px] px-[12px] text-[14px]"}
+      `}
+              >
+                  <Home size={20} className="shrink-0" />
+                  {!isSidebarCollapsed && (
+                      <span className="whitespace-nowrap">Back to Home</span>
+                  )}
+              </button>
           </div>
         </aside>
 
@@ -322,13 +281,12 @@ export default function ClientDashboard() {
         {/* Main Content */}
         <main
           className={cn(
-            "relative flex-1 min-w-0 h-full overflow-x-hidden overflow-y-auto touch-pan-y scroll-smooth flex flex-col transition-all duration-300",
-            isSidebarCollapsed ? "lg:ml-[72px]" : "lg:ml-72"
+            "relative flex-1 min-w-0 h-full overflow-x-hidden overflow-y-auto touch-pan-y scroll-smooth flex flex-col transition-all duration-300"
           )}
           data-lenis-prevent
         >
           {/* Mobile Top Bar (Only visible when sidebar needs toggle) */}
-          <header className="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
+          <header className="xl:hidden h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
             <div className="flex flex-col">
               <div className="flex items-baseline gap-0.5">
                 <span className={cn(
@@ -364,6 +322,40 @@ export default function ClientDashboard() {
             </ErrorBoundary>
           </div>
         </main>
+
+        {isProfileDrawerOpen && (
+          <div className="fixed inset-0 z-[70]">
+            <button
+              type="button"
+              className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
+              onClick={() => setIsProfileDrawerOpen(false)}
+              aria-label="Close profile drawer"
+            />
+            <aside className="absolute inset-y-0 right-0 w-full md:w-[72vw] max-w-[920px] overflow-hidden bg-gray-50 shadow-2xl animate-in slide-in-from-right duration-300">
+              <div className="absolute inset-x-0 top-0 z-20 flex h-[130px] items-start justify-between bg-[#36503F] px-7 py-8 shadow-sm">
+                <div>
+                  <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight text-white">
+                    Profile & <span className="italic text-[#FEF8C3]">KYC</span>
+                  </h2>
+                  <p className="mt-2 text-base font-semibold text-[#FEF8C3]/85">
+                    Manage your identity verification and profile details.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsProfileDrawerOpen(false)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+                  aria-label="Close profile drawer"
+                >
+                  <X className="h-7 w-7" />
+                </button>
+              </div>
+              <div className="h-full overflow-y-auto pt-[130px]">
+                <Profile isCompact drawerMode />
+              </div>
+            </aside>
+          </div>
+        )}
       </div>
     </div>
   );

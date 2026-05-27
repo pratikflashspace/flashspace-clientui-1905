@@ -60,7 +60,7 @@ const RECENT_QUOTATIONS = [
 
 const QuotationGenerator = () => {
     return (
-        <div className=" mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-700">
+ <div className=" mx-auto min-h-screen p-4 md:p-6 lg:p-8 space-y-8 animate-in fade-in duration-700"> 
             {/* Header Section */}
 {/* Header Removed */}
 
@@ -72,14 +72,14 @@ const QuotationGenerator = () => {
                             <div className="p-2 bg-teal-50 rounded-lg text-[#5bb09c]">
                                 <FileText className="w-5 h-5" />
                             </div>
-                            <h2 className="text-xl font-bold text-gray-900">
+                            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900">
                                 Create New Quotation
                             </h2>
                         </div>
 
                         {/* Client Details */}
                         <div className="space-y-6">
-                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-sm font-bold text-gray-400 uppercase tracking-widest">
                                 Client Details
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -116,7 +116,7 @@ const QuotationGenerator = () => {
 
                         {/* Space Requirements */}
                         <div className="space-y-6">
-                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-sm font-bold text-gray-400 uppercase tracking-widest">
                                 Space Requirements
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -237,7 +237,7 @@ const QuotationGenerator = () => {
                     {/* Recent Quotations Section */}
                     <div className="bg-transparent space-y-4">
                         <div className="flex justify-between items-center px-1">
-                            <h3 className="font-bold text-gray-800 text-lg">
+                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A]">
                                 Recent Quotations
                             </h3>
                             <button className="text-xs font-bold text-gray-500 hover:text-[#5bb09c] transition-colors">
@@ -255,7 +255,7 @@ const QuotationGenerator = () => {
 
                     {/* Fixed Performance Section */}
                     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-6">
-                        <h3 className="font-bold text-gray-800 text-lg">
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A]">
                             Quotation Stats
                         </h3>
                         <QuotationStats />

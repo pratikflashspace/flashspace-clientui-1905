@@ -121,9 +121,10 @@ const resolveDocumentUrl = async (
 interface KYCVerificationProps {
   hideCompanyDetails?: boolean;
   isCompact?: boolean;
+  drawerMode?: boolean;
 }
 
-export default function KYCVerification({ hideCompanyDetails = false, isCompact = false }: KYCVerificationProps) {
+export default function KYCVerification({ hideCompanyDetails = false, isCompact = false, drawerMode = false }: KYCVerificationProps) {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [profileId, setProfileId] = useState<string | null>(
@@ -1007,12 +1008,12 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
 
   if (user?.role === 'admin' || user?.role === 'super_admin') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 flex items-center justify-center "> 
         <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-gray-100 shadow-sm text-center">
           <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <Shield className="w-10 h-10 text-green-500" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Verified Administrator</h2>
+          <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-bold text-gray-900 mb-2">Verified Administrator</h2>
           <p className="text-gray-500 mb-6">
             As an administrator, your KYC is automatically approved. 
             You have full access to all booking and dashboard features.
@@ -1082,12 +1083,12 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
     const isPersonalSubmitted = individualProfile?.overallStatus && individualProfile?.overallStatus !== "not_started";
 
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4 md:px-8">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl md:text-3xl font-bold  text-[#35503F]">
+              <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl md:text-3xl font-bold  text-[#35503F]">
                 KYC <span className="text-[#35503F] opacity-100">Verification</span>
               </h1>
               {isPersonalVerified ? (
@@ -1109,7 +1110,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
 
           {/* 1. Personal Identity Section */}
           <div>
-            <h2 className="text-lg font-bold text-gray-800 mb-4">1. Personal Identity <span className="text-gray-400 font-normal text-sm ml-1">(Mandatory)</span></h2>
+            <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-800 mb-4">1. Personal Identity <span className="text-gray-400 font-normal text-sm ml-1">(Mandatory)</span></h2>
             <div className={`rounded-2xl border p-6 transition-all ${isPersonalVerified
               ? "bg-green-50/50 border-green-100"
               : "bg-white border-green-600 shadow-md ring-1 ring-green-600/10"
@@ -1121,7 +1122,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                     <User className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900 mb-1">
                       {isPersonalVerified ? "Personal Verification Complete" : "Start Personal Verification"}
                     </h3>
                     <p className="text-sm text-gray-500 max-w-xl">
@@ -1172,7 +1173,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
           {!hideCompanyDetails && (
             <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className={`text-lg font-bold ${!isPersonalVerified ? "text-gray-400" : "text-gray-800"}`}>
+              <h2 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-lg font-bold ${!isPersonalVerified ? "text-gray-400" : "text-gray-800"}`}>
                 2. Partner Profiles <span className="text-gray-400 font-normal text-sm ml-1">(Optional)</span>
               </h2>
               {!isPersonalVerified ? (
@@ -1217,7 +1218,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                           {partner.personalInfo?.fullName?.charAt(0) || "P"}
                         </div>
                         <div className="text-left">
-                          <h4 className="font-semibold text-gray-900 truncate max-w-[120px] sm:max-w-[180px]">{partner.personalInfo?.fullName || "Partner"}</h4>
+                          <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="font-semibold text-gray-900 truncate max-w-[120px] sm:max-w-[180px]">{partner.personalInfo?.fullName || "Partner"}</h4>
                           <p className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-[180px]">{partner.personalInfo?.email}</p>
                         </div>
                       </div>
@@ -1254,7 +1255,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
           {!hideCompanyDetails && (
             <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className={`text-lg font-bold ${!isPersonalVerified ? "text-gray-400" : "text-gray-800"}`}>3. Business Profiles</h2>
+              <h2 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-lg font-bold ${!isPersonalVerified ? "text-gray-400" : "text-gray-800"}`}>3. Business Profiles</h2>
               {!isPersonalVerified && (
                 <span className="text-xs text-red-300 italic">
                   Locked until Personal Verification is Approved
@@ -1311,7 +1312,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                             <Building2 className="w-5 h-5 text-gray-600" />
                           </div>
                           <div>
-                            <h4 className="font-bold text-gray-900 line-clamp-1">{biz.businessInfo?.companyName || "Business Name"}</h4>
+                            <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-gray-900 line-clamp-1">{biz.businessInfo?.companyName || "Business Name"}</h4>
                             <p className="text-xs text-gray-500">{biz.businessInfo?.gstNumber || "GST Pending"}</p>
                           </div>
                         </div>
@@ -1367,7 +1368,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
     );
   }
   return (
-    <div className={`${isCompact ? 'py-4 px-2' : 'min-h-screen bg-gray-50 py-8 px-4 md:px-8'}`} style={isCompact ? { zoom: 0.85 } : undefined}>
+ <div className={`${drawerMode ? 'text-[12px] [&_button]:text-xs [&_input]:h-8 [&_input]:text-xs [&_label]:text-[11px] [&_select]:h-8 [&_select]:text-xs [&_textarea]:text-xs' : isCompact ? 'py-4 px-2' : 'min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 '}`} style={isCompact ? { zoom: drawerMode ? 0.72 : 0.85 } : undefined}> 
       <input
         ref={fileInputRef}
         type="file"
@@ -1376,10 +1377,10 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
         onChange={handleFileSelect}
       />
 
-      <div className={`mx-auto ${isCompact ? 'max-w-3xl space-y-4' : 'max-w-4xl space-y-6'}`}>
+      <div className={`mx-auto ${drawerMode ? 'max-w-none space-y-2' : isCompact ? 'max-w-3xl space-y-4' : 'max-w-4xl space-y-6'}`}>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold  text-[#35503F]">
+            <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl md:text-3xl font-bold  text-[#35503F]">
               {profileId === "new" ? "New Verification" : "Verification Details"}
             </h1>
             <p className="text-gray-500 mt-1">
@@ -1410,7 +1411,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
         </div>
 
         {/* Status and Progress Card */}
-        <div className={`bg-white shadow-sm border border-gray-100 ${isCompact ? 'rounded-2xl p-4 md:p-5' : 'rounded-3xl p-6 md:p-8'}`}>
+        <div className={`bg-white shadow-sm border border-gray-100 ${isCompact ? 'rounded-2xl p-3' : 'rounded-3xl p-6 md:p-8'}`}>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6">
             <div className="flex items-center gap-3 md:gap-4">
               <div className={`${isCompact ? 'w-10 h-10 rounded-xl' : 'w-14 h-14 rounded-2xl'} ${getOverallStatusConfig(kycData?.overallStatus || "not_started").bg.replace("500", "100")} flex items-center justify-center`}>
@@ -1418,7 +1419,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
               </div>
               <div>
                 <p className={`${isCompact ? 'text-[10px] mb-0.5' : 'text-xs mb-1'} font-bold text-gray-400 uppercase tracking-widest`}>Current Status</p>
-                <h3 className={`${isCompact ? 'text-lg' : 'text-xl'} font-bold text-gray-900 leading-tight`}>
+                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`${isCompact ? 'text-lg' : 'text-xl'} font-bold text-gray-900 leading-tight`}>
                   {getOverallStatusConfig(kycData?.overallStatus || "not_started").text}
                 </h3>
               </div>
@@ -1515,7 +1516,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
               {activeStep === "personal" && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                    <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
                       <User className="w-5 h-5 text-yellow-500" /> Personal
                       Information
                     </h2>
@@ -1699,7 +1700,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
               {activeStep === "business" && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                    <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
                       <Building2 className="w-5 h-5 text-[#35503F]" />{" "}
                       Business Information
                     </h2>
@@ -1832,7 +1833,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                   {/* Company Partners Section */}
                   <div className="border-t border-gray-100 pt-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-medium text-gray-900 flex items-center gap-2">
+                      <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-medium text-gray-900 flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-500" /> Company
                         Partners <span className="text-xs font-normal text-gray-400">(Optional)</span>
                       </h3>
@@ -1923,7 +1924,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
               {requiresVideoKYC() && activeStep === "video" && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                    <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
                       <FileVideo className="w-5 h-5 text-[#35503F]" /> Video
                       KYC
                     </h2>
@@ -1933,7 +1934,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                     {/* Instructions */}
                     <div className="space-y-6">
                       <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
-                        <h3 className="font-semibold text-yellow-900 mb-2 flex items-center gap-2">
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-semibold text-yellow-900 mb-2 flex items-center gap-2">
                           <Info className="w-4 h-4" /> Instructions
                         </h3>
                         <ul className="text-sm text-yellow-800 space-y-2 list-disc pl-4">
@@ -1954,7 +1955,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                       </div>
 
                       <div className="border border-gray-200 rounded-xl p-4">
-                        <h4 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">
+                        <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">
                           Example Video
                         </h4>
                         <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
@@ -1992,7 +1993,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                                 )}
                               </div>
                               <div>
-                                <h3
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }}
                                   className={`font-semibold ${isRejected ? "text-red-700" : "text-gray-900"}`}
                                 >
                                   {isRejected
@@ -2055,7 +2056,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                               <Upload className="w-10 h-10 text-yellow-600" />
                             </div>
                             <div>
-                              <h3 className="font-semibold text-gray-900">
+                              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-semibold text-gray-900">
                                 Upload Verification Video
                               </h3>
                               <p className="text-sm text-gray-500 mt-1">
@@ -2101,7 +2102,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
               {activeStep === "documents" && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                    <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
                       <FileText className="w-5 h-5 text-[#35503F]" />{" "}
                       Required Documents
                     </h2>
@@ -2124,7 +2125,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-medium text-gray-900">
+                                <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-medium text-gray-900">
                                   {docType.name}
                                 </h3>
                                 {docType.required && (
@@ -2245,7 +2246,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
               {activeStep === "review" && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
+                    <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-semibold  text-gray-900 flex items-center gap-2">
                       <Shield className="w-5 h-5 text-[#35503F]" /> Review &
                       Submit
                     </h2>
@@ -2511,7 +2512,7 @@ export default function KYCVerification({ hideCompanyDetails = false, isCompact 
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
                     <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden relative">
                       <div className="flex items-center justify-between p-4 border-b">
-                        <h3 className="font-semibold text-lg">Document Preview</h3>
+                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="font-semibold text-lg">Document Preview</h3>
                         <button
                           onClick={() => setPreviewDoc(null)}
                           className="p-2 hover:bg-gray-100 rounded-full transition-colors"

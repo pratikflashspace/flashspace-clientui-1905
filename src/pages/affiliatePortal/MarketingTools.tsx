@@ -15,10 +15,10 @@ const ASSETS_DATA = [
 
 const MarketingTools = () => {
   return (
-    <div className="mx-auto min-h-screen p-6 lg:p-10 space-y-8 animate-in fade-in duration-500">
+ <div className="mx-auto min-h-screen p-4 md:p-6 lg:p-8 space-y-8 animate-in fade-in duration-500"> 
       <div className="mb-10">
-        <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-          Marketing <span className="text-[#4A6D56] italic">Tools</span>
+        <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          Marketing <span className="text-[#36503F] italic">Tools</span>
         </h1>
         <p className="text-[#6b7280] mt-2 text-lg font-medium">Access calculators, forecasts, and promotional assets</p>
       </div>
@@ -27,19 +27,19 @@ const MarketingTools = () => {
         <TabsList className="bg-transparent h-auto p-0 gap-8 mb-10 border-b border-gray-100 w-full justify-start rounded-none overflow-x-auto overflow-y-hidden flex-nowrap scrollbar-none">
           <TabsTrigger
             value="calculator"
-            className="whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[#2d5a4c] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-4 text-base font-bold text-gray-400 data-[state=active]:text-[#1a1a1a] transition-all"
+            className="whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[#2d5a4c] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-4 text-sm font-bold text-gray-400 data-[state=active]:text-[#1a1a1a] transition-all"
           >
             Commission Calculator
           </TabsTrigger>
           <TabsTrigger
             value="forecast"
-            className="whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[#2d5a4c] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-4 text-base font-bold text-gray-400 data-[state=active]:text-[#1a1a1a] transition-all"
+            className="whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[#2d5a4c] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-4 text-sm font-bold text-gray-400 data-[state=active]:text-[#1a1a1a] transition-all"
           >
             Revenue Forecast
           </TabsTrigger>
           <TabsTrigger
             value="assets"
-            className="whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[#2d5a4c] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-4 text-base font-bold text-gray-400 data-[state=active]:text-[#1a1a1a] transition-all"
+            className="whitespace-nowrap rounded-none border-b-2 border-transparent data-[state=active]:border-[#2d5a4c] data-[state=active]:bg-transparent data-[state=active]:shadow-none px-0 pb-4 text-sm font-bold text-gray-400 data-[state=active]:text-[#1a1a1a] transition-all"
           >
             Marketing Assets
           </TabsTrigger>
@@ -58,19 +58,19 @@ const MarketingTools = () => {
             {ASSETS_DATA.map((asset, idx) => (
               <div
                 key={idx}
-                className="bg-[#f8f8f8] p-6 rounded-[2rem] border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 flex flex-col justify-between group hover:shadow-lg transition-all"
+                className="bg-white p-6 rounded-xl border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 flex flex-col justify-between group hover:shadow-lg transition-all"
               >
                 <div className="space-y-4">
                   <div className="flex justify-between items-start">
                     <div className="p-3 bg-gray-50 rounded-xl text-gray-400 group-hover:text-[#5bb09c] transition-colors">
                       <FileText className="w-6 h-6" />
                     </div>
-                    <span className="text-[10px] font-bold bg-gray-100 text-gray-500 px-2 py-1 rounded-md uppercase tracking-wider">
+                    <span className="text-sm font-bold bg-gray-100 text-gray-500 px-2 py-1 rounded-md uppercase tracking-wider">
                       {asset.type}
                     </span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-gray-900 text-lg leading-tight">{asset.title}</h4>
+                    <h4 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-[#1A1A1A] leading-tight">{asset.title}</h4>
                     <p className="text-gray-400 text-xs mt-1 font-medium">
                       {asset.size !== "N/A" && `${asset.size} • `}{asset.downloads} downloads
                     </p>

@@ -72,7 +72,7 @@ const InvoicePaper = ({ data }: { data: AffiliateInvoice }) => {
             {/* Header Row */}
             <div className="flex justify-between items-start mb-8">
                 <div>
-                    <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
                         FlashSpace
                     </h1>
                     <p className="text-sm text-gray-500 font-medium">
@@ -86,7 +86,7 @@ const InvoicePaper = ({ data }: { data: AffiliateInvoice }) => {
                 </div>
                 <div className="text-right">
                     <div className="flex flex-col items-end gap-1">
-                        <h2 className="text-lg font-bold text-slate-900">
+                        <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-900">
                             Invoice {data.invoiceNumber}
                         </h2>
                         <StatusBadge status={data.status} />
@@ -112,7 +112,7 @@ const InvoicePaper = ({ data }: { data: AffiliateInvoice }) => {
                     Bill To
                 </p>
                 <div className="text-sm text-slate-900">
-                    <p className="font-bold text-base">{data.client}</p>
+                    <p className="font-bold text-sm">{data.client}</p>
                     {data.clientAddress.map((line, i) => (
                         <p key={i}>{line}</p>
                     ))}
@@ -275,7 +275,7 @@ const Invoices = () => {
     };
 
     return (
-        <div className="w-full bg-[#f7f7f6] p-6 lg:p-10 pb-2 lg:pb-4 font-sans relative">
+ <div className="min-h-screen p-4 md:p-6 lg:p-8 w-full bg-[#FAFAF7] font-sans relative">
             {/* --- HIDDEN PRINT AREA --- 
           This is what will be printed. It is hidden from screen but visible to print.
       */}
@@ -286,23 +286,30 @@ const Invoices = () => {
             )}
 
             {/* --- NORMAL SCREEN CONTENT (Hidden during print via CSS) --- */}
-            <div className="w-full space-y-8 no-print animate-slide-up">
-                {/* Header */}
-                {/* Header Removed */}
+            <div className="max-w-7xl mx-auto space-y-8 no-print">
+                <div className="space-y-1">
+                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight">
+                        <span className="text-[#1A1A1A]">Affiliate </span>
+                        <span className="text-[#36503F] italic">Invoices</span>
+                    </h1>
+                    <p className="text-sm md:text-base text-[#6B8F78] font-medium">
+                        View and download invoices for your referred bookings
+                    </p>
+                </div>
 
                 {/* Toolbar */}
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#f8f8f8] p-4 rounded-xl border border-gray-200 shadow">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px]">
                     <div className="relative flex-1 w-full sm:max-w-md">
                         <Search
                             size={18}
-                            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B8F78]"
                         />
                         <input
                             type="text"
                             placeholder="Search by ID or Client..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5aa39c]/20 focus:border-[#5aa39c] transition-all text-sm"
+                            className="w-full pl-11 pr-4 py-3 bg-white rounded-lg border border-[#D4E0D0] focus:outline-none focus:border-[#36503F] focus:ring-0 text-sm font-medium transition-all"
                         />
                     </div>
 
@@ -312,8 +319,8 @@ const Invoices = () => {
                             <button
                                 onClick={() => setShowFilter(!showFilter)}
                                 className={`flex items-center gap-2 px-4 py-2.5 border rounded-lg text-sm font-semibold transition ${statusFilter.length > 0
-                                    ? "bg-[#5aa39c]/10 text-[#5aa39c] border-[#5aa39c]"
-                                    : "bg-white text-gray-600 border-gray-200 hover:bg-gray-50"
+                                    ? "bg-[#F0F4EE] text-[#36503F] border-[#36503F]"
+                                    : "bg-white text-[#6B8F78] border-[#D4E0D0] hover:bg-[#F0F4EE]"
                                     }`}
                             >
                                 <Filter size={16} /> Filter{" "}
@@ -322,15 +329,15 @@ const Invoices = () => {
                             </button>
 
                             {showFilter && (
-                                <div className="absolute right-0 top-12 w-48 bg-[#f8f8f8] border border-gray-200 rounded-xl shadow-xl p-3 z-30 animate-fade-in-up">
-                                    <p className="text-xs font-bold text-gray-400 uppercase mb-2">
+                                <div className="absolute right-0 top-12 w-48 bg-white border border-[#D4E0D0] rounded-xl shadow-xl p-3 z-30">
+                                    <p className="text-sm font-bold text-[#6B8F78] mb-2">
                                         Status
                                     </p>
                                     {["paid", "pending", "overdue", "cancelled"].map(
                                         (status) => (
                                             <label
                                                 key={status}
-                                                className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer p-1.5 hover:bg-gray-50 rounded"
+                                                className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer p-1.5 hover:bg-[#F0F4EE] rounded"
                                             >
                                                 <input
                                                     type="checkbox"
@@ -364,24 +371,24 @@ const Invoices = () => {
                             )}
                         </div>
 
-                        <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50">
+                        <button className="inline-flex items-center justify-center gap-2 bg-[#F0F4EE] text-[#36503F] hover:bg-[#D4E0D0] rounded-lg h-10 px-4 text-sm font-bold border border-[#D4E0D0] transition-all">
                             <Download size={16} /> Export CSV
                         </button>
                     </div>
                 </div>
 
                 {/* Table */}
-                <div className="bg-[#f8f8f8] rounded-2xl border border-gray-200 shadow overflow-hidden min-h-[400px]">
-                    <div className="overflow-x-auto">
+                <div className="bg-white rounded-xl border border-[#D4E0D0] shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] overflow-hidden">
+                    <div className="overflow-x-auto min-h-[400px]">
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-24 gap-3">
-                                <Loader2 className="w-10 h-10 text-[#5aa39c] animate-spin" />
-                                <p className="text-gray-500 font-medium">Loading invoices...</p>
+                                <Loader2 className="w-10 h-10 text-[#36503F] animate-spin" />
+                                <p className="text-[#6B8F78] font-medium">Loading invoices...</p>
                             </div>
                         ) : (
                             <table className="w-full text-left border-collapse">
                                 <thead>
-                                    <tr className="bg-[#f6f6f4] border-b border-[#f1f2ed]">
+                                    <tr className="bg-[#FAFAF7] border-b border-[#D4E0D0]">
                                         {[
                                             "Invoice ID",
                                             "Client",
@@ -393,14 +400,14 @@ const Invoices = () => {
                                         ].map((h) => (
                                             <th
                                                 key={h}
-                                                className="px-6 py-4 text-xs font-bold text-gray-500 uppercase whitespace-nowrap"
+                                                className="px-6 py-5 text-sm font-bold text-[#6B8F78] tracking-wider whitespace-nowrap"
                                             >
                                                 {h}
                                             </th>
                                         ))}
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-[#f1f2ed]">
+                                <tbody className="divide-y divide-gray-200/60">
                                     {filteredData.length > 0 ? (
                                         filteredData.map((inv) => (
                                             <tr
@@ -435,7 +442,7 @@ const Invoices = () => {
                                                                     inv,
                                                                 )
                                                             }
-                                                            className="p-2 bg-[#5aa39c]/10 text-[#5aa39c] hover:bg-[#5aa39c] hover:text-white rounded-lg transition-all"
+                                                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F0F4EE] text-[#36503F] hover:bg-[#36503F] hover:text-[#fef8c5] transition-all border border-[#D4E0D0]"
                                                             title="View Details"
                                                         >
                                                             <Eye size={16} />
@@ -444,7 +451,7 @@ const Invoices = () => {
                                                             onClick={() =>
                                                                 handleDownload(inv)
                                                             }
-                                                            className="p-2 bg-white border border-gray-200 text-gray-500 hover:text-slate-900 hover:bg-gray-50 rounded-lg transition-all"
+                                                            className="w-10 h-10 flex items-center justify-center rounded-lg bg-[#F0F4EE] text-[#36503F] hover:bg-[#36503F] hover:text-[#fef8c5] transition-all border border-[#D4E0D0]"
                                                             title="Download/Print PDF"
                                                         >
                                                             <Download size={16} />
@@ -481,7 +488,7 @@ const Invoices = () => {
                         {/* Modal Header (Sticky) */}
                         <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white sticky top-0 z-10">
                             <div className="flex items-center gap-3">
-                                <h2 className="font-bold text-lg text-slate-800">
+                                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-slate-800">
                                     {selectedInvoice.invoiceNumber}
                                 </h2>
                                 <StatusBadge status={selectedInvoice.status} />
