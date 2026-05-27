@@ -142,16 +142,22 @@ export default function VisitRecords() {
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Total Visits</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">{totalVisits}</p>
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Total Visits</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{totalVisits}</p>
           </div>
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Official Visits</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">{officialVisits}</p>
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Official Visits</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{officialVisits}</p>
           </div>
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Deliveries</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">{deliveryVisits}</p>
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Deliveries</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{deliveryVisits}</p>
           </div>
         </div>
 

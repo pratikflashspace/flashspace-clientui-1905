@@ -208,16 +208,22 @@ export default function MailRecords() {
         {/* Stats Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Pending Pickup</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">{stats.pending}</p>
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Pending Pickup</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{stats.pending}</p>
           </div>
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Forwarded</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">{stats.forwarded}</p>
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Forwarded</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{stats.forwarded}</p>
           </div>
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <p className="text-xs font-bold text-gray-400  tracking-wider mb-1">Collected</p>
-            <p className="text-3xl font-extrabold text-[#35503F]">{stats.collected}</p>
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Collected</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{stats.collected}</p>
           </div>
         </div>
 

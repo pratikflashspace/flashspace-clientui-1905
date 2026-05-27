@@ -650,32 +650,6 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                 ))}
               </div>
 
-              {/* Edit Profile Button */}
-              {activeTab !== "company" && (!isEditing ? (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-4 py-2 rounded-xl font-bold hover:bg-[#35503F]/90 transition-all shadow-sm active:scale-95 text-sm whitespace-nowrap"
-                >
-                  <Edit3 className="w-4 h-4" /> Edit Profile
-                </button>
-              ) : (
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="inline-flex items-center justify-center gap-2 bg-[#35503F] text-[#FEF8C3] px-4 py-2 rounded-xl font-bold hover:bg-[#35503F]/90 transition-all shadow-sm active:scale-95 text-sm whitespace-nowrap"
-                  >
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    Save
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-sm active:scale-95 text-sm whitespace-nowrap"
-                  >
-                    <X className="w-4 h-4" /> Cancel
-                  </button>
-                </div>
-              ))}
             </div>
 
             {/* Content */}
@@ -683,10 +657,38 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
               {/* Personal Info Tab */}
               {activeTab === "personal" && (
                 <div className={isCompact ? "space-y-3" : "space-y-6"}>
-                  <h2 style={{ fontFamily: "'Inter', sans-serif" }} className={`font-sans font-semibold text-gray-900 flex items-center gap-2 ${isCompact ? 'text-sm' : 'text-lg'}`}>
-                    <User className="w-5 h-5 text-[#35503F]" /> Personal
-                    Information
-                  </h2>
+                  <div className="flex items-center justify-between">
+                    <h2 style={{ fontFamily: "'Inter', sans-serif" }} className={`font-sans font-semibold text-gray-900 flex items-center gap-2 ${isCompact ? 'text-sm' : 'text-lg'}`}>
+                      <User className="w-5 h-5 text-[#35503F]" /> Personal
+                      Information
+                    </h2>
+                    
+                    {!isEditing ? (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="inline-flex items-center justify-center gap-1.5 text-[#35503F] hover:bg-[#35503F]/5 px-3 py-1.5 rounded-lg font-semibold transition-all text-xs"
+                      >
+                        <Edit3 className="w-3 h-3" /> Edit Profile
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={handleSave}
+                          disabled={saving}
+                          className="inline-flex items-center justify-center gap-1.5 bg-[#35503F] text-[#FEF8C3] px-3 py-1.5 rounded-lg font-semibold hover:bg-[#35503F]/90 transition-all text-xs"
+                        >
+                          {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                          Save
+                        </button>
+                        <button
+                          onClick={handleCancel}
+                          className="inline-flex items-center justify-center gap-1.5 bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-50 transition-all text-xs"
+                        >
+                          <X className="w-3 h-3" /> Cancel
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
                   <div className={`grid grid-cols-1 md:grid-cols-2 ${isCompact ? 'gap-3' : 'gap-6'}`}>
                     <div>

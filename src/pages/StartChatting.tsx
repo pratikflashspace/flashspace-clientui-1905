@@ -825,7 +825,7 @@ const StartChatting = () => {
 
         const [virtualRes, coworkingRes] = await Promise.all([
           fetchVirtual ? getVirtualOfficesByCity(cityName) : Promise.resolve({ offices: [] }),
-          fetchCoworking ? getCoworkingSpacesByCity(cityName) : Promise.resolve([])
+          fetchCoworking ? getCoworkingSpacesByCity(cityName) : Promise.resolve({ spaces: [] })
         ]);
 
         // Virtual office service returns { offices: [...], pagination: ... }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, Loader2, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ListingCardModern from "@/components/services/ListingCardModern";
 import { getAllVirtualOffices } from "@/services/virtualOffice.service";
@@ -81,9 +81,19 @@ const BusinessSetupHomeCard = ({ item, onClick }: { item: any; onClick: () => vo
                             e.stopPropagation();
                             onClick();
                         }}
-                        className="w-full bg-[#36503F] text-[#FEF8C5] text-sm font-bold py-2.5 px-4 rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
+                        className="flex-[1.4] bg-[#36503F] text-[#FEF8C5] text-sm font-bold py-2.5 px-4 rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
                     >
-                        Buy Now
+                        Get Best Price
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                        }}
+                        className="flex-1 flex items-center justify-center gap-1.5 border border-[#36503F] bg-[#36503F] text-[#FEF8C5] text-sm font-semibold py-2.5 px-2 rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
+                    >
+                        <Phone className="w-4 h-4" />
+                        Contact Sales
                     </button>
                 </div>
             </div>
