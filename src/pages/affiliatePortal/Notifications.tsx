@@ -324,7 +324,7 @@ const Notifications = () => {
                 <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
                   My <span className="text-[#36503F] italic">Notifications</span>
                 </h1>
-                <p className="text-sm md:text-base text-gray-500 font-medium">
+                <p className="text-[16px] text-[#6B7280] font-medium">
                   Stay updated with all your workspace activities
                 </p>
               </div>
@@ -396,7 +396,7 @@ const Notifications = () => {
                     className="rounded-2xl border border-dashed border-[#d8e3df] bg-[#f7faf8] px-6 py-7 text-center"
                   >
                     <Bell className="mx-auto h-8 w-8 text-[#6a8288]" />
-                    <p className="mt-3 text-sm font-medium text-[#496065]">Loading deleted notifications...</p>
+                    <p className="mt-3 text-[16px] font-medium text-[#496065] text-[#6B7280]">Loading deleted notifications...</p>
                   </motion.div>
                 ) : filteredNotifications.length === 0 ? (
                   <motion.div 

@@ -229,7 +229,7 @@ const CouponsAndVouchers = () => {
         <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight">
           <span className="text-[#1A1A1A]">Coupons</span>
         </h1>
-        <p className="text-sm md:text-base text-[#6B8F78] font-medium">Generate and manage your affiliate coupons</p>
+        <p className="text-[16px] text-[#6B7280] font-medium">Generate and manage your affiliate coupons</p>
       </div>
 
 
@@ -492,7 +492,7 @@ const CouponsAndVouchers = () => {
                 <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900 tracking-tight">
                   Create New <span className="text-[#4A6D56] italic">Coupon</span>
                 </h2>
-                <p className="text-xs md:text-sm text-gray-500 font-medium">
+                <p className="text-xs md:text-[16px] text-[#6B7280] font-medium">
                   Generate a discount code to refer clients.
                 </p>
               </div>

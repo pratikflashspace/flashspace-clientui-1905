@@ -99,7 +99,7 @@ const LeaderBoard: React.FC = () => {
             <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
               Affiliate <span className="italic text-[#36503F]">Leaderboard</span>
             </h1>
-            <p className="mt-2 text-sm font-medium text-[#6B8F78] md:text-base">
+            <p className="mt-2 text-[16px] font-medium text-[#6B7280]">
               Ranked by successful bookings via affiliate coupon code.
             </p>
           </div>
@@ -114,7 +114,7 @@ const LeaderBoard: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-base font-extrabold leading-tight">Your Position</h2>
-                <p className="mt-1 truncate text-sm font-semibold leading-tight text-white/70">
+                <p className="mt-1 truncate text-[16px] font-semibold leading-tight text-white/70 text-[#6B7280]">
                   {currentUser.rank
                     ? `Ranked #${currentUser.rank} of ${pagination.totalEntries} affiliates`
                     : "No successful bookings yet"}

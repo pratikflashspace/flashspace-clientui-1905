@@ -183,7 +183,7 @@ const InvoicePaper = ({ data }: { data: Invoice }) => {
                     <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
                         FlashSpace
                     </h1>
-                    <p className="text-sm text-gray-500 font-medium">
+                    <p className="text-[16px] text-[#6B7280] font-medium">
                         Virtual Office Solutions
                     </p>
                     <div className="mt-3 text-xs text-gray-500 leading-relaxed">
@@ -216,7 +216,7 @@ const InvoicePaper = ({ data }: { data: Invoice }) => {
 
             {/* Bill To */}
             <div className="mb-8">
-                <p className="text-xs font-bold text-gray-500 uppercase mb-2">
+                <p className="text-xs font-bold text-[#6B7280] uppercase mb-2 text-[16px]">
                     Bill To
                 </p>
                 <div className="text-sm text-slate-900">
@@ -385,7 +385,7 @@ const Invoices = () => {
                     <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
                         Invoices
                     </h1>
-                    <p className="text-gray-500 text-lg">
+                    <p className="text-[#6B7280] text-[16px]">
                         Manage your commission payouts
                     </p>
                 </div>

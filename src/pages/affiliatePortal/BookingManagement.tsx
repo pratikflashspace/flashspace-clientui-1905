@@ -105,7 +105,7 @@ const StatCard = ({
                 <Icon className="w-4 h-4 text-[#36503F]" />
             </div>
         </div>
-        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{value}</h3>
+        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{value}</h3>
     </div>
 );
 
@@ -150,7 +150,7 @@ const BookingDetailsModal = ({
             <div className="p-6 pt-2 overflow-y-auto space-y-6 custom-scrollbar" data-lenis-prevent>
                 <div className="space-y-4">
                     <div className="p-4 bg-gray-50 rounded-xl space-y-1">
-                        <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Booking ID</p>
+                        <p className="text-xs text-[#6B7280] font-medium uppercase tracking-wide text-[16px]">Booking ID</p>
                         <p className="text-lg font-bold text-[#334D3D] font-mono">{booking.id}</p>
                     </div>
 
@@ -304,7 +304,7 @@ const BookingManagement = () => {
                     <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
                         Booking <span className="text-[#36503F] italic">Management</span>
                     </h1>
-                    <p className="mt-2 text-lg font-medium text-[#6B8F78] tracking-tight">
+                    <p className="mt-2 text-[16px] font-medium text-[#6B7280] tracking-tight">
                         Track all your referred clients and their bookings
                     </p>
                 </div>

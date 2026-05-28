@@ -16,7 +16,7 @@ const AffiliateKYC = () => {
                         KYC <span className="text-[#36503F] italic">Verification</span>
                         <Shield className="w-8 h-8 text-[#35503F]" />
                     </h1>
-                    <p className="text-gray-500 mt-2 text-lg font-light">
+                    <p className="text-[#6B7280] mt-2 text-[16px] font-light">
                         Complete your identity verification to enable full portal features
                     </p>
                 </motion.div>

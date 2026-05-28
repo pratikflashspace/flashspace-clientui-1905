@@ -70,7 +70,7 @@ const StatCard = ({ label, value, trend, icon: Icon, delay }: any) => (
             </div>
         </div>
         <div className="space-y-2">
-            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">{value}</h3>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{value}</h3>
             {trend && (
                 <div className={`flex items-center gap-1.5 text-xs font-bold ${trend.startsWith('-') ? 'text-red-500' : 'text-[#10b981]'}`}>
                     <ArrowUpRight size={14} className={trend.startsWith('-') ? 'rotate-90' : ''} />
@@ -227,7 +227,7 @@ const DashboardRevenue = () => {
                         <span className="text-[#1A1A1A]">Revenue </span>
                         <span className="text-[#36503F] italic">Dashboard</span>
                     </h1>
-                    <p className="text-sm md:text-base font-medium text-[#6B8F78]">
+                    <p className="text-[16px] font-medium text-[#6B7280]">
                         Track your earnings and commission trends
                     </p>
                 </div>

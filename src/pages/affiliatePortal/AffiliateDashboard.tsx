@@ -352,7 +352,7 @@ const Dashboard = () => {
                         <span className="text-[#1A1A1A]">Affiliate </span>
                         <span className="text-[#36503F] italic">Dashboard</span>
                     </h1>
-                    <p className="text-sm md:text-base font-medium text-[#6B8F78]">
+                    <p className="text-[16px] font-medium text-[#6B7280]">
                         Track your referrals, revenue, and performance
                     </p>
                 </div>
@@ -373,7 +373,7 @@ const Dashboard = () => {
                         <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-extrabold tracking-tight text-[#1A1A1A]">
                             AI-Powered Insights
                         </h2>
-                        <p className="text-sm font-medium text-[#6B8F78]">
+                        <p className="text-[16px] font-medium text-[#6B7280]">
                             Leverage AI to maximize your earnings
                         </p>
                     </div>
