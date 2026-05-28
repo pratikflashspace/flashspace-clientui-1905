@@ -189,7 +189,7 @@ export default function RevenueForecast() {
                 <Calendar className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider">{timeframe} Total Deals</span>
               </div>
-              <span className="text-2xl font-extrabold text-gray-900">{Math.round(data.reduce((sum, d) => sum + d.deals, 0))}</span>
+              <span className="text-[24px] font-extrabold text-gray-900">{Math.round(data.reduce((sum, d) => sum + d.deals, 0))}</span>
             </div>
             
             <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 flex flex-col justify-center relative overflow-hidden">
@@ -201,7 +201,7 @@ export default function RevenueForecast() {
                   <Calculator className="w-4 h-4" />
                   <span className="text-xs font-bold uppercase tracking-wider">{timeframe} Commission</span>
                 </div>
-                <span className="text-2xl font-extrabold text-emerald-900">{formatCurrency(totalCumulative)}</span>
+                <span className="text-[24px] font-extrabold text-emerald-900">{formatCurrency(totalCumulative)}</span>
               </div>
             </div>
 
@@ -210,7 +210,7 @@ export default function RevenueForecast() {
                 <TrendingUp className="w-4 h-4" />
                 <span className="text-xs font-bold uppercase tracking-wider">Monthly Avg (in {timeframe})</span>
               </div>
-              <span className="text-2xl font-extrabold text-gray-900">{formatCurrency(monthlyAverage)}</span>
+              <span className="text-[24px] font-extrabold text-gray-900">{formatCurrency(monthlyAverage)}</span>
             </div>
           </div>
 

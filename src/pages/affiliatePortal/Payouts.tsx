@@ -102,10 +102,10 @@ const StatCard = ({
         className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg animate-fade-in-up"
         style={{ animationDelay: `${delay}ms` }}
     >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6">
             <span className="text-sm font-medium text-[#6B8F78]">{label}</span>
         </div>
-        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-3xl font-extrabold ${colorClass} tracking-tight flex items-baseline gap-1`}>
+        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-[24px] font-extrabold ${colorClass} tracking-tight flex items-baseline gap-1`}>
             {typeof value === "number" ? (
                 <AnimatedCounter
                     value={value}
@@ -226,7 +226,7 @@ const Payouts = () => {
                             Management
                         </span>
                     </h1>
-                    <p className="text-[#677E73]text-lg">
+                    <p className="text-[#677E73]text-[16px] text-[#6B7280]">
                         Track your commission payouts
                     </p>
                 </div>
@@ -254,12 +254,12 @@ const Payouts = () => {
                     <StatCard
                         label="Next Auto Payout"
                         value={
-                            <div className="flex flex-col">
+                            <div className="flex flex-col items-center justify-center w-full">
                                 <span>{getNextSundayDateTime()}</span>
                                 <span className="text-[10px] sm:text-xs font-bold text-gray-400 mt-0.5 uppercase tracking-wide">(at 7 PM)</span>
                             </div>
                         }
-                        colorClass="text-[1.2rem] text-[#35503F]"
+                        colorClass="text-[#35503F]"
                         delay={300}
                     />
                 </div>
@@ -422,7 +422,7 @@ const Payouts = () => {
                             </button>
                         </div>
                         <div className="p-6 space-y-4">
-                            <p className="text-sm text-gray-500">
+                            <p className="text-[16px] text-[#6B7280]">
                                 You are requesting a payout for <span className="font-bold text-slate-900">{selectedPayout.invoiceNumber}</span>.
                                 The amount of <span className="font-bold text-[#5aa39c]">{formatCurrency(selectedPayout.commission)}</span> will be transferred to your registered bank account.
                             </p>
@@ -467,7 +467,7 @@ const Payouts = () => {
                             <CheckCircle2 size={40} />
                         </div>
                         <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="font-bold text-2xl text-slate-900 mb-2">Payout Initiated!</h2>
-                        <p className="text-sm text-gray-500 mb-8 px-2 font-medium">
+                        <p className="text-[16px] text-[#6B7280] mb-8 px-2 font-medium">
                             Your payout request has been successfully submitted. The amount will reflect in your account within 2-3 business days.
                         </p>
                         <button

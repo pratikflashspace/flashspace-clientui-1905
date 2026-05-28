@@ -298,7 +298,7 @@ const CommissionCalculator = () => {
             </div>
             <div className="flex items-center gap-1">
               <IndianRupee className="w-4 h-4 text-gray-400" />
-              <span className="text-3xl font-extrabold text-gray-400 line-through decoration-2 decoration-red-400/50">
+              <span className="text-[24px] font-extrabold text-gray-400 line-through decoration-2 decoration-red-400/50">
                 {listedPrice.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </span>
             </div>
@@ -314,7 +314,7 @@ const CommissionCalculator = () => {
             </div>
             <div className="flex items-center gap-1 text-white">
               <IndianRupee className="w-6 h-6 text-emerald-400" />
-              <span className="text-3xl font-extrabold tracking-tight">
+              <span className="text-[24px] font-extrabold tracking-tight">
                 {customerPays.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </span>
             </div>
@@ -329,7 +329,7 @@ const CommissionCalculator = () => {
             </div>
             <div className="relative z-10 flex items-center gap-1 text-[#FEF8C3]">
               <IndianRupee className="w-8 h-8 opacity-80" />
-              <span className="text-3xl font-extrabold tracking-tight drop-shadow-sm">
+              <span className="text-[24px] font-extrabold tracking-tight drop-shadow-sm">
                 {commission.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
               </span>
             </div>

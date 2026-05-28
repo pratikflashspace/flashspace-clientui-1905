@@ -343,8 +343,10 @@ export default function Billing() {
               <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">{stats.activeSubscriptions}</p>
           </div>
           <div className="bg-white min-h-[124px] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] border border-[#D4E0D0] p-6 transition-all hover:shadow-lg">
-            <p className="text-sm font-medium text-[#6B8F78]">Next Billing</p>
-            <p className="font-extrabold tracking-tight text-2xl text-[#1A1A1A]">
+            <div className="flex items-center justify-between mb-4">
+                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">Next Billing</span>
+              </div>
+              <p className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">
               {stats.nextBilling ? formatDate(stats.nextBilling) : "-"}
             </p>
           </div>

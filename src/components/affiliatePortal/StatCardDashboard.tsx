@@ -13,7 +13,7 @@ const StatCardDashboard = ({ label, value, trend, icon: Icon, delay }: any) => (
                 />
             </div>
         </div>
-        <div className="text-3xl font-extrabold text-[#1A1A1A] tracking-tight">
+        <div className="text-[24px] font-extrabold text-[#1A1A1A] tracking-tight">
             {value}
         </div>
         {trend && (

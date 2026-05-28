@@ -206,7 +206,7 @@ const QuotationGenerator = () => {
                                     AI Price Suggestion
                                 </span>
                             </div>
-                            <p className="text-xs text-gray-600 leading-relaxed">
+                            <p className="text-xs text-[#6B7280] leading-relaxed text-[16px]">
                                 Based on current market rates and your selected
                                 criteria, the recommended price range is
                                 <span className="font-bold text-gray-900 mx-1">

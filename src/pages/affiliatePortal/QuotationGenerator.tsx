@@ -369,7 +369,7 @@ const QuotationGenerator = () => {
                         <div className="flex items-center justify-between p-6 border-b border-gray-100 flex-shrink-0">
                             <div>
                                 <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900">All Quotations</h2>
-                                <p className="text-sm text-gray-500 mt-0.5">{filteredAll.length} quotation{filteredAll.length !== 1 ? 's' : ''} found</p>
+                                <p className="text-[16px] text-[#6B7280] mt-0.5">{filteredAll.length} quotation{filteredAll.length !== 1 ? 's' : ''} found</p>
                             </div>
                             <button onClick={() => setShowAllModal(false)} className="p-2.5 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
                                 <X className="w-5 h-5" />
@@ -490,7 +490,7 @@ const QuotationGenerator = () => {
                 <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
                     Quotation <span className="text-[#36503F] italic">Generator</span>
                 </h1>
-                <p className="text-[#6b7280] mt-2 text-lg font-medium">
+                <p className="text-[#6b7280] mt-2 text-[16px] font-medium text-[#6B7280]">
                     Create instant quotations with FlashSpace and your affiliate branding
                 </p>
             </div>
@@ -524,7 +524,7 @@ const QuotationGenerator = () => {
                                         value={formData.clientName}
                                         onChange={(e) => handleInputChange("clientName", e.target.value)}
                                     />
-                                    {errors.clientName && <p className="text-xs text-red-500 font-medium">{errors.clientName}</p>}
+                                    {errors.clientName && <p className="text-xs text-red-500 font-medium text-[16px] text-[#6B7280]">{errors.clientName}</p>}
                                 </div>
                                 <div className="space-y-2">
                                     <Label className={`text-sm font-semibold text-[#374151] ${errors.email ? "text-red-500" : ""}`}>Email Address</Label>

@@ -109,7 +109,7 @@ export default function SpacePortalSettings() {
             </h2>
           </div>
 
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-[16px] text-slate-500 text-[#6B7280]">
             Choose how you want to receive updates from the portal.
           </p>
 
@@ -137,7 +137,7 @@ export default function SpacePortalSettings() {
             </h2>
           </div>
 
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="mt-2 text-[16px] text-slate-500 text-[#6B7280]">
             Keep your account protected with strong security habits.
           </p>
 

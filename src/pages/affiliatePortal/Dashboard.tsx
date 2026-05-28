@@ -135,7 +135,7 @@ const Dashboard = () => {
                         <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
                             Affiliate <span className="text-[#36503F] italic">Dashboard</span>
                         </h1>
-                        <p className="text-gray-500 text-base md:text-lg">
+                        <p className="text-[#6B7280] text-[16px] md:text-[16px]">
                             Track your referrals, revenue, and performance
                         </p>
                     </div>

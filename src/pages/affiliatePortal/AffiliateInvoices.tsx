@@ -75,7 +75,7 @@ const InvoicePaper = ({ data }: { data: AffiliateInvoice }) => {
                     <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
                         FlashSpace
                     </h1>
-                    <p className="text-sm text-gray-500 font-medium">
+                    <p className="text-[16px] text-[#6B7280] font-medium">
                         Virtual Office Solutions
                     </p>
                     <div className="mt-3 text-xs text-gray-500 leading-relaxed">
@@ -108,7 +108,7 @@ const InvoicePaper = ({ data }: { data: AffiliateInvoice }) => {
 
             {/* Bill To */}
             <div className="mb-8">
-                <p className="text-xs font-bold text-gray-500 uppercase mb-2">
+                <p className="text-xs font-bold text-[#6B7280] uppercase mb-2 text-[16px]">
                     Bill To
                 </p>
                 <div className="text-sm text-slate-900">
@@ -292,7 +292,7 @@ const Invoices = () => {
                         <span className="text-[#1A1A1A]">Affiliate </span>
                         <span className="text-[#36503F] italic">Invoices</span>
                     </h1>
-                    <p className="text-sm md:text-base text-[#6B8F78] font-medium">
+                    <p className="text-[16px] text-[#6B7280] font-medium">
                         View and download invoices for your referred bookings
                     </p>
                 </div>

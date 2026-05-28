@@ -207,7 +207,7 @@ export default function Profile() {
 
 
 
-            <p className="text-sm text-slate-500">
+            <p className="text-[16px] text-slate-500 text-[#6B7280]">
 
               Keep your contact details up to date for client communication.
 
@@ -243,7 +243,7 @@ export default function Profile() {
 
 
 
-            <p className="text-sm text-slate-500">
+            <p className="text-[16px] text-slate-500 text-[#6B7280]">
 
               These details appear to clients on your space listings.
 

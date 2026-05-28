@@ -137,7 +137,7 @@ const LeadManagementAffiliate = () => {
                         <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
                             Lead <span className="italic">Management</span>
                         </h1>
-                        <p className="mt-2 text-lg font-medium text-[#6B8F78] tracking-tight">
+                        <p className="mt-2 text-[16px] font-medium text-[#6B7280] tracking-tight">
                             Track and manage your referral leads
                         </p>
                     </div>
