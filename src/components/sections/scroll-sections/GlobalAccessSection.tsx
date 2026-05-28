@@ -38,7 +38,7 @@ export const GlobalAccessSection = () => {
                     <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
                         Access premium workspaces across North America, Europe, Asia-Pacific, and the Middle East — with one unified membership. No extra bookings, no extra fees.
                     </p>
-                    <Link to="/city-listing">
+                    <Link to="/services/virtual-office" onClick={() => window.scrollTo(0, 0)}>
                         <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
                             View all locations
                             <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

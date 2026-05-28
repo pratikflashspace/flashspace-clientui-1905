@@ -40,7 +40,7 @@ export const BusinessSetupSection = () => {
                         From company registration to GST filing, we provide end-to-end business setup services.
                         Get operational in a new city within days, not months.
                     </p>
-                    <Link to="/Solutions/business-setup">
+                    <Link to="/services/business-setup" onClick={() => window.scrollTo(0, 0)}>
                         <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
                             Start your setup
                             <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
