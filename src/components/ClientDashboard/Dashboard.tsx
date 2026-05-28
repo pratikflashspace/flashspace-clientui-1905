@@ -403,11 +403,11 @@ export default function Dashboard() {
       case "in_progress":
         return { text: "Draft", color: "text-gray-400", isSmall: true };
       case "approved":
-        return { text: "Verified", color: "text-green-600", isSmall: false };
+        return { text: "Verified", color: "text-green-600", isSmall: true };
       case "pending":
-        return { text: "Pending", color: "text-yellow-600", isSmall: false };
+        return { text: "Pending", color: "text-yellow-600", isSmall: true };
       case "rejected":
-        return { text: "Rejected", color: "text-red-600", isSmall: false };
+        return { text: "Rejected", color: "text-red-600", isSmall: true };
       default:
         return { text: "Not Started", color: "text-gray-400", isSmall: true };
     }
