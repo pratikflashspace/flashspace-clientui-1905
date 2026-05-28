@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import chatService from '@/services/chat.service';
 import { useDarkMode } from '@/contexts/DarkModeContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from "@/lib/utils";
 import {
@@ -205,7 +205,7 @@ interface SidebarMenuItem {
 // [NEW] Constants for the popup
 const SIDEBAR_WIDTH_ICON = 80; // Your sidebar is 80px (w-20)
 const UPDATES_WIDTH = 420;
-const HEADER_OFFSET = '4.5rem'; // Restored to 4.5rem to close the gap
+const HEADER_OFFSET = '0px'; // Restored to 0px to close the gap
 
 // [NEW] Copied the UpdatesPopup component from your other file
 // ------------------------------------------------
@@ -1259,9 +1259,6 @@ const StartChatting = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] dark:text-gray-100 flex flex-col overflow-x-hidden font-grotesk">
-      <div className="z-[200] relative">
-        <Header openLogin={isLoginOpen} openSignup={isSignupOpen} />
-      </div>
 
       {showUpdates && (
         <div
@@ -1315,31 +1312,24 @@ const StartChatting = () => {
         </div>
       )}
 
-      {/* Fixed Left Sidebar */}
       <div
         ref={sidebarRef}
         className={`fixed left-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-xl lg:shadow-none z-[110] lg:z-10 flex flex-col overflow-hidden transform transition-all duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } ${!isSidebarOpen ? "lg:translate-x-0 lg:w-[60px]" : "lg:w-[260px]"}`}
+          } ${!isSidebarOpen ? "lg:translate-x-0 lg:w-[60px]" : "lg:w-[320px]"}`}
         style={{
-          width: isSidebarOpen ? "260px" : "60px",
+          width: isSidebarOpen ? "320px" : "60px",
           top: HEADER_OFFSET,
           height: `calc(100vh - ${HEADER_OFFSET})`,
         }}
       >
-        {/* New Chat + Collapse button row - FIXED TOP */}
-        <div className="flex-shrink-0 flex flex-col px-2 bg-white dark:bg-gray-900 z-10">
-          <div className="h-14 flex items-center justify-between px-2">
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors flex items-center gap-2 text-sm font-semibold"
-              title="Collapse sidebar"
-              style={{ color: '#677e73' }}
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Collapse</span>
-            </button>
-          </div>
-
+        {/* Logo - FIXED TOP */}
+        <div className="flex-shrink-0 flex items-center h-16 px-4 mb-2 pt-2 border-b border-gray-100 dark:border-gray-800/60 overflow-hidden">
+          <Link to="/" aria-label="FlashSpace home" className="flex items-center min-w-[120px]">
+            <img src="/Logo/Flashspace Logo.png" alt="FlashSpace" className="h-[24px] w-auto" />
+          </Link>
+        </div>
+        {/* New Chat row - FIXED TOP */}
+        <div className="flex-shrink-0 flex flex-col px-2 bg-white dark:bg-gray-900 z-10 pt-2">
           <div className="space-y-0.5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
             <button
               onClick={handleNewChat}
@@ -1446,7 +1436,7 @@ const StartChatting = () => {
         </nav>
 
         {/* Bottom — Home */}
-        <div className="border-t border-gray-200 dark:border-gray-700 p-3">
+        <div className="border-t border-gray-200 dark:border-gray-700 p-3 space-y-1">
           <button
             onClick={() => handleNavigation('/')}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
@@ -1455,17 +1445,25 @@ const StartChatting = () => {
             <Home className="w-4 h-4 flex-shrink-0" />
             Home
           </button>
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+            style={{ color: '#677e73' }}
+          >
+            <ChevronLeft className="w-4 h-4 flex-shrink-0" />
+            Collapse Sidebar
+          </button>
         </div>
       </div>
 
       {/* Main Content - Adjusted for wider sidebar */}
       <div
-        className={`flex-1 pt-[4.5rem] flex flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? "lg:ml-[260px]" : "lg:ml-[60px]"} ml-0`}
+        className={`flex-1 pt-0 flex flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? "lg:ml-[320px]" : "lg:ml-[60px]"} ml-0`}
         style={{
           marginRight: showMap && window.innerWidth >= 1024 ? `${mapWidth}px` : '0px',
         }}
       >
-        <div className="flex-1 h-[calc(100dvh-3rem)] lg:h-[calc(100dvh-4rem)] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col min-w-0 transition-all duration-500">
+        <div className="flex-1 h-[100dvh] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col min-w-0 transition-all duration-500">
           {/* Chat Interface */}
           <div className="w-full h-full flex flex-col bg-white dark:bg-[#0B1120] relative">
 

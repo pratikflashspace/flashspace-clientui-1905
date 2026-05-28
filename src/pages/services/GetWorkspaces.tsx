@@ -26,6 +26,7 @@ import {
   Flame,
   Map as MapIcon,
   Loader2,
+  CheckCircle,
 } from "lucide-react";
 import hotToast from "react-hot-toast";
 import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
@@ -85,6 +86,9 @@ interface UnifiedWorkspace {
   lat: number;
   lng: number;
   spaceId?: string;
+  description?: string;
+  features?: string[];
+  timeline?: string;
 }
 
 
@@ -300,6 +304,77 @@ const WorkspaceCard = ({
     e.stopPropagation();
     setImgIndex((i) => (i + 1) % images.length);
   };
+
+  if (type === "business-setup") {
+    return (
+      <div className="group bg-[#F8FAF9] rounded-[24px] overflow-hidden border border-[#E9EFEA] hover:-translate-y-1.5 transition-all duration-200 ease-out shadow-sm hover:shadow-md aspect-square flex flex-col p-6 cursor-default">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-3">
+          <div className="pr-2">
+            <h3 className="font-semibold text-[14px] text-[#1a2b21] leading-snug tracking-tight">
+              {ws.name}
+            </h3>
+            <p className="text-[13px] text-[#6B8F78] mt-2.5 min-h-[44px] leading-relaxed">
+              {ws.description}
+            </p>
+          </div>
+          {ws.popular && (
+            <span className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1 rounded-full bg-[#F0F5F2] text-[#425e4c] flex-shrink-0">
+              <span className="animate-pulse">🔥</span> Popular
+            </span>
+          )}
+        </div>
+
+        {/* Features */}
+        <div className="flex flex-col gap-3 mb-8 mt-2">
+          {ws.features?.map((feature, idx) => (
+            <div key={idx} className="flex items-center gap-3 text-[14px] text-[#6B8F78]">
+              <span className="w-5 h-5 rounded-full bg-[#E5F3EB] flex items-center justify-center flex-shrink-0">
+                <span className="w-2.5 h-2.5 bg-[#10B981] rounded-full"></span>
+              </span>
+              <span>{feature}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom / Pricing */}
+        <div className="mt-auto border-t border-[#E9EFEA] pt-5 flex flex-col gap-5">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[12px] font-medium text-[#7A9D88]">Starting from</span>
+              <span className="text-[20px] font-bold text-[#1a2b21]">{ws.plans[0]?.price}</span>
+            </div>
+            <div className="flex flex-col gap-0.5 text-right">
+              <span className="text-[12px] font-medium text-[#7A9D88]">Timeline</span>
+              <span className="text-[15px] font-semibold text-[#1a2b21]">{ws.timeline || "N/A"}</span>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onBusinessSetupBuy?.(ws);
+              }}
+              className="flex-1 bg-[#36503F] text-[#FEF8C5] text-[14px] font-semibold py-3 px-4 rounded-[12px] hover:bg-[#2A4032] transition-colors flex items-center justify-center shadow-sm"
+            >
+              Buy Now
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                window.dispatchEvent(new CustomEvent('open-contact-modal'));
+              }}
+              className="flex-1 flex items-center justify-center gap-2 border border-[#36503F] bg-transparent text-[#36503F] text-[14px] font-semibold py-3 px-2 rounded-[12px] hover:bg-[#36503F]/5 transition-colors"
+            >
+              <Phone className="w-4 h-4" />
+              Contact Sales
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (view === "list") {
       return (
@@ -983,36 +1058,97 @@ const GetWorkspaces = () => {
           const headings = [
             "GST Registration",
             "Company Registration (LLP/OPC/Pvt Ltd)",
-            "FSSAI Registration",
+            "MSME / Udyam Registration",
             "Startup India Registration",
-            "MSME / Udyam Registration"
+            "FSSAI Registration",
+            "GST Filing",
+            "LLP Compliance",
+            "MCA Compliance"
           ];
           const demoBusinessSetups = headings.map((heading, i) => {
             let imgPath = `/home${i+1}.jpg`;
             let price = "4999";
-            if (heading === "FSSAI Registration") { imgPath = "/business1.png"; price = "2999"; }
-            else if (heading === "Startup India Registration") { imgPath = "/business2.png"; price = "1499"; }
-            else if (heading.includes("Company Registration")) { imgPath = "/business3.png"; price = "11999"; }
-            else if (heading === "MSME / Udyam Registration") { imgPath = "/business4.png"; price = "1499"; }
-            else if (heading === "GST Registration") { imgPath = "/business5.png"; price = "2499"; }
+            let description = "";
+            let features: string[] = [];
+            let timeline = "";
+            
+            if (heading === "GST Registration") { 
+               imgPath = "/business5.png";
+               price = "₹2499/yr"; 
+               description = "Get your GST number and start invoicing legally across India.";
+               features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Digital Filing Support"];
+               timeline = "1-2 days";
+            }
+            else if (heading.includes("Company Registration")) { 
+               imgPath = "/business3.png";
+               price = "₹11999/yr"; 
+               description = "Register your private limited company with end-to-end legal setup.";
+               features = ["Company Name Approval", "Incorporation Certificate", "MOA & AOA Filing"];
+               timeline = "10-15 days";
+            }
+            else if (heading.includes("MSME")) { 
+               imgPath = "/business4.png";
+               price = "₹1499/yr"; 
+               description = "Unlock MSME benefits, subsidies, and government schemes.";
+               features = ["Udyam Registration", "MSME Certificate", "Loan Benefits"];
+               timeline = "1-2 days";
+            }
+            else if (heading === "Startup India Registration") { 
+               imgPath = "/business2.png";
+               price = "₹1499/yr"; 
+               description = "Get DPIIT recognition and startup tax benefits.";
+               features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification"];
+               timeline = "5-7 days";
+            }
+            else if (heading === "FSSAI Registration") { 
+               imgPath = "/business1.png";
+               price = "₹2999/yr"; 
+               description = "Food business license and compliance support for restaurants & brands.";
+               features = ["Food License Support", "State/Central License", "Compliance Guidance"];
+               timeline = "20-30 days";
+            }
+            else if (heading === "GST Filing") {
+               imgPath = "/business5.png";
+               price = "₹999/yr";
+               description = "Monthly and annual GST return filing handled by experts.";
+               features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation"];
+               timeline = "Monthly / Quarterly";
+            }
+            else if (heading === "LLP Compliance") {
+               imgPath = "/business3.png";
+               price = "₹4999/yr";
+               description = "Stay compliant with annual LLP filing and legal requirements.";
+               features = ["Annual Filing", "Form 8 & 11", "ROC Compliance"];
+               timeline = "Ongoing Annual Compliance";
+            }
+            else if (heading === "MCA Compliance") {
+               imgPath = "/business4.png";
+               price = "₹5999/yr";
+               description = "Complete MCA compliance and ROC filing support for companies.";
+               features = ["ROC Filing", "Board Resolution Support", "Director KYC"];
+               timeline = "Monthly / Annual";
+            }
             
             return {
               id: `bs-${i+1}`,
               name: heading,
               location: activeCity,
               address: "",
+              description,
+              features,
+              timeline,
               rating: 4.8 + (i % 3) * 0.1,
               reviews: 120 + i * 15,
-              tags: ["Company Registration", "GST Setup", "Compliance"],
-              plans: [{ label: "Starting at", price: `₹${price}` }],
+              tags: ["Compliance", "Registration"],
+              plans: [{ label: "Starting at", price: price }],
               image: imgPath,
               images: [imgPath],
-              popular: i < 2,
+              popular: heading === "GST Registration",
               available: true,
               negotiable: true,
               lat: 28.6139,
               lng: 77.209,
-              spaceId: ""
+              spaceId: `BS-2024-${i+1}`
             };
           });
           setWorkspaces(demoBusinessSetups);
@@ -1417,9 +1553,11 @@ const GetWorkspaces = () => {
             {loading ? (
               <div
                 className={
-                  viewMode === "grid"
-                    ? `grid gap-4 pb-8 ${(mapCollapsed || workspaceType === "business-setup") ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
-                    : "flex flex-col gap-4 pb-8"
+                  workspaceType === "business-setup"
+                    ? "grid gap-6 pb-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                    : viewMode === "grid"
+                      ? `grid gap-4 pb-8 ${mapCollapsed ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
+                      : "flex flex-col gap-4 pb-8"
                 }
               >
                 <SkeletonCardGrid count={8} view={viewMode} />
@@ -1427,9 +1565,11 @@ const GetWorkspaces = () => {
             ) : (
               <div
                 className={
-                  viewMode === "grid"
-                    ? `grid gap-4 pb-8 ${(mapCollapsed || workspaceType === "business-setup") ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
-                    : "flex flex-col gap-4 pb-8"
+                  workspaceType === "business-setup"
+                    ? "grid gap-6 pb-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                    : viewMode === "grid"
+                      ? `grid gap-4 pb-8 ${mapCollapsed ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
+                      : "flex flex-col gap-4 pb-8"
                 }
               >
                 {sortedWorkspaces.length > 0 ? (
@@ -1437,18 +1577,15 @@ const GetWorkspaces = () => {
                     <WorkspaceCard
                       key={ws.id}
                       ws={ws}
-                      view={viewMode}
+                      view={workspaceType === "business-setup" ? "grid" : viewMode}
                       type={workspaceType}
                       onBusinessSetupBuy={setSelectedBusinessSetup}
                     />
                   ))
                 ) : (
-                  <div className="col-span-3 py-16 text-center text-muted-foreground">
+                  <div className="col-span-full py-16 text-center text-muted-foreground">
                     <p className="text-base font-medium">
-                      No spaces found in "{activeCity}"
-                    </p>
-                    <p className="text-sm mt-1">
-                      Try searching a different city.
+                      No services found
                     </p>
                   </div>
                 )}

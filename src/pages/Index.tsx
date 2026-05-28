@@ -12,7 +12,7 @@ import { CTA } from "@/components/sections/CTA";
 import Footer from "@/components/Footer";
 import { TrustedByFilmstrip } from "@/components/sections/TrustedByFilmstrip";
 import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 
 const FadeInSection = ({
   children,
@@ -37,6 +37,27 @@ interface IndexProps {
 }
 
 const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
+  useEffect(() => {
+    let hasOpened = false;
+    
+    // Auto-open chat widget when scrolling past hero section
+    const handleScroll = () => {
+      if (!hasOpened && window.scrollY > window.innerHeight * 0.7) {
+        const widget = document.querySelector("chat-widget");
+        if (widget && widget.shadowRoot) {
+          const button = widget.shadowRoot.querySelector("button");
+          if (button) {
+            button.click();
+            hasOpened = true;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col scroll-smooth relative w-full">
       <Header openLogin={openLogin} openSignup={openSignup} />

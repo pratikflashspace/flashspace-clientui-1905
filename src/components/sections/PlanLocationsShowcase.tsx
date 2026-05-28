@@ -33,64 +33,67 @@ const services = [
 const BusinessSetupHomeCard = ({ item, onClick }: { item: any; onClick: () => void }) => {
     return (
         <div
-            className="group bg-card rounded-[20px] overflow-hidden border border-border hover:-translate-y-1.5 transition-all duration-200 ease-out shadow-sm hover:shadow-md h-full flex flex-col"
+            className="group bg-[#F8FAF9] rounded-[24px] overflow-hidden border border-[#E9EFEA] hover:-translate-y-1.5 transition-all duration-200 ease-out shadow-sm hover:shadow-md h-full flex flex-col p-6 cursor-default"
             onClick={onClick}
         >
-            <div className="relative aspect-[16/10] overflow-hidden bg-muted">
-                <img
-                    src={item.images[0]}
-                    alt={item.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
-                {item.name === "GST Registration" && (
-                    <div className="absolute top-3 left-3 z-10">
-                        <span className="bg-[#FE8A00] text-white text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 uppercase tracking-tight">
-                            <span className="animate-pulse">🔥</span> Popular
-                        </span>
-                    </div>
-                )}
-            </div>
-            
-            <div className="p-4 flex flex-col flex-1">
-                <h4 className="text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1 mb-2">
-                    {item.name}
-                </h4>
-                
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                    {item.features?.map((feature: string, idx: number) => (
-                        <span
-                            key={idx}
-                            className="text-[11px] text-muted-foreground border border-border rounded-full px-2.5 py-0.5"
-                        >
-                            {feature}
-                        </span>
-                    ))}
-                </div>
-                
-                <div className="space-y-2 mb-4 mt-auto">
-                    <p className="text-sm text-muted-foreground">
-                        Starting from <span className="font-bold text-foreground">{item.price}</span>
+            {/* Header */}
+            <div className="flex justify-between items-start mb-3">
+                <div className="pr-2">
+                    <h3 className="font-semibold text-[18px] text-[#1a2b21] leading-snug tracking-tight">
+                        {item.name}
+                    </h3>
+                    <p className="text-[14px] text-[#6B8F78] mt-2.5 min-h-[44px] leading-relaxed">
+                        {item.description}
                     </p>
                 </div>
+                {item.popular && (
+                    <span className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1 rounded-full bg-[#F0F5F2] text-[#425e4c] flex-shrink-0">
+                        <span className="animate-pulse">🔥</span> Popular
+                    </span>
+                )}
+            </div>
+
+            {/* Features */}
+            <div className="flex flex-col gap-3 mb-8 mt-2">
+                {item.features?.map((feature: string, idx: number) => (
+                    <div key={idx} className="flex items-center gap-3 text-[14px] text-[#6B8F78]">
+                        <span className="w-5 h-5 rounded-full bg-[#E5F3EB] flex items-center justify-center flex-shrink-0">
+                            <span className="w-2.5 h-2.5 bg-[#10B981] rounded-full"></span>
+                        </span>
+                        <span>{feature}</span>
+                    </div>
+                ))}
+            </div>
+            
+            {/* Bottom / Pricing */}
+            <div className="mt-auto border-t border-[#E9EFEA] pt-5 flex flex-col gap-5">
+                <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-0.5">
+                        <span className="text-[12px] font-medium text-[#7A9D88]">Starting from</span>
+                        <span className="text-[20px] font-bold text-[#1a2b21]">{item.price}</span>
+                    </div>
+                    <div className="flex flex-col gap-0.5 text-right">
+                        <span className="text-[12px] font-medium text-[#7A9D88]">Timeline</span>
+                        <span className="text-[15px] font-semibold text-[#1a2b21]">{item.timeline || "N/A"}</span>
+                    </div>
+                </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onClick();
                         }}
-                        className="flex-[1.4] bg-[#36503F] text-[#FEF8C5] text-sm font-bold py-2.5 px-4 rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
+                        className="flex-1 bg-[#36503F] text-[#FEF8C5] text-[14px] font-semibold py-3 px-4 rounded-[12px] hover:bg-[#2A4032] transition-colors flex items-center justify-center shadow-sm"
                     >
-                        Get Best Price
+                        Buy Now
                     </button>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             window.dispatchEvent(new CustomEvent('open-contact-modal'));
                         }}
-                        className="flex-1 flex items-center justify-center gap-1.5 border border-[#36503F] bg-[#36503F] text-[#FEF8C5] text-sm font-semibold py-2.5 px-2 rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
+                        className="flex-1 flex items-center justify-center gap-2 border border-[#36503F] bg-transparent text-[#36503F] text-[14px] font-semibold py-3 px-2 rounded-[12px] hover:bg-[#36503F]/5 transition-colors"
                     >
                         <Phone className="w-4 h-4" />
                         Contact Sales
@@ -121,27 +124,79 @@ export const PlanLocationsShowcase = () => {
         return [
             "GST Registration",
             "Company Registration",
-            "FSSAI Registration",
-            "Startup India Registration",
             "MSME Registration",
+            "Startup India Registration",
+            "FSSAI Registration",
+            "GST Filing",
+            "LLP Compliance",
+            "MCA Compliance"
         ].map((name, i) => {
-            let imgPath = `/home${i+1}.jpg`;
-            if (name === "FSSAI Registration") { imgPath = "/business1.png"; }
-            else if (name === "Startup India Registration") { imgPath = "/business2.png"; }
-            else if (name.includes("Company Registration")) { imgPath = "/business3.png"; }
-            else if (name.includes("MSME")) { imgPath = "/business4.png"; }
-            else if (name === "GST Registration") { imgPath = "/business5.png"; }
+            let price = "";
+            let description = "";
+            let features: string[] = [];
+            let timeline = "";
+            
+            if (name === "GST Registration") { 
+               price = "₹2499/yr"; 
+               description = "Get your GST number and start invoicing legally across India.";
+               features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Digital Filing Support"];
+               timeline = "1-2 days";
+            }
+            else if (name === "Company Registration") { 
+               price = "₹11999/yr"; 
+               description = "Register your private limited company with end-to-end legal setup.";
+               features = ["Company Name Approval", "Incorporation Certificate", "MOA & AOA Filing"];
+               timeline = "10-15 days";
+            }
+            else if (name.includes("MSME")) { 
+               price = "₹1499/yr"; 
+               description = "Unlock MSME benefits, subsidies, and government schemes.";
+               features = ["Udyam Registration", "MSME Certificate", "Loan Benefits"];
+               timeline = "1-2 days";
+            }
+            else if (name === "Startup India Registration") { 
+               price = "₹1499/yr"; 
+               description = "Get DPIIT recognition and startup tax benefits.";
+               features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification"];
+               timeline = "5-7 days";
+            }
+            else if (name === "FSSAI Registration") { 
+               price = "₹2999/yr"; 
+               description = "Food business license and compliance support for restaurants & brands.";
+               features = ["Food License Support", "State/Central License", "Compliance Guidance"];
+               timeline = "20-30 days";
+            }
+            else if (name === "GST Filing") {
+               price = "₹999/yr";
+               description = "Monthly and annual GST return filing handled by experts.";
+               features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation"];
+               timeline = "Monthly / Quarterly";
+            }
+            else if (name === "LLP Compliance") {
+               price = "₹4999/yr";
+               description = "Stay compliant with annual LLP filing and legal requirements.";
+               features = ["Annual Filing", "Form 8 & 11", "ROC Compliance"];
+               timeline = "Ongoing Annual Compliance";
+            }
+            else if (name === "MCA Compliance") {
+               price = "₹5999/yr";
+               description = "Complete MCA compliance and ROC filing support for companies.";
+               features = ["ROC Filing", "Board Resolution Support", "Director KYC"];
+               timeline = "Monthly / Annual";
+            }
             
             return {
                 _id: `bs-${i}`,
                 name,
                 address: "",
                 area: "Online",
-                price: ["₹2499/yr", "₹11999/yr", "₹2999/yr", "₹1499/yr", "₹1499/yr"][i],
+                description,
+                timeline,
+                price,
                 rating: 4.8 + (i % 3) * 0.1,
                 reviews: 120 + i * 15,
-                images: [imgPath],
-                features: ["Expert Support", "Fast Processing", "End-to-end Setup"],
+                images: [],
+                features,
                 popular: name === "GST Registration",
                 availability: "Available Now"
             };
