@@ -484,215 +484,226 @@ export default function Dashboard() {
                               <ClientHeaderActions />
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {statsCards.map((card, idx) => (
-            <div
-              key={idx}
-              className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">{card.title}</span>
-                <div className="w-8 h-8 rounded-lg bg-[#36503F]/10 flex items-center justify-center">
-                  <card.icon className="w-4 h-4 text-[#36503F]" />
-                </div>
-              </div>
-              <div className={`${card.isSmall ? 'text-2xl' : 'text-3xl'} font-extrabold text-[#1A1A1A] tracking-tight`}>
-                {card.value}
-              </div>
-            </div>
-          ))}
-        </div>
-        {/* Manage Bookings Section */}
-        {Array.isArray(bookings) && bookings.filter((b) => b.status === "active" || b.status === "pending_payment" || b.status === "pending_kyc" || b.autoRenew).length > 0 && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-bold text-gray-900 tracking-tight">
-                Manage <span className="text-[#36503F] italic">Bookings</span>
-              </h2>
-
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {bookings
-                .filter((b) => b.status === "active" || b.status === "pending_payment" || b.status === "pending_kyc" || b.autoRenew)
-                .sort((a, b) => {
-                  const dateA = new Date(a.endDate || 0).getTime();
-                  const dateB = new Date(b.endDate || 0).getTime();
-                  return dateA - dateB;
-                })
-                .map((booking) => {
-                  const statusConfig = getStatusConfig(booking);
-                  const isBusinessSetup = isBusinessSetupBooking(booking);
-
-                  if (isBusinessSetup) {
-                    const purchasedDate = booking.startDate || booking.createdAt || "";
-                    const packageName =
-                      booking.plan?.name ||
-                      booking.spaceSnapshot?.name ||
-                      "Business Setup";
-
-                    return (
-                      <button
-                        key={booking._id}
-                        type="button"
-                        onClick={() => setSelectedBooking(booking)}
-                        className="text-left bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative min-h-[250px] flex flex-col"
-                      >
-                        <div className="flex items-start justify-between gap-3 mb-5">
-                          <div className="min-w-0">
-                            <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700">
-                              Business Setup
-                            </span>
-                            <p className="mt-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                              {booking.bookingNumber || "Booking ID"}
-                            </p>
-                          </div>
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${statusConfig.bg} ${statusConfig.text}`}
-                          >
-                            <statusConfig.icon className="w-3 h-3" />
-                            {statusConfig.label}
-                          </span>
-                        </div>
-
-                        <div className="flex-1 space-y-3">
-                          <h3
-                            style={{ fontFamily: "'Inter', sans-serif" }}
-                            className="text-lg font-bold text-gray-900 group-hover:text-[#35503F] transition-colors line-clamp-2"
-                          >
-                            {packageName}
-                          </h3>
-                          <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <Calendar className="w-4 h-4 text-gray-400" />
-                            <span className="font-medium">
-                              Bought on {formatDate(purchasedDate)}
-                            </span>
-                          </div>
-                          <div className="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-green-700 border border-green-100">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Lifetime service
-                          </div>
-                        </div>
-
-                        <div className="h-px bg-gray-100 my-4" />
-
-                        <div>
-                          <p className="text-xl font-black text-gray-900">
-                            {formatCurrency(booking.plan.price)}
-                          </p>
-                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                            One-time package
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  }
-
-                  return (
-                    <div
-                      key={booking._id}
-                      className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative"
-                    >
-                      {/* Header: Space ID & Status */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                            {getWorkspaceDisplayName(booking)}
-                          </span>
-                          <span
-                            className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border ${booking.type === "VirtualOffice" ||
-                              booking.type === "virtual_office"
-                                ? "bg-gray-50 border-gray-200 text-gray-600"
-                                : "bg-gray-50 border-gray-200 text-gray-600"
-                              }`}
-                          >
-                            {booking.type === "VirtualOffice" ||
-                              booking.type === "virtual_office"
-                              ? "Virtual Office"
-                              : booking.type === "BusinessSetup" ||
-                                booking.type === "business_setup"
-                                ? "Business Setup"
-                              : booking.type === "MeetingRoom" ||
-                                booking.type === "meeting_room"
-                                ? "Meeting Room"
-                                : "Coworking"}
-                          </span>
-                        </div>
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${statusConfig.bg} ${statusConfig.text}`}
-                        >
-                          <statusConfig.icon className="w-3 h-3" />
-                          {statusConfig.label}
-                        </span>
-                      </div>
-
-                      {/* Main Content */}
-                      <div className="mb-5">
-                        <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
-                          {booking.bookingNumber || "Booking ID"}
-                        </h3>
-                        <div className="flex items-start gap-2 text-gray-500 text-xs mb-3 h-8">
-                          <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-[#35503F]" />
-                          <span className="line-clamp-2">
-                            {booking.spaceSnapshot?.city} — {booking.spaceSnapshot?.address?.split(",")[0]}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <Calendar className="w-4 h-4 text-gray-400" />
-                          <span className="font-medium">
-                            {formatDate(booking.startDate || "")} —{" "}
-                            {formatDate(booking.endDate || "")}
-                          </span>
-                        </div>
-
-                        {/* Auto-renewal Status */}
-                        {(booking.status === "active" || booking.status === "pending_payment" || booking.autoRenew) && (
-                          <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-green-50/50 border border-green-100 rounded-xl w-fit">
-                            <div className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-[10px] font-bold text-green-700 uppercase tracking-tight">
-                              Renewal on: {formatDate(booking.endDate || "")}
-                            </span>
-                          </div>
-                        )}
-                        {booking.status === "pending_kyc" && (
-                          <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-100 rounded-xl w-fit">
-                            <AlertCircle className="w-3.5 h-3.5 text-yellow-600" />
-                            <span className="text-[10px] font-bold text-yellow-700 uppercase tracking-tight">
-                              Verification Required
-                            </span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="h-px bg-gray-100 my-4" />
-
-                      {/* Footer: Price & Actions */}
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-lg font-black text-gray-900">
-                            {formatCurrency(booking.plan.price)}
-                            <span className="text-xs font-normal text-gray-500 ml-1">
-                              {getPriceUnit(booking.plan.tenureUnit)}
-                            </span>
-                          </p>
-                          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                            {booking.plan.tenure} {booking.plan.tenureUnit} Plan
-                          </p>
-                        </div>
-                        
-                        <button
-                          onClick={() => setSelectedBooking(booking)}
-                          className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:bg-[#35503F] hover:text-white transition-all shadow-sm border border-gray-100"
-                        >
-                          <Eye className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+        {loading ? (
+          <div className="min-h-[400px] flex items-center justify-center">
+            <div className="text-center">
+              <Loader2 className="w-10 h-10 text-[#35503F] animate-spin mx-auto mb-4" />
+              <p className="text-gray-500">Loading dashboard...</p>
             </div>
           </div>
+        ) : (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {statsCards.map((card, idx) => (
+                <div
+                  key={idx}
+                  className="bg-white border border-[#D4E0D0] rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <span style={{ fontFamily: "'Inter', sans-serif" }} className="text-[14px] font-medium text-[#6B8F78]">{card.title}</span>
+                    <div className="w-8 h-8 rounded-lg bg-[#36503F]/10 flex items-center justify-center">
+                      <card.icon className="w-4 h-4 text-[#36503F]" />
+                    </div>
+                  </div>
+                  <div className={`${card.isSmall ? 'text-2xl' : 'text-3xl'} font-extrabold text-[#1A1A1A] tracking-tight`}>
+                    {card.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Manage Bookings Section */}
+            {Array.isArray(bookings) && bookings.filter((b) => b.status === "active" || b.status === "pending_payment" || b.status === "pending_kyc" || b.autoRenew).length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-bold text-gray-900 tracking-tight">
+                    Manage <span className="text-[#36503F] italic">Bookings</span>
+                  </h2>
+
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {bookings
+                    .filter((b) => b.status === "active" || b.status === "pending_payment" || b.status === "pending_kyc" || b.autoRenew)
+                    .sort((a, b) => {
+                      const dateA = new Date(a.endDate || 0).getTime();
+                      const dateB = new Date(b.endDate || 0).getTime();
+                      return dateA - dateB;
+                    })
+                    .map((booking) => {
+                      const statusConfig = getStatusConfig(booking);
+                      const isBusinessSetup = isBusinessSetupBooking(booking);
+
+                      if (isBusinessSetup) {
+                        const purchasedDate = booking.startDate || booking.createdAt || "";
+                        const packageName =
+                          booking.plan?.name ||
+                          booking.spaceSnapshot?.name ||
+                          "Business Setup";
+
+                        return (
+                          <button
+                            key={booking._id}
+                            type="button"
+                            onClick={() => setSelectedBooking(booking)}
+                            className="text-left bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative min-h-[250px] flex flex-col"
+                          >
+                            <div className="flex items-start justify-between gap-3 mb-5">
+                              <div className="min-w-0">
+                                <span className="inline-flex items-center rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700">
+                                  Business Setup
+                                </span>
+                                <p className="mt-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                  {booking.bookingNumber || "Booking ID"}
+                                </p>
+                              </div>
+                              <span
+                                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${statusConfig.bg} ${statusConfig.text}`}
+                              >
+                                <statusConfig.icon className="w-3 h-3" />
+                                {statusConfig.label}
+                              </span>
+                            </div>
+
+                            <div className="flex-1 space-y-3">
+                              <h3
+                                style={{ fontFamily: "'Inter', sans-serif" }}
+                                className="text-lg font-bold text-gray-900 group-hover:text-[#35503F] transition-colors line-clamp-2"
+                              >
+                                {packageName}
+                              </h3>
+                              <div className="flex items-center gap-2 text-xs text-gray-500">
+                                <Calendar className="w-4 h-4 text-gray-400" />
+                                <span className="font-medium">
+                                  Bought on {formatDate(purchasedDate)}
+                                </span>
+                              </div>
+                              <div className="inline-flex items-center gap-2 rounded-full bg-green-50 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide text-green-700 border border-green-100">
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                                Lifetime service
+                              </div>
+                            </div>
+
+                            <div className="h-px bg-gray-100 my-4" />
+
+                            <div>
+                              <p className="text-xl font-black text-gray-900">
+                                {formatCurrency(booking.plan.price)}
+                              </p>
+                              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                                One-time package
+                              </p>
+                            </div>
+                          </button>
+                        );
+                      }
+
+                      return (
+                        <div
+                          key={booking._id}
+                          className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative"
+                        >
+                          {/* Header: Space ID & Status */}
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                {getWorkspaceDisplayName(booking)}
+                              </span>
+                              <span
+                                className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border ${booking.type === "VirtualOffice" ||
+                                  booking.type === "virtual_office"
+                                    ? "bg-gray-50 border-gray-200 text-gray-600"
+                                    : "bg-gray-50 border-gray-200 text-gray-600"
+                                  }`}
+                              >
+                                {booking.type === "VirtualOffice" ||
+                                  booking.type === "virtual_office"
+                                  ? "Virtual Office"
+                                  : booking.type === "BusinessSetup" ||
+                                    booking.type === "business_setup"
+                                    ? "Business Setup"
+                                  : booking.type === "MeetingRoom" ||
+                                    booking.type === "meeting_room"
+                                    ? "Meeting Room"
+                                    : "Coworking"}
+                              </span>
+                            </div>
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${statusConfig.bg} ${statusConfig.text}`}
+                            >
+                              <statusConfig.icon className="w-3 h-3" />
+                              {statusConfig.label}
+                            </span>
+                          </div>
+
+                          {/* Main Content */}
+                          <div className="mb-5">
+                            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
+                              {booking.bookingNumber || "Booking ID"}
+                            </h3>
+                            <div className="flex items-start gap-2 text-gray-500 text-xs mb-3 h-8">
+                              <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-[#35503F]" />
+                              <span className="line-clamp-2">
+                                {booking.spaceSnapshot?.city} — {booking.spaceSnapshot?.address?.split(",")[0]}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <Calendar className="w-4 h-4 text-gray-400" />
+                              <span className="font-medium">
+                                {formatDate(booking.startDate || "")} —{" "}
+                                {formatDate(booking.endDate || "")}
+                              </span>
+                            </div>
+
+                            {/* Auto-renewal Status */}
+                            {(booking.status === "active" || booking.status === "pending_payment" || booking.autoRenew) && (
+                              <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-green-50/50 border border-green-100 rounded-xl w-fit">
+                                <div className="flex h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
+                                <span className="text-[10px] font-bold text-green-700 uppercase tracking-tight">
+                                  Renewal on: {formatDate(booking.endDate || "")}
+                                </span>
+                              </div>
+                            )}
+                            {booking.status === "pending_kyc" && (
+                              <div className="mt-4 flex items-center gap-2 px-3 py-2 bg-yellow-50 border border-yellow-100 rounded-xl w-fit">
+                                <AlertCircle className="w-3.5 h-3.5 text-yellow-600" />
+                                <span className="text-[10px] font-bold text-yellow-700 uppercase tracking-tight">
+                                  Verification Required
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="h-px bg-gray-100 my-4" />
+
+                          {/* Footer: Price & Actions */}
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-lg font-black text-gray-900">
+                                {formatCurrency(booking.plan.price)}
+                                <span className="text-xs font-normal text-gray-500 ml-1">
+                                  {getPriceUnit(booking.plan.tenureUnit)}
+                                </span>
+                              </p>
+                              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                                {booking.plan.tenure} {booking.plan.tenureUnit} Plan
+                              </p>
+                            </div>
+                            
+                            <button
+                              onClick={() => setSelectedBooking(booking)}
+                              className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:bg-[#35503F] hover:text-white transition-all shadow-sm border border-gray-100"
+                            >
+                              <Eye className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* Booking Detail Modal */}
