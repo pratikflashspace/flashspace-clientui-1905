@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Building2, ChevronDown, LayoutDashboard, LogOut, Menu, Settings, Users, X } from "lucide-react";
+import { Building2, ChevronDown, LayoutDashboard, LogOut, Menu, Settings, Users, X, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginModal } from "@/components/auth/LoginModal";
@@ -267,6 +267,14 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
           </nav>
 
           <div className="flex items-center gap-3">
+            <a 
+              href="tel:+919888687898" 
+              className="hidden md:flex items-center gap-1.5 text-[13px] font-bold text-[#36503F] border border-[#36503F] rounded-full px-4 py-2 hover:bg-[#36503F]/5 transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5" />
+              +91 98886 87898
+            </a>
+
             <button
               onClick={() => setIsContactOpen(true)}
               className="hidden rounded-full bg-[#36503F] px-5 py-2 text-[13px] font-semibold text-[#FEF8C5] transition-transform hover:scale-[1.01] hover:bg-[#1F2E26] active:scale-[0.99] sm:inline-flex"

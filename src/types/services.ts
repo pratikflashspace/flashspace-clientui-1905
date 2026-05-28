@@ -270,6 +270,11 @@ export interface BusinessSetupFeature {
   description: string;
   timeline: string;
   price: string;
+  popular?: boolean;
+  features?: string[];
+  documents?: string[];
+  badge?: string;
+  stat?: string;
 }
 
 export interface BusinessSetupService {

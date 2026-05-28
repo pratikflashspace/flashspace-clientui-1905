@@ -209,46 +209,93 @@ const BusinessSetup = () => {
 
   const features: BusinessSetupFeature[] = [
     {
-      icon: <FileCheck className="w-6 h-6" />,
-      title: "Company Registration",
-      description: "Complete assistance with Private Limited, LLP, OPC, and Partnership company registration.",
-      timeline: "7-15 days",
-      price: "Starting ₹999"
-    },
-    {
       icon: <Shield className="w-6 h-6" />,
       title: "GST Registration",
-      description: "Hassle-free GST registration with expert guidance and documentation support.",
-      timeline: "3-7 days",
-      price: "Starting ₹499"
+      description: "Get your GST number and start invoicing legally across India.",
+      timeline: "1-2 days",
+      price: "Starting ₹2,499",
+      popular: true,
+      features: ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"],
+      documents: ["PAN Card", "Aadhaar Card", "Address Proof", "Bank Details"],
+      badge: "Govt Compliant",
+      stat: "10k+ Businesses Registered"
+    },
+    {
+      icon: <FileCheck className="w-6 h-6" />,
+      title: "Company Registration",
+      description: "Register your private limited company with end-to-end legal setup.",
+      timeline: "10-15 days",
+      price: "Starting ₹11,999",
+      features: ["Company Name Approval", "Incorporation Certificate", "PAN & TAN", "MOA & AOA Filing"],
+      documents: ["PAN & Aadhaar", "Address Proof", "Passport Size Photo"],
+      badge: "MCA Approved",
+      stat: "Startup Essential"
     },
     {
       icon: <Building className="w-6 h-6" />,
-      title: "Business License",
-      description: "Obtain necessary business licenses and permits required for your industry.",
-      timeline: "10-21 days",
-      price: "Starting ₹1,499"
-    },
-    {
-      icon: <Users className="w-6 h-6" />,
-      title: "Trademark Registration",
-      description: "Protect your brand with comprehensive trademark registration services.",
-      timeline: "12-18 months",
-      price: "Starting ₹2,999"
-    },
-    {
-      icon: <CheckCircle className="w-6 h-6" />,
-      title: "Compliance Services",
-      description: "Ongoing compliance management including filings, returns, and statutory requirements.",
-      timeline: "Monthly/Yearly",
-      price: "Starting ₹999/month"
+      title: "MSME Registration",
+      description: "Unlock MSME benefits, subsidies, and government schemes.",
+      timeline: "1-2 days",
+      price: "Starting ₹1,499",
+      features: ["Udyam Registration", "MSME Certificate", "Loan Benefits", "Priority Lending Support"],
+      documents: ["Aadhaar", "PAN", "Business Details"],
+      badge: "Govt Benefits",
+      stat: "Fastest Approval"
     },
     {
       icon: <Award className="w-6 h-6" />,
-      title: "ISO Certification",
-      description: "ISO certification services to enhance your business credibility and market reach.",
-      timeline: "2-6 months",
-      price: "Starting ₹15,999"
+      title: "Startup India Registration",
+      description: "Get DPIIT recognition and startup tax benefits.",
+      timeline: "5-7 days",
+      price: "Starting ₹1,499",
+      features: ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification", "Investor Ready Setup"],
+      documents: ["Company Incorporation Docs", "PAN", "Pitch/Business Details"],
+      badge: "DPIIT Certified",
+      stat: "Investor Friendly"
+    },
+    {
+      icon: <Shield className="w-6 h-6" />,
+      title: "GST Filing",
+      description: "Monthly and annual GST return filing handled by experts.",
+      timeline: "Monthly / Quarterly",
+      price: "Starting ₹999",
+      features: ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"],
+      documents: ["Sales Invoices", "Purchase Invoices", "Bank Statements"],
+      badge: "On-Time Filing",
+      stat: "Error-Free Returns"
+    },
+    {
+      icon: <FileCheck className="w-6 h-6" />,
+      title: "LLP Compliance",
+      description: "Stay compliant with annual LLP filing and legal requirements.",
+      timeline: "Ongoing Annual Compliance",
+      price: "Starting ₹4,999",
+      features: ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"],
+      documents: ["LLP Agreement", "Financial Statements", "Bank Statements"],
+      badge: "ROC Compliant",
+      stat: "Legal Safe"
+    },
+    {
+      icon: <Building className="w-6 h-6" />,
+      title: "MCA Compliance",
+      description: "Complete MCA compliance and ROC filing support for companies.",
+      timeline: "Monthly / Annual",
+      price: "Starting ₹5,999",
+      features: ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"],
+      documents: ["Financial Statements", "Audit Reports", "Director Details"],
+      badge: "MCA Ready",
+      stat: "Filing Managed"
+    },
+    {
+      icon: <CheckCircle className="w-6 h-6" />,
+      title: "FSSAI Registration",
+      description: "Food business license and compliance support for restaurants & brands.",
+      timeline: "20-30 days",
+      price: "Starting ₹2,999",
+      features: ["Food License Support", "State/Central License", "Compliance Guidance", "Renewal Support"],
+      documents: ["ID Proof", "Business Address", "Food Category Details"],
+      badge: "Food Safe",
+      stat: "FSSAI Certified"
     }
   ];
 

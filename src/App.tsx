@@ -138,6 +138,8 @@ import { PartnerRoute } from "./components/auth/PartnerRoute";
 import { AffiliateRoute } from "./components/auth/AffiliateRoute";
 import KycVerification from "./components/Spaces/KycVerification";
 import LoadingScreen from "./components/ui/LoadingScreen";
+import { FloatingAiButton } from "./components/ui/FloatingAiButton";
+
 // --- React Query setup ---
 const queryClient = new QueryClient();
 
@@ -192,6 +194,7 @@ const App = () => (
             <NotificationProvider>
                 <ChatProvider>
                   <ScrollToTop />
+                  <FloatingAiButton />
                   {/* <MouseFollower/> */}
                   <Suspense fallback={<LoadingScreen />}>
                     <ErrorBoundary>
