@@ -22,6 +22,7 @@ import {
   RefreshCw,
   ShieldCheck,
   Eye,
+  Trash2,
 } from "lucide-react";
 import { Country, State, City } from "country-state-city";
 import { toast } from "sonner";
@@ -360,6 +361,28 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
     }
   };
 
+  const handleRemoveImage = async () => {
+    try {
+      setUploadingImage(true);
+      const response = await authService.updateProfile({ profilePicture: "" });
+      
+      if (response.success) {
+        setProfileImage(null);
+        if (user) {
+          updateUser({ ...user, profilePicture: "" });
+        }
+        toast.success("Profile picture removed");
+      } else {
+        toast.error(response.message || "Failed to remove image");
+      }
+    } catch (err) {
+      console.error("Image removal error:", err);
+      toast.error("An error occurred during removal");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setProfileData((prev) => ({ ...prev, [field]: value }));
   };
@@ -586,6 +609,19 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                       <Camera className="w-5 h-5" />
                       <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploadingImage} />
                     </label>
+                    {profileImage && (
+                      <button 
+                        onClick={handleRemoveImage}
+                        disabled={uploadingImage}
+                        className={cn(
+                          "absolute top-0 right-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-500 hover:text-white transition-all shadow-md text-red-500 -mt-1 -mr-1 z-10",
+                          uploadingImage && "opacity-50 pointer-events-none"
+                        )}
+                        title="Remove profile picture"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
 
                   {/* Name and ID */}

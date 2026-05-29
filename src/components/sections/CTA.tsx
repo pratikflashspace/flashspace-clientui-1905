@@ -19,7 +19,7 @@ export const CTA = () => {
         <div className="relative overflow-hidden rounded-[20px] ">
           {/* Background Image */}
           <img
-            src="/home10.jpg"
+            src="https://res.cloudinary.com/davqpypmw/image/upload/v1780035692/flashspace_homepage/zvlcjjpgccxiqybgdly3.jpg"
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
           />

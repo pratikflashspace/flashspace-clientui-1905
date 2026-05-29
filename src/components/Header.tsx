@@ -41,6 +41,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
   const [isSignupOpen, setIsSignupOpen] = useState(openSignup);
   const [isPartnerChoiceOpen, setIsPartnerChoiceOpen] = useState(false);
   const [signupRole, setSignupRole] = useState<"user" | "partner" | "affiliate">("user");
+  const [imgError, setImgError] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const currentRoute = `${location.pathname}${location.search}${location.hash}`;
   const loginRedirectTo = (() => {
@@ -91,6 +92,10 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
   useEffect(() => {
     setIsUserMenuOpen(false);
   }, [location.pathname, isAuthenticated]);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [user?.profilePicture]);
 
   useEffect(() => {
     setIsSignupOpen(openSignup);
@@ -289,11 +294,12 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                   className="flex items-center rounded-full border border-[#36503F]/20 bg-[#36503F]/5 p-1 text-[#36503F]"
                 >
                   <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white text-sm font-bold text-[#36503F]">
-                    {profilePictureUrl ? (
+                    {profilePictureUrl && !imgError ? (
                       <img
                         src={profilePictureUrl}
                         alt={user?.fullName || "User"}
                         className="h-full w-full object-cover"
+                        onError={() => setImgError(true)}
                       />
                     ) : (
                       user?.fullName?.charAt(0).toUpperCase() || "U"

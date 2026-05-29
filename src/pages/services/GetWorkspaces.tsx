@@ -1075,63 +1075,63 @@ const GetWorkspaces = () => {
             let timeline = "";
             
             if (heading === "GST Registration") { 
-               imgPath = "/business5.png";
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
                price = "₹2499 only"; 
                description = "Get your GST number and start invoicing legally across India.";
                features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"];
                timeline = "1-2 days";
             }
             else if (heading.includes("Company Registration")) { 
-               imgPath = "/business3.png";
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
                price = "₹11999 only"; 
                description = "Register your private limited company with end-to-end legal setup.";
                features = ["Company Name Approval", "Incorporation Certificate", "PAN & TAN", "MOA & AOA Filing"];
                timeline = "10-15 days";
             }
             else if (heading.includes("MSME")) { 
-               imgPath = "/business4.png";
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
                price = "₹1499 only"; 
                description = "Unlock MSME benefits, subsidies, and government schemes.";
                features = ["Udyam Registration", "MSME Certificate", "Loan Benefits", "Priority Lending Support"];
                timeline = "1-2 days";
             }
             else if (heading === "Startup India Registration") { 
-               imgPath = "/business2.png";
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
                price = "₹1499 only"; 
                description = "Get DPIIT recognition and startup tax benefits.";
                features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification", "Investor Ready Setup"];
                timeline = "5-7 days";
             }
             else if (heading === "FSSAI Registration") { 
-               imgPath = "/business1.png";
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
                price = "₹2999 only"; 
                description = "Food business license and compliance support for restaurants & brands.";
                features = ["Food License Support", "State/Central License", "Compliance Guidance", "Renewal Support"];
                timeline = "20-30 days";
             }
             else if (heading === "GST Filing") {
-               imgPath = "/business5.png";
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
                price = "₹1999/month";
                description = "Monthly and annual GST return filing handled by experts.";
                features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"];
                timeline = "Monthly / Quarterly";
             }
             else if (heading === "LLP Compliance") {
-               imgPath = "/business3.png";
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
                price = "₹14999 only";
                description = "Stay compliant with annual LLP filing and legal requirements.";
                features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
                timeline = "Ongoing Annual Compliance";
             }
             else if (heading === "MCA Compliance") {
-               imgPath = "/business4.png";
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
                price = "₹17999 only";
                description = "Complete MCA compliance and ROC filing support for companies.";
                features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
                timeline = "Monthly / Annual";
             }
             else if (heading === "Section 8 Registration") {
-               imgPath = "/business1.png";
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
                price = "₹14999 only";
                description = "Register your NGO or non-profit organization as a Section 8 company.";
                features = ["NGO Registration", "80G & 12A Support", "MOA & AOA Filing", "PAN & TAN"];
