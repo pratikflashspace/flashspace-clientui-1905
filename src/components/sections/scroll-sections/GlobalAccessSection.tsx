@@ -23,9 +23,9 @@ export const GlobalAccessSection = () => {
                         className="w-full h-[350px] lg:h-[450px] object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
-                        <span className="text-[#FEF8C5] text-sm font-bold uppercase tracking-widest mb-2 block">Global Access</span>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#FEF8C5] leading-tight tracking-tight">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 lg:p-12">
+                        <span className="text-[#FEF8C5] text-xs sm:text-sm font-bold uppercase tracking-widest mb-1 sm:mb-2 block">Global Access</span>
+                        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#FEF8C5] leading-tight tracking-tight">
                             One membership.
                             <br />
                             <span className="text-[#FEF8C5]/70 font-bold">Work from anywhere in the world.</span>
@@ -34,12 +34,12 @@ export const GlobalAccessSection = () => {
                 </motion.div>
 
                 {/* Description */}
-                <div className="max-w-2xl">
-                    <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                <div className="max-w-2xl px-5 sm:px-0 text-justify sm:text-left mx-auto sm:mx-0">
+                    <p className="text-[15px] sm:text-lg text-muted-foreground mb-6 leading-relaxed">
                         Access premium workspaces across North America, Europe, Asia-Pacific, and the Middle East — with one unified membership. No extra bookings, no extra fees.
                     </p>
                     <Link to="/services/virtual-office" onClick={() => window.scrollTo(0, 0)}>
-                        <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
+                        <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold w-full sm:w-auto">
                             View all locations
                             <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                         </Button>

@@ -247,17 +247,34 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
           )}
         />
         <div className="fs-container relative z-10 flex h-full items-center justify-between">
-          <Link
-            to="/"
-            aria-label="FlashSpace home"
-            className="flex min-w-[120px] items-center"
-          >
-            <img
-              src="/Logo/Flashspace Logo.png"
-              alt="FlashSpace"
-              className="h-[22px] w-auto md:h-7"
-            />
-          </Link>
+          
+          <div className="flex items-center gap-2 lg:gap-0">
+            {/* Hamburger (Mobile only) */}
+            <button
+              onClick={() => setIsMenuOpen(true)}
+              aria-label="Open menu"
+              className="group flex h-10 w-10 items-center justify-center lg:hidden transition-all active:scale-95 bg-transparent -ml-3"
+            >
+              <div className="flex flex-col items-start gap-[6px]">
+                <span className="h-[2.5px] w-[12px] rounded-full bg-[#36503F] transition-all duration-300 group-hover:w-[24px]" />
+                <span className="h-[2.5px] w-[18px] rounded-full bg-[#36503F] transition-all duration-300 group-hover:w-[24px]" />
+                <span className="h-[2.5px] w-[24px] rounded-full bg-[#36503F] transition-all duration-300" />
+              </div>
+            </button>
+
+            {/* Logo */}
+            <Link
+              to="/"
+              aria-label="FlashSpace home"
+              className="flex min-w-[100px] lg:min-w-[120px] items-center"
+            >
+              <img
+                src="/Logo/Flashspace Logo.png"
+                alt="FlashSpace"
+                className="h-[22px] w-auto md:h-7"
+              />
+            </Link>
+          </div>
 
           <nav className="hidden items-center gap-8 lg:flex">
             {navItems.map((item) => (
@@ -274,7 +291,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
           <div className="flex items-center gap-3">
             <a 
               href="tel:+919888687898" 
-              className="hidden md:flex items-center gap-1.5 text-[13px] font-bold text-[#36503F] border border-[#36503F] rounded-full px-4 py-2 hover:bg-[#36503F]/5 transition-colors"
+              className="flex items-center gap-1 md:gap-1.5 text-[12px] md:text-[13px] font-bold text-[#36503F] border border-[#228B22] md:border-[#36503F] rounded-full px-3 py-1.5 md:px-4 md:py-2 hover:bg-[#36503F]/5 transition-colors"
             >
               <Phone className="w-3.5 h-3.5" />
               +91 98886 87898
@@ -288,7 +305,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
             </button>
 
             {isAuthenticated ? (
-              <div ref={userMenuRef} className="relative">
+              <div ref={userMenuRef} className="relative hidden lg:block">
                 <button
                   onClick={() => setIsUserMenuOpen((value) => !value)}
                   className="flex items-center rounded-full border border-[#36503F]/20 bg-[#36503F]/5 p-1 text-[#36503F]"
@@ -326,25 +343,17 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                 )}
               </div>
             ) : (
-              <button onClick={() => navigate("/login")} className="hidden text-sm font-medium text-[#36503F] hover:text-[#1F2E26] sm:inline-flex">
+              <button onClick={() => navigate("/login")} className="hidden text-sm font-medium text-[#36503F] hover:text-[#1F2E26] lg:inline-flex">
                 Sign in
               </button>
             )}
-
-            <button
-              onClick={() => setIsMenuOpen(true)}
-              aria-label="Open menu"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-[#36503F] lg:hidden"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
           </div>
         </div>
       </header>
 
       <div className={cn("fixed inset-0 z-[120] bg-black/30 transition-opacity lg:hidden", isMenuOpen ? "opacity-100" : "pointer-events-none opacity-0")}>
-        <aside className={cn("h-full w-[82vw] max-w-sm bg-[#36503F] px-6 py-5 transition-transform duration-200", isMenuOpen ? "translate-x-0" : "-translate-x-full")}>
-          <div className="mb-10 flex items-center justify-between">
+        <aside className={cn("flex flex-col h-full w-[75vw] max-w-sm bg-[#36503F] px-6 py-5 transition-transform duration-200", isMenuOpen ? "translate-x-0" : "-translate-x-full")}>
+          <div className="mb-8 flex items-center justify-between">
             <Link to="/" onClick={closeDrawer} className="text-[18px] font-extrabold tracking-[-0.03em] text-white" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               <img
                 src="/Logo/Flashspace Logo.png"
@@ -356,21 +365,59 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
               <X className="h-5 w-5" />
             </button>
           </div>
-          <nav className="flex flex-col gap-1">
-            {navItems.map((item, index) => (
+          
+          {isAuthenticated && (
+            <div className="mb-6 flex items-center gap-3 border-b border-[#FEF8C5]/20 pb-6">
+              <Link to="/dashboard" onClick={closeDrawer} className="flex items-center gap-4 w-full">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white text-lg font-bold text-[#36503F]">
+                  {profilePictureUrl && !imgError ? (
+                    <img
+                      src={profilePictureUrl}
+                      alt={user?.fullName || "User"}
+                      className="h-full w-full object-cover"
+                      onError={() => setImgError(true)}
+                    />
+                  ) : (
+                    user?.fullName?.charAt(0).toUpperCase() || "U"
+                  )}
+                </span>
+                <div className="flex flex-col overflow-hidden text-left">
+                  <span className="truncate text-base font-semibold text-white">{user?.fullName}</span>
+                  <span className="truncate text-[13px] text-[#FEF8C5]/80 hover:text-[#FEF8C5] transition-colors">View Dashboard</span>
+                </div>
+              </Link>
+            </div>
+          )}
+
+          <nav className="flex flex-col gap-1 flex-1 overflow-y-auto">
+            {navItems.map((item) => (
               <Link
                 key={item.label}
                 to={item.href}
                 onClick={closeDrawer}
-                className={cn("rounded-lg px-2 py-3 text-base font-medium text-white", index === 0 && "text-[#FEF8C5]")}
+                className={cn("rounded-lg px-2 py-3 text-base font-medium text-white transition-colors hover:bg-white/5", location.pathname === item.href && "text-[#FEF8C5]")}
               >
                 {item.label}
               </Link>
             ))}
           </nav>
-          <button onClick={() => { closeDrawer(); setIsContactOpen(true); }} className="mt-8 w-full rounded-full border border-[#FEF8C5]/70 bg-[#36503F] px-5 py-3 text-sm font-bold text-[#FEF8C5] hover:bg-[#1F2E26]">
-            Get started
-          </button>
+          
+          <div className="mt-auto pt-6 flex flex-col gap-3">
+            <button onClick={() => { closeDrawer(); setIsContactOpen(true); }} className="w-full rounded-full border border-[#FEF8C5]/70 bg-[#36503F] px-5 py-3 text-sm font-bold text-[#FEF8C5] transition-colors hover:bg-white/10">
+              Get started
+            </button>
+            
+            {!isAuthenticated ? (
+              <button onClick={() => { closeDrawer(); navigate("/login"); }} className="w-full rounded-full bg-[#FEF8C5] px-5 py-3 text-sm font-bold text-[#36503F] transition-colors hover:bg-white">
+                Sign in
+              </button>
+            ) : (
+              <button onClick={async () => { closeDrawer(); await logout(); navigate("/"); }} className="flex w-full items-center justify-center gap-2 rounded-full border border-[#FEF8C5]/70 bg-[#36503F] px-5 py-3 text-sm font-bold text-red-400 transition-colors hover:bg-white/10">
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            )}
+          </div>
         </aside>
       </div>
 

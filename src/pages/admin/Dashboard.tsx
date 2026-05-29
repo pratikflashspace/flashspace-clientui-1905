@@ -193,7 +193,7 @@ export default function AdminDashboard() {
               <h3 className="text-lg font-bold text-foreground">Recent Leads</h3>
               <p className="text-xs text-muted-foreground mt-0.5">Latest enquiries from the website</p>
             </div>
-            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" onClick={() => navigate("/admin/leads")}>
+            <Button variant="ghost" size="sm" className="text-primary font-bold" onClick={() => navigate("/admin/leads")}>
               View All <ArrowRight className="ml-1 w-4 h-4" />
             </Button>
           </div>
@@ -245,7 +245,7 @@ export default function AdminDashboard() {
               <h3 className="text-lg font-bold text-foreground">Recent Bookings</h3>
               <p className="text-xs text-muted-foreground mt-0.5">Latest successful transactions</p>
             </div>
-            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80" onClick={() => navigate("/admin/sales-analytics")}>
+            <Button variant="ghost" size="sm" className="text-primary font-bold" onClick={() => navigate("/admin/sales-analytics")}>
               View All <ArrowRight className="ml-1 w-4 h-4" />
             </Button>
           </div>

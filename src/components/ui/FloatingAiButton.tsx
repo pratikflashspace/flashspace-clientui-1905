@@ -73,7 +73,7 @@ export const FloatingAiButton = () => {
     <button
       ref={buttonRef}
       onClick={() => navigate("/start-chatting")}
-      className={`fixed bottom-6 right-[100px] z-50 flex items-center gap-2 rounded-full px-4 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ${
+      className={`hidden md:flex fixed bottom-6 right-[100px] z-50 items-center gap-2 rounded-full px-4 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ${
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
       } ${
         isOverDark 

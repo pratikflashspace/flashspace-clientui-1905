@@ -78,13 +78,13 @@ const BusinessSetupHomeCard = ({ item, onClick }: { item: any; onClick: () => vo
                     </div>
                 </div>
                 
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-3 pt-2">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
                             onClick();
                         }}
-                        className="flex-1 bg-[#36503F] text-[#FEF8C5] text-[14px] font-semibold py-3 px-4 rounded-[12px] hover:bg-[#2A4032] transition-colors flex items-center justify-center shadow-sm"
+                        className="flex-[1.2] bg-[#36503F] text-[#FEF8C5] text-[12px] sm:text-[14px] font-semibold py-2 sm:py-3 px-2 sm:px-4 rounded-[10px] sm:rounded-[12px] hover:bg-[#2A4032] transition-colors flex items-center justify-center shadow-sm whitespace-nowrap"
                     >
                         Buy Now
                     </button>
@@ -93,9 +93,9 @@ const BusinessSetupHomeCard = ({ item, onClick }: { item: any; onClick: () => vo
                             e.stopPropagation();
                             window.dispatchEvent(new CustomEvent('open-contact-modal'));
                         }}
-                        className="flex-1 flex items-center justify-center gap-2 border border-[#36503F] bg-transparent text-[#36503F] text-[14px] font-semibold py-3 px-2 rounded-[12px] hover:bg-[#36503F]/5 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1 sm:gap-2 border border-[#36503F] bg-transparent text-[#36503F] text-[11px] sm:text-[14px] font-semibold py-2 sm:py-3 px-1 sm:px-2 rounded-[10px] sm:rounded-[12px] hover:bg-[#36503F]/5 transition-colors whitespace-nowrap"
                     >
-                        <Phone className="w-4 h-4" />
+                        <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
                         Contact Sales
                     </button>
                 </div>
@@ -298,10 +298,10 @@ export const PlanLocationsShowcase = () => {
                     viewport={{ once: true }}
                     className="mb-8 sm:mb-12 text-center"
                 >
-                    <h2 className="text-3xl sm:text-4xl lg:text-4xl font-bold tracking-[-0.02em] text-[#1A1A1A] mb-3 px-2">
+                    <h2 className="text-2xl sm:text-4xl lg:text-4xl font-bold tracking-[-0.02em] text-[#1A1A1A] mb-2 sm:mb-3 px-2">
                         Everything Your Business Needs, Pan India
                     </h2>
-                    <p className="text-[#6B8F78] text-sm sm:text-base max-w-lg mx-auto px-4">
+                    <p className="text-[#6B8F78] text-[11px] sm:text-base max-w-lg mx-auto px-4">
                         Flexible workspace and business solutions tailored to your needs.
                     </p>
                 </motion.div>
@@ -316,7 +316,7 @@ export const PlanLocationsShowcase = () => {
                                     setActiveServiceId(service.id);
                                     setSlideIndex(0);
                                 }}
-                                className={`px-5 py-2.5 rounded-xl text-sm sm:text-base font-semibold transition-all ${
+                                className={`px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-base font-semibold transition-all whitespace-nowrap ${
                                     activeServiceId === service.id
                                         ? "bg-white text-[#1A1A1A] shadow-sm"
                                         : "text-gray-500 hover:text-gray-900"
@@ -370,7 +370,7 @@ export const PlanLocationsShowcase = () => {
                                     setSlideIndex(p => p - 1);
                                 }
                             }}
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 touch-pan-y"
+                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 touch-pan-y px-4 sm:px-0"
                         >
                             {isLoading ? (
                                 <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground">

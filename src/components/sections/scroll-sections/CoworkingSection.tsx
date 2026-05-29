@@ -31,9 +31,9 @@ export const CoworkingSection = () => {
                         className="w-full h-[350px] lg:h-[420px] object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
-                        <span className="text-[#FEF8C5] text-sm font-bold uppercase tracking-widest mb-2 block">Coworking</span>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#FEF8C5] leading-tight tracking-tight">
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 lg:p-12">
+                        <span className="text-[#FEF8C5] text-xs sm:text-sm font-bold uppercase tracking-widest mb-1 sm:mb-2 block">Coworking</span>
+                        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#FEF8C5] leading-tight tracking-tight">
                             Flexible desks & cabins
                             <br />
                             <span className="text-[#FEF8C5]/70 font-bold">for every team size.</span>
@@ -42,14 +42,14 @@ export const CoworkingSection = () => {
                 </motion.div>
 
                 {/* Description + amenities */}
-                <div className="grid lg:grid-cols-2 gap-12 items-start">
-                    <div>
-                        <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                <div className="grid lg:grid-cols-2 gap-12 items-start px-5 sm:px-0">
+                    <div className="text-justify sm:text-left">
+                        <p className="text-[15px] sm:text-lg text-muted-foreground mb-6 leading-relaxed">
                             From hot desks to private cabins, find the perfect coworking setup for individuals
                             and teams. Fully furnished, move-in ready spaces with world-class amenities.
                         </p>
                         <Link to="/services/coworking-space">
-                            <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
+                            <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold w-full sm:w-auto">
                                 Browse Coworking Spaces
                                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                             </Button>
@@ -74,15 +74,15 @@ export const CoworkingSection = () => {
                 </div>
 
                 {/* Stats */}
-                <div className="flex flex-wrap gap-8 lg:gap-16 pt-8 border-t border-border/50">
+                <div className="flex justify-between sm:justify-start gap-2 sm:gap-8 lg:gap-16 pt-8 border-t border-border/50 px-5 sm:px-0 w-full">
                     {[
                         { value: "100+", label: "Coworking locations" },
                         { value: "₹4,999", label: "Starting price/month" },
                         { value: "24/7", label: "Access available" },
                     ].map((stat) => (
-                        <div key={stat.label}>
-                            <div className="text-2xl lg:text-3xl font-bold text-foreground tracking-tight">{stat.value}</div>
-                            <div className="text-sm text-muted-foreground">{stat.label}</div>
+                        <div key={stat.label} className="flex-1 text-center sm:text-left sm:flex-none">
+                            <div className="text-[18px] sm:text-2xl lg:text-3xl font-bold text-foreground tracking-tight">{stat.value}</div>
+                            <div className="text-[10px] sm:text-sm text-muted-foreground leading-tight mt-1 sm:mt-0">{stat.label}</div>
                         </div>
                     ))}
                 </div>

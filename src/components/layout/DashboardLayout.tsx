@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeft, ChevronRight, Home, Menu, X } from "lucide-react";
+import "@/pages/affiliatePortal/portal-animations.css"; // Ensure standard animations
 
-const FLASHSPACE_LOGO_URL =
-  "https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png";
+const FLASHSPACE_LOGO_URL = "/Logo/Flashspace Logo.png";
 
 interface NavItem {
   label: string;
@@ -34,18 +34,15 @@ export const DashboardLayout = ({
   });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Persist collapsed state
   useEffect(() => {
     localStorage.setItem("admin-sidebar-collapsed", String(collapsed));
   }, [collapsed]);
 
-  // Persist scroll position across navigation
   useEffect(() => {
     const scrollContainer = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
-    
-    // Restore scroll position
     const savedScrollPos = sessionStorage.getItem("admin-sidebar-scroll");
     if (savedScrollPos && scrollContainer) {
       scrollContainer.scrollTop = parseInt(savedScrollPos, 10);
@@ -59,178 +56,172 @@ export const DashboardLayout = ({
 
     scrollContainer?.addEventListener('scroll', handleScroll);
     return () => scrollContainer?.removeEventListener('scroll', handleScroll);
-  }, [location.pathname]); // Update on each route change to ensure restoration after component remount
+  }, [location.pathname]);
 
-  const isActive = (href: string) => location.pathname === href;
+  const isActive = (href: string) => {
+    if (href === "/admin" || href === "/admin/") {
+      return location.pathname === "/admin" || location.pathname === "/admin/";
+    }
+    return location.pathname.startsWith(href);
+  };
+
+  const sidebarClasses = cn(
+    "fixed top-0 left-0 z-50 h-screen bg-[#f8f8f8] shadow-xl border-r border-[#edede6] flex flex-col transition-all duration-300 ease-in-out",
+    "w-72",
+    mobileMenuOpen ? "translate-x-0" : "-translate-x-full",
+    "lg:relative lg:translate-x-0 lg:shadow-none lg:h-full overflow-hidden",
+    collapsed ? "lg:w-20" : "lg:w-72"
+  );
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      {/* Mobile Sidebar Overlay (keeping as overlay but removing fixed height dependencies) */}
+    <div className="flex h-screen bg-[#FAFAF7] overflow-hidden font-sans" data-lenis-prevent>
+      {/* Mobile Overlay */}
       {mobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <aside
-        className={cn(
-          "fixed top-0 left-0 h-full bg-background border-r border-border z-50 transition-all duration-300 shadow-sm",
-          collapsed ? "w-20" : "w-72",
-          mobileMenuOpen
-            ? "translate-x-0"
-            : "-translate-x-full lg:translate-x-0",
-        )}
-      >
-        <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className="p-6 border-b border-border">
-            <Link
-              to="/"
-              className={cn("flex items-center mb-4", collapsed && "justify-center")}
-              aria-label="FlashSpace home"
+      {/* Sidebar (Matching Affiliate Sidebar) */}
+      <aside className={sidebarClasses} data-lenis-prevent>
+        <div className={cn("flex flex-col shrink-0 transition-all duration-300", collapsed ? "p-4 items-center" : "w-[287px] h-[137px] p-[24px]")}>
+          <div className={cn("flex items-center w-full", collapsed ? "justify-center" : "justify-between")}>
+            <img
+              src={FLASHSPACE_LOGO_URL}
+              alt="FlashSpace Logo"
+              onClick={() => navigate("/")}
+              className={cn("w-auto object-contain transition-all duration-300 ml-[-12px] cursor-pointer", collapsed ? "h-7" : "h-9")}
+            />
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
             >
-              <img
-                src={FLASHSPACE_LOGO_URL}
-                alt="FlashSpace Logo"
-                className={cn(
-                  "w-auto object-contain transition-all dark:invert",
-                  collapsed ? "h-7 max-w-10" : "h-9 max-w-[170px]",
-                )}
-              />
-            </Link>
-            {!collapsed && (
-              <div>
-                <h2 className="font-bold text-foreground text-sm">
-                  {portalName}
-                </h2>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {portalDescription}
-                </p>
-              </div>
-            )}
+              <X size={24} />
+            </button>
           </div>
 
-          {/* Navigation */}
-          <ScrollArea
-            ref={scrollAreaRef}
-            className="flex-1 min-h-0 py-4"
-            scrollbarClassName="text-[#35503F]/75 hover:text-[#35503F]"
-            data-lenis-prevent
-          >
-            <nav className="px-3 space-y-1">
-              {navItems.map((item) => (
-                <div key={item.href}>
-                  <Link
-                    to={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
+          <div className={cn("mt-[17px] overflow-hidden transition-all duration-300 flex flex-col gap-1", collapsed ? "h-0 opacity-0" : "h-auto opacity-100")}>
+            <h2 className="w-[239px] h-[20px] text-[14px] font-bold text-[#1a2d1d] whitespace-nowrap leading-none flex items-center" style={{ fontFamily: "'Inter', sans-serif" }}>
+              {portalName}
+            </h2>
+            <p className="w-[239px] h-[16px] text-[12px] text-[#64748b] whitespace-nowrap font-medium leading-none flex items-center">
+              {portalDescription}
+            </p>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div
+          ref={scrollAreaRef}
+          className="flex-1 min-h-0 px-4 space-y-2 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          data-lenis-prevent
+        >
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <div key={item.href} className="mb-2">
+                <Link
+                  to={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  title={collapsed ? item.label : ""}
+                  className={cn(
+                    "flex items-center transition-all duration-300 rounded-lg group relative",
+                    collapsed ? "justify-center w-12 h-12 mx-auto" : "justify-start w-[263px] h-[40px] px-[12px] gap-4 mx-auto",
+                    active
+                      ? "bg-[#334d3d] text-[#FEF8C3] shadow-sm"
+                      : "text-[#677e73] hover:bg-gray-50 hover:text-[#1a2d1d]"
+                  )}
+                >
+                  <span className={cn("shrink-0", active ? "opacity-100" : "opacity-80 group-hover:opacity-100")}>
+                    {item.icon}
+                  </span>
+                  <span
                     className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                      isActive(item.href)
-                        ? "bg-primary text-primary-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      "text-[14px] font-semibold whitespace-nowrap transition-all duration-200",
+                      collapsed ? "w-0 opacity-0 overflow-hidden absolute" : "w-auto opacity-100 static"
                     )}
                   >
-                    {item.icon}
-                    {!collapsed && <span>{item.label}</span>}
-                  </Link>
-                  {!collapsed && item.children && (
-                    <div className="ml-9 mt-1 space-y-1">
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.href}
-                          to={child.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={cn(
-                            "block px-3 py-2 rounded-lg text-sm transition-colors",
-                            isActive(child.href)
-                              ? "text-primary font-medium"
-                              : "text-muted-foreground hover:text-foreground",
-                          )}
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </nav>
-          </ScrollArea>
+                    {item.label}
+                  </span>
+                </Link>
+                {!collapsed && item.children && (
+                  <div className="ml-10 mt-1 flex flex-col gap-1 border-l-2 border-[#edede6] pl-2">
+                    {item.children.map((child) => (
+                      <Link
+                        key={child.href}
+                        to={child.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-lg text-sm transition-all duration-200",
+                          isActive(child.href)
+                            ? "bg-[#334d3d]/10 text-[#1a2d1d] font-bold"
+                            : "text-[#677e73] hover:bg-gray-50 hover:text-[#1a2d1d] font-medium"
+                        )}
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
-          {/* Sidebar Header for Mobile only when open */}
-          <div className="lg:hidden p-4 border-b flex justify-end">
-            <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(false)}>
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
-
-          {/* Collapse Toggle (Desktop) */}
-          <div className="p-4 border-t border-border hidden lg:block">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setCollapsed(!collapsed)}
-              className={cn("w-full flex items-center gap-3 justify-start text-muted-foreground hover:bg-muted hover:text-foreground", collapsed && "justify-center")}
-            >
-              <ChevronLeft className={cn("w-5 h-5 transition-transform duration-300", collapsed && "rotate-180")} />
-              {!collapsed && <span className="font-semibold text-xs uppercase tracking-wider">Collapse</span>}
-            </Button>
-          </div>
-
-          {/* Back to Home */}
-          <div className="p-4 border-t border-border">
-            <Link to="/">
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn("w-full flex items-center justify-start gap-3", collapsed && "justify-center px-2")}
-              >
-                <Home className="w-4 h-4" />
-                {!collapsed && <span className="font-medium text-xs uppercase tracking-wider">Home</span>}
-              </Button>
-            </Link>
-          </div>
+        {/* Footer and Bottom Actions */}
+        <div className="p-6 border-t border-gray-100 space-y-4 bg-[#f8f9fa]/30 shrink-0">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className={cn(
+              "hidden lg:flex items-center transition-colors text-[#677e73] hover:text-[#1a2d1d] py-2 mx-auto",
+              collapsed ? "justify-center w-full" : "justify-start gap-4 w-[263px] h-[40px] px-[12px]"
+            )}
+          >
+            {collapsed ? (
+              <ChevronRight size={22} />
+            ) : (
+              <>
+                <ChevronLeft size={20} />
+                <span className="text-[15px] font-bold">Collapse</span>
+              </>
+            )}
+          </button>
+          <button
+            onClick={() => navigate("/")}
+            className={cn(
+              "flex items-center rounded-lg shadow-sm font-bold transition-all border border-gray-200 text-[#677e73] bg-white hover:bg-gray-50 hover:shadow-md mx-auto",
+              collapsed ? "justify-center w-full h-14" : "justify-start gap-4 w-[263px] h-[40px] px-[12px] text-[14px]"
+            )}
+          >
+            <Home size={20} />
+            {!collapsed && (
+              <span className="whitespace-nowrap">Back to Home</span>
+            )}
+          </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main
-        className={cn(
-          "transition-all duration-300 min-h-screen flex flex-col",
-          collapsed ? "lg:ml-20" : "lg:ml-72",
-        )}
-      >
-        {/* Mobile Top Bar (Only visible when sidebar needs toggle) */}
-        <header className="lg:hidden h-16 bg-white/80 backdrop-blur-md border-b border-border sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
-          <div className="flex flex-col">
-            <img
-              src={FLASHSPACE_LOGO_URL}
-              alt="FlashSpace Logo"
-              className="h-8 w-auto max-w-[150px] object-contain dark:invert"
-            />
-            <p className="text-[10px] text-muted-foreground mt-0.5 font-bold uppercase tracking-widest leading-none">
-              {portalName}
-            </p>
+      <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden relative transition-all duration-300">
+        {/* Mobile Header */}
+        <header className="lg:hidden bg-white border-b border-[#edede6] h-16 flex items-center justify-between px-4 shrink-0 z-30 relative shadow-sm">
+          <div className="flex items-center">
+            <img src={FLASHSPACE_LOGO_URL} alt="FlashSpace Logo" className="h-8 w-auto" />
           </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setMobileMenuOpen(true)}
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
-          </div>
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="group relative flex flex-col items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 hover:bg-gray-100"
+          >
+            <Menu className="w-6 h-6 text-gray-700" />
+          </button>
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden">
+        <main className="flex-1 min-h-0 overflow-y-auto relative custom-scrollbar p-4 md:p-6 lg:p-8" data-lenis-prevent>
           {children}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

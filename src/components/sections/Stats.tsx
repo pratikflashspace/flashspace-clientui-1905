@@ -54,12 +54,12 @@ export const Stats = () => {
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
 
   return (
-    <section ref={sectionRef} className="bg-[#F0F4EE] py-8">
-      <div className="fs-container grid grid-cols-2 divide-x-0 divide-y divide-[#D4E0D0] md:grid-cols-4 md:divide-x md:divide-y-0">
+    <section ref={sectionRef} className="bg-[#F0F4EE] py-4 md:py-8">
+      <div className="fs-container flex justify-between items-start md:grid md:grid-cols-4 md:divide-x md:divide-[#D4E0D0] px-2 md:px-8">
         {stats.map((stat, index) => (
-          <div key={stat.label} className="px-4 py-6 text-center md:py-2">
+          <div key={stat.label} className="px-1 md:px-4 py-2 md:py-2 text-center flex-1">
             <div
-              className="text-[32px] font-bold leading-none text-[#36503F] md:text-[40px]"
+              className="text-[16px] sm:text-[18px] font-bold leading-none text-[#36503F] md:text-[40px]"
               style={{
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
                 transitionDelay: `${index * 90}ms`,
@@ -71,7 +71,7 @@ export const Stats = () => {
                 start={isInView}
               />
             </div>
-            <div className="mt-2 text-[13px] font-medium text-[#6B8F78]">{stat.label}</div>
+            <div className="mt-1 md:mt-2 text-[8.5px] sm:text-[11px] md:text-[13px] font-medium text-[#6B8F78] leading-tight md:leading-normal mx-auto">{stat.label}</div>
           </div>
         ))}
       </div>

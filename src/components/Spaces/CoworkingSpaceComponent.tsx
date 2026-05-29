@@ -223,16 +223,22 @@ const CoworkingSpaceComponent = () => {
           </div>
 
           {/* --- PHOTO GRID --- */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[400px] mb-8 rounded-2xl overflow-hidden">
-            <div className="md:col-span-2 h-full">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 h-[250px] md:h-[400px] mb-6 md:mb-8 rounded-xl md:rounded-2xl overflow-hidden">
+            <div className="md:col-span-2 h-full relative">
               <img
                 src={photosForGrid[0]}
                 alt="Main Space"
                 className="w-full h-full object-cover hover:opacity-95 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
                 onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
               />
+              <button
+                onClick={() => { setGalleryInitialIndex(0); setIsGalleryOpen(true); }}
+                className="md:hidden absolute bottom-4 right-4 bg-black/50 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-sm font-medium"
+              >
+                1/{photos.length}
+              </button>
             </div>
-            <div className="md:col-span-1 grid grid-rows-2 gap-2 h-full">
+            <div className="hidden md:grid md:col-span-1 grid-rows-2 gap-2 h-full">
               <img
                 src={photosForGrid[1]}
                 alt="Detail 1"
@@ -246,7 +252,7 @@ const CoworkingSpaceComponent = () => {
                 onClick={() => { setGalleryInitialIndex(2); setIsGalleryOpen(true); }}
               />
             </div>
-            <div className="md:col-span-1 h-full relative">
+            <div className="hidden md:block md:col-span-1 h-full relative">
               <img
                 src={photosForGrid[3]}
                 alt="Detail 3"
