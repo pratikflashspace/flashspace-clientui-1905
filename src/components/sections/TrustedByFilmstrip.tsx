@@ -161,21 +161,60 @@ export const TrustedByFilmstrip = () => {
           style={{ background: "linear-gradient(to left, #FAFAF7, transparent)" }}
         />
 
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-        >
-          <ScrollRow logos={row1Logos} speed={0.4} />
-        </motion.div>
+        {/* Desktop Scrolling Animation */}
+        <div className="hidden md:block">
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <ScrollRow logos={row1Logos} speed={0.4} />
+          </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-        >
-          <ScrollRow logos={row2Logos} speed={0.4} reverse />
-        </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <ScrollRow logos={row2Logos} speed={0.4} reverse />
+          </motion.div>
+        </div>
+
+        {/* Mobile Static Collage */}
+        <div className="md:hidden text-center mb-6 px-4">
+          <h2 className="inline-block text-[12px] font-bold text-[#228B22] uppercase tracking-[0.05em] border border-[#228B22] rounded-full px-5 py-2 bg-[#228B22]/5">
+            Trusted by top companies
+          </h2>
+        </div>
+        <div className="md:hidden flex flex-wrap justify-center items-center gap-x-8 gap-y-8 px-4 py-2">
+          {clientLogos.map((logo, index) => {
+            // Individually tune mobile heights to perfectly balance wide vs square logos
+            let mobileHeight = "h-[28px]";
+            if (logo.name === "Agrizy") mobileHeight = "h-[44px]";
+            if (logo.name === "Adda247") mobileHeight = "h-[36px]";
+            if (logo.name === "Flipkart") mobileHeight = "h-[36px]";
+            if (logo.name === "Growth School") mobileHeight = "h-[22px]";
+            if (logo.name === "Plum") mobileHeight = "h-[26px]";
+            if (logo.name === "Study IQ") mobileHeight = "h-[38px]";
+            if (logo.name === "Truly Madly") mobileHeight = "h-[28px]";
+
+            return (
+              <motion.div
+                key={logo.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={isInView ? { opacity: 1, scale: 1 } : {}}
+                transition={{ delay: index * 0.08, duration: 0.5, ease: "easeOut" }}
+                className="flex items-center justify-center"
+              >
+                <img
+                  src={logo.src}
+                  alt={logo.name}
+                  className={`${mobileHeight} w-auto object-contain brightness-105 contrast-[1.1] transition-all duration-300`}
+                />
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
 
 

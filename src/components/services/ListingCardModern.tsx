@@ -375,10 +375,10 @@ const ListingCardModern = memo<ListingCardModernProps>(
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2 mt-auto">
+          <div className="flex gap-2 mt-auto pt-2">
             <button
               onClick={handleCardClick}
-              className="flex-[1.4] bg-[#36503F] text-[#FEF8C5] text-sm font-bold py-2.5 px-4 rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
+              className="flex-[1.2] bg-[#36503F] text-[#FEF8C5] text-[12px] sm:text-sm font-bold py-2 sm:py-2.5 px-2 sm:px-4 rounded-[10px] sm:rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98] whitespace-nowrap flex items-center justify-center"
             >
               Get Best Price
             </button>
@@ -387,9 +387,9 @@ const ListingCardModern = memo<ListingCardModernProps>(
                 e.stopPropagation();
                 window.dispatchEvent(new CustomEvent('open-contact-modal'));
               }}
-              className="flex-1 flex items-center justify-center gap-1.5 border border-[#36503F] bg-[#36503F] text-sm font-semibold text-[#FEF8C5] py-2.5 px-2 rounded-xl hover:bg-[#1F2E26] transition-all active:scale-[0.98]"
+              className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 border border-[#36503F] bg-[#36503F] text-[#FEF8C5] text-[11px] sm:text-sm font-semibold py-2 sm:py-2.5 px-1 sm:px-2 rounded-[10px] sm:rounded-xl hover:bg-[#1F2E26] transition-all active:scale-[0.98] whitespace-nowrap"
             >
-              <Phone className="w-4 h-4" />
+              <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
               Contact Sales
             </button>
           </div>

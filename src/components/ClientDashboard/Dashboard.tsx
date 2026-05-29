@@ -420,7 +420,7 @@ export default function Dashboard() {
   const nextRenewalDate = dashboardData?.nextBookingDate;
   const nextRenewalDisplay = nextRenewalDate ? formatDate(nextRenewalDate) : "-";
   const nextRenewalColor = nextRenewalDate ? "text-gray-900" : "text-gray-400";
-  const isNextRenewalSmall = !nextRenewalDate;
+  const isNextRenewalSmall = true;
 
   // Active Services Logic
   const activeServicesCount = dashboardData?.activeServices || 0;

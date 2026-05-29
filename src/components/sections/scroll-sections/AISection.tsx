@@ -32,12 +32,12 @@ export const AISection = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
 
-                    <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1F2E26]/40 backdrop-blur-md border border-[#FEF8C5]/30 mb-4">
-                            <Sparkles className="w-4 h-4 text-[#FEF8C5]" />
-                            <span className="text-[#FEF8C5] text-sm font-bold uppercase tracking-widest">AI-Powered</span>
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 lg:p-12">
+                        <div className="inline-flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-[#1F2E26]/40 backdrop-blur-md border border-[#FEF8C5]/30 mb-2 sm:mb-4">
+                            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-[#FEF8C5]" />
+                            <span className="text-[#FEF8C5] text-xs sm:text-sm font-bold uppercase tracking-widest">AI-Powered</span>
                         </div>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#FEF8C5] leading-tight tracking-tight">
+                        <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#FEF8C5] leading-tight tracking-tight">
                             Flash, The #1 AI
                             <br />
                             <span className="text-[#FEF8C5]/70 font-bold">for End to End Business Solutions.</span>
@@ -46,15 +46,15 @@ export const AISection = () => {
                 </motion.div>
 
                 {/* Description & Capabilities */}
-                <div className="grid lg:grid-cols-2 gap-12 items-start">
-                    <div>
-                        <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                <div className="grid lg:grid-cols-2 gap-12 items-start px-5 sm:px-0">
+                    <div className="text-justify sm:text-left">
+                        <p className="text-[15px] sm:text-lg text-muted-foreground mb-6 leading-relaxed">
                             Flash AI works with your entire business ecosystem, from AI-powered chat that answers every query instantly,
                             to intelligent forecasting for renewals, smart recommendation engines, and beyond. One platform. End-to-end
                             intelligence.
                         </p>
                         <Link to="/start-chatting">
-                            <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold">
+                            <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold w-full sm:w-auto">
                                 Learn more
                                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                             </Button>

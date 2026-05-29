@@ -10,19 +10,19 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-md hover:shadow-lg",
+          "bg-[#36503F] text-[#FEF8C5] hover:bg-[#FEF8CF] hover:text-[#36503F] shadow-md hover:shadow-lg",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border-2 border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] hover:text-[#FEF8C5] hover:border-[#1F2E26]",
+          "border-2 border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#FEF8CF] hover:text-[#36503F] hover:border-[#FEF8CF]",
         secondary:
-          "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26]",
-        ghost: "text-[#36503F] hover:bg-[#36503F] hover:text-[#FEF8C5]",
+          "bg-[#36503F] text-[#FEF8C5] hover:bg-[#FEF8CF] hover:text-[#36503F]",
+        ghost: "text-[#36503F] hover:bg-[#FEF8CF] hover:text-[#36503F]",
         link: "text-[#36503F] underline-offset-4 hover:underline",
         // Hero variants for landing page
         hero: "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-lg hover:shadow-xl",
         heroOutline:
-          "border-2 border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] hover:border-[#1F2E26]",
+          "border-2 border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#FEF8CF] hover:text-[#36503F] hover:border-[#FEF8CF]",
         // White variants for dark backgrounds
         white:
           "bg-white text-foreground hover:bg-white/90 shadow-lg hover:shadow-xl",
