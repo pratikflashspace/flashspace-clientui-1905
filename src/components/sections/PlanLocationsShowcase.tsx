@@ -11,13 +11,13 @@ import { VirtualOfficeItem } from "@/types/services";
 const spaceHsr = "/card-koramangala.jpg";
 const spaceNariman = "/card-lower-parel.jpg";
 const spaceConnaught = "/card-connaught-place.jpg";
-const spaceAnna = "/card-andheri.avif";
+const spaceAnna = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035695/flashspace_homepage/xumauocmqwjezmi33xac.avif";
 const locationBkc = "/card-bkc.jpg";
 const locationCp = "/card-nehru-place.jpg";
-const featureBusinessSetup = "/feature-business-setup.jpg";
-const featureVirtualOffice = "/feature-virtual-offices.jpg";
-const featureGlobalAccess = "/feature-global-access.jpg";
-const featureCoworking = "/feature-coworking.jpg";
+const featureBusinessSetup = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035698/flashspace_homepage/tomzaov6xhcukqhjpqrz.jpg";
+const featureVirtualOffice = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035700/flashspace_homepage/ualbj98du7oept1limyk.jpg";
+const featureGlobalAccess = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035701/flashspace_homepage/v2wogxj5agehafmu1pnv.jpg";
+const featureCoworking = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035703/flashspace_homepage/peittny4nqnjmxpcpef7.jpg";
 const locationMg = "/card-gurgaon.jpg";
 const locationCyber = "/card-hinjewadi.jpg";
 

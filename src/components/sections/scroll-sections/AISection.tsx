@@ -5,7 +5,7 @@ import { ArrowUpRight, Sparkles, Zap, Shield, BarChart3, MessageSquare, Bot, Clo
 import { Link } from "react-router-dom";
 
 // Using high-quality placeholders as requested
-const officeIllustrated = "/home9.png";
+const officeIllustrated = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035690/flashspace_homepage/ouatzi9zzixqblouzrm5.png";
 
 const capabilities = [
     { id: "booking", label: "Smart Booking", icon: Zap, active: true },

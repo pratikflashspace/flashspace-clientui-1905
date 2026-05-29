@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Sparkles } from "lucide-react";
 
-const heroImage = "/heroimage.png";
+const heroImage = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035710/flashspace_homepage/qm9lp632cwyizdnsd95t.png";
 const popularCities = ["Ahmedabad", "Bangalore", "Chennai", "Delhi", "Gurgaon", "Hyderabad", "Mumbai", "Noida", "Pune"];
 const otherCities = ["Agra", "Aluva", "Ambala", "Amritsar", "Bhopal", "Chandigarh", "Coimbatore", "Faridabad", "Ghaziabad", "Indore", "Jaipur", "Kochi", "Kolkata", "Lucknow", "Nagpur", "Rajkot", "Surat", "Vadodara", "Vijayawada", "Visakhapatnam"];
 
@@ -147,7 +147,7 @@ export const HeroWithSearch = () => {
                 {visibleCities.map((city) => (
                   <button
                     key={city}
-                    onClick={() => navigateToCity(city)}
+                    onClick={() => navigateToOption(city)}
                     className="rounded-full border border-[#D4E0D0] bg-white px-3 py-1.5 text-[11px] font-medium text-[#6B8F78] hover:border-[#36503F] hover:text-[#36503F] transition-colors"
                   >
                     {city}

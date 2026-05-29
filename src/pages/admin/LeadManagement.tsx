@@ -194,7 +194,6 @@ const LeadManagement = () => {
 
   const handleCall = (phone: string) => (window.location.href = `tel:${phone}`);
   const handleEmail = (email: string) => (window.location.href = `mailto:${email}`);
-  const handleAddLead = () => toast({ title: "Add New Lead", description: "Opening lead creation form..." });
 
   const renderLeadTable = () => (
     <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
@@ -263,7 +262,6 @@ const LeadManagement = () => {
           </h1>
           <p className="text-muted-foreground mt-2">Track and manage your incoming leads</p>
         </div>
-        <Button onClick={handleAddLead}><Plus className="w-4 h-4 mr-2" />Add Lead</Button>
       </div>
 
       {/* Stats */}

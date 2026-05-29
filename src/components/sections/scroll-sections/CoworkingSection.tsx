@@ -5,7 +5,7 @@ import { ArrowUpRight, Wifi, Coffee, Users, Monitor } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Using high-quality placeholder as requested
-const featureCoworking = "/home4.jpg";
+const featureCoworking = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035673/flashspace_homepage/iqibetxdweicak9un3ur.jpg";
 
 const amenities = [
     { icon: Wifi, label: "High-speed WiFi" },

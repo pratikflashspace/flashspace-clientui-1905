@@ -5,7 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Using high-quality placeholder as requested
-const featureBusinessSetup = "/home6.png";
+const featureBusinessSetup = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035682/flashspace_homepage/dh6bjebpk3xwe3mobsuo.png";
 
 export const BusinessSetupSection = () => {
     return (
