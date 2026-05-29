@@ -54,7 +54,7 @@ const BusinessSetupHomeCard = ({ item, onClick }: { item: any; onClick: () => vo
             </div>
 
             {/* Features */}
-            <div className="flex flex-col gap-3 mb-8 mt-2">
+            <div className="flex flex-col gap-3 mb-4 mt-2">
                 {item.features?.map((feature: string, idx: number) => (
                     <div key={idx} className="flex items-center gap-3 text-[14px] text-[#6B8F78]">
                         <span className="w-5 h-5 rounded-full bg-[#E5F3EB] flex items-center justify-center flex-shrink-0">
@@ -66,7 +66,7 @@ const BusinessSetupHomeCard = ({ item, onClick }: { item: any; onClick: () => vo
             </div>
             
             {/* Bottom / Pricing */}
-            <div className="mt-auto border-t border-[#E9EFEA] pt-5 flex flex-col gap-5">
+            <div className="mt-auto border-t border-[#E9EFEA] pt-4 flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-0.5">
                         <span className="text-[12px] font-medium text-[#7A9D88]">Starting from</span>
@@ -129,7 +129,8 @@ export const PlanLocationsShowcase = () => {
             "FSSAI Registration",
             "GST Filing",
             "LLP Compliance",
-            "MCA Compliance"
+            "MCA Compliance",
+            "Section 8 Registration"
         ].map((name, i) => {
             let price = "";
             let description = "";
@@ -137,52 +138,58 @@ export const PlanLocationsShowcase = () => {
             let timeline = "";
             
             if (name === "GST Registration") { 
-               price = "₹2499/yr"; 
+               price = "₹2499 only"; 
                description = "Get your GST number and start invoicing legally across India.";
-               features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Digital Filing Support"];
+               features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"];
                timeline = "1-2 days";
             }
             else if (name === "Company Registration") { 
-               price = "₹11999/yr"; 
+               price = "₹11999 only"; 
                description = "Register your private limited company with end-to-end legal setup.";
-               features = ["Company Name Approval", "Incorporation Certificate", "MOA & AOA Filing"];
+               features = ["Company Name Approval", "Incorporation Certificate", "PAN & TAN", "MOA & AOA Filing"];
                timeline = "10-15 days";
             }
             else if (name.includes("MSME")) { 
-               price = "₹1499/yr"; 
+               price = "₹1499 only"; 
                description = "Unlock MSME benefits, subsidies, and government schemes.";
-               features = ["Udyam Registration", "MSME Certificate", "Loan Benefits"];
+               features = ["Udyam Registration", "MSME Certificate", "Loan Benefits", "Priority Lending Support"];
                timeline = "1-2 days";
             }
             else if (name === "Startup India Registration") { 
-               price = "₹1499/yr"; 
+               price = "₹1499 only"; 
                description = "Get DPIIT recognition and startup tax benefits.";
-               features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification"];
+               features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification", "Investor Ready Setup"];
                timeline = "5-7 days";
             }
             else if (name === "FSSAI Registration") { 
-               price = "₹2999/yr"; 
+               price = "₹2999 only"; 
                description = "Food business license and compliance support for restaurants & brands.";
-               features = ["Food License Support", "State/Central License", "Compliance Guidance"];
+               features = ["Food License Support", "State/Central License", "Compliance Guidance", "Renewal Support"];
                timeline = "20-30 days";
             }
             else if (name === "GST Filing") {
-               price = "₹999/yr";
+               price = "₹1999/month";
                description = "Monthly and annual GST return filing handled by experts.";
-               features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation"];
+               features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"];
                timeline = "Monthly / Quarterly";
             }
             else if (name === "LLP Compliance") {
-               price = "₹4999/yr";
+               price = "₹14999 only";
                description = "Stay compliant with annual LLP filing and legal requirements.";
-               features = ["Annual Filing", "Form 8 & 11", "ROC Compliance"];
+               features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
                timeline = "Ongoing Annual Compliance";
             }
             else if (name === "MCA Compliance") {
-               price = "₹5999/yr";
+               price = "₹17999 only";
                description = "Complete MCA compliance and ROC filing support for companies.";
-               features = ["ROC Filing", "Board Resolution Support", "Director KYC"];
+               features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
                timeline = "Monthly / Annual";
+            }
+            else if (name === "Section 8 Registration") {
+               price = "₹14999 only";
+               description = "Register your NGO or non-profit organization as a Section 8 company.";
+               features = ["NGO Registration", "80G & 12A Support", "MOA & AOA Filing", "PAN & TAN"];
+               timeline = "15-20 days";
             }
             
             return {
