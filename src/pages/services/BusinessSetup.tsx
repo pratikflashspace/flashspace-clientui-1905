@@ -123,7 +123,7 @@ const BusinessSetup = () => {
       return;
     }
 
-    const gstAmount = Math.round(basePrice * 0.18);
+    const gstAmount = Number((basePrice * 0.18).toFixed(2));
     const totalAmount = basePrice + gstAmount;
     setIsPaymentLoading(true);
 
@@ -213,7 +213,7 @@ const BusinessSetup = () => {
       title: "GST Registration",
       description: "Get your GST number and start invoicing legally across India.",
       timeline: "1-2 days",
-      price: "Starting ₹2,499",
+      price: "Starting ₹2,499 only",
       popular: true,
       features: ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"],
       documents: ["PAN Card", "Aadhaar Card", "Address Proof", "Bank Details"],
@@ -225,7 +225,7 @@ const BusinessSetup = () => {
       title: "Company Registration",
       description: "Register your private limited company with end-to-end legal setup.",
       timeline: "10-15 days",
-      price: "Starting ₹11,999",
+      price: "Starting ₹11,999 only",
       features: ["Company Name Approval", "Incorporation Certificate", "PAN & TAN", "MOA & AOA Filing"],
       documents: ["PAN & Aadhaar", "Address Proof", "Passport Size Photo"],
       badge: "MCA Approved",
@@ -236,7 +236,7 @@ const BusinessSetup = () => {
       title: "MSME Registration",
       description: "Unlock MSME benefits, subsidies, and government schemes.",
       timeline: "1-2 days",
-      price: "Starting ₹1,499",
+      price: "Starting ₹1,499 only",
       features: ["Udyam Registration", "MSME Certificate", "Loan Benefits", "Priority Lending Support"],
       documents: ["Aadhaar", "PAN", "Business Details"],
       badge: "Govt Benefits",
@@ -247,7 +247,7 @@ const BusinessSetup = () => {
       title: "Startup India Registration",
       description: "Get DPIIT recognition and startup tax benefits.",
       timeline: "5-7 days",
-      price: "Starting ₹1,499",
+      price: "Starting ₹1,499 only",
       features: ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification", "Investor Ready Setup"],
       documents: ["Company Incorporation Docs", "PAN", "Pitch/Business Details"],
       badge: "DPIIT Certified",
@@ -258,7 +258,7 @@ const BusinessSetup = () => {
       title: "GST Filing",
       description: "Monthly and annual GST return filing handled by experts.",
       timeline: "Monthly / Quarterly",
-      price: "Starting ₹999",
+      price: "Starting ₹1,999/month",
       features: ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"],
       documents: ["Sales Invoices", "Purchase Invoices", "Bank Statements"],
       badge: "On-Time Filing",
@@ -269,7 +269,7 @@ const BusinessSetup = () => {
       title: "LLP Compliance",
       description: "Stay compliant with annual LLP filing and legal requirements.",
       timeline: "Ongoing Annual Compliance",
-      price: "Starting ₹4,999",
+      price: "Starting ₹14,999 only",
       features: ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"],
       documents: ["LLP Agreement", "Financial Statements", "Bank Statements"],
       badge: "ROC Compliant",
@@ -280,7 +280,7 @@ const BusinessSetup = () => {
       title: "MCA Compliance",
       description: "Complete MCA compliance and ROC filing support for companies.",
       timeline: "Monthly / Annual",
-      price: "Starting ₹5,999",
+      price: "Starting ₹17,999 only",
       features: ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"],
       documents: ["Financial Statements", "Audit Reports", "Director Details"],
       badge: "MCA Ready",
@@ -291,11 +291,22 @@ const BusinessSetup = () => {
       title: "FSSAI Registration",
       description: "Food business license and compliance support for restaurants & brands.",
       timeline: "20-30 days",
-      price: "Starting ₹2,999",
+      price: "Starting ₹2,999 only",
       features: ["Food License Support", "State/Central License", "Compliance Guidance", "Renewal Support"],
       documents: ["ID Proof", "Business Address", "Food Category Details"],
       badge: "Food Safe",
       stat: "FSSAI Certified"
+    },
+    {
+      icon: <Building className="w-6 h-6" />,
+      title: "Section 8 Registration",
+      description: "Register your NGO or non-profit organization as a Section 8 company.",
+      timeline: "15-20 days",
+      price: "Starting ₹14,999 only",
+      features: ["NGO Registration", "80G & 12A Support", "MOA & AOA Filing", "PAN & TAN"],
+      documents: ["PAN & Aadhaar", "Address Proof", "Passport Size Photo"],
+      badge: "NGO Ready",
+      stat: "Social Impact"
     }
   ];
 

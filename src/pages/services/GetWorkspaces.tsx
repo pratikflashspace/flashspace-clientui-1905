@@ -99,7 +99,8 @@ const formatInr = (amount: number) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(amount);
 
 type PaginationMeta = {
@@ -326,7 +327,7 @@ const WorkspaceCard = ({
         </div>
 
         {/* Features */}
-        <div className="flex flex-col gap-3 mb-8 mt-2">
+        <div className="flex flex-col gap-3 mb-4 mt-2">
           {ws.features?.map((feature, idx) => (
             <div key={idx} className="flex items-center gap-3 text-[14px] text-[#6B8F78]">
               <span className="w-5 h-5 rounded-full bg-[#E5F3EB] flex items-center justify-center flex-shrink-0">
@@ -338,7 +339,7 @@ const WorkspaceCard = ({
         </div>
 
         {/* Bottom / Pricing */}
-        <div className="mt-auto border-t border-[#E9EFEA] pt-5 flex flex-col gap-5">
+        <div className="mt-auto border-t border-[#E9EFEA] pt-4 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex flex-col gap-0.5">
               <span className="text-[12px] font-medium text-[#7A9D88]">Starting from</span>
@@ -808,7 +809,7 @@ const GetWorkspaces = () => {
     }
 
     const taxableAmount = Math.max(basePrice - couponDiscount, 0);
-    const gstAmount = Math.round(taxableAmount * 0.18);
+    const gstAmount = Number((taxableAmount * 0.18).toFixed(2));
     const totalAmount = taxableAmount + gstAmount;
     setBusinessPaymentLoading(true);
 
@@ -904,7 +905,7 @@ const GetWorkspaces = () => {
     }
 
     const taxableAmount = Math.max(basePrice - couponDiscount, 0);
-    const gstAmount = Math.round(taxableAmount * 0.18);
+    const gstAmount = Number((taxableAmount * 0.18).toFixed(2));
     const totalAmount = taxableAmount + gstAmount;
     setBusinessTestPaymentLoading(true);
 
@@ -1063,7 +1064,8 @@ const GetWorkspaces = () => {
             "FSSAI Registration",
             "GST Filing",
             "LLP Compliance",
-            "MCA Compliance"
+            "MCA Compliance",
+            "Section 8 Registration"
           ];
           const demoBusinessSetups = headings.map((heading, i) => {
             let imgPath = `/home${i+1}.jpg`;
@@ -1074,59 +1076,66 @@ const GetWorkspaces = () => {
             
             if (heading === "GST Registration") { 
                imgPath = "/business5.png";
-               price = "₹2499/yr"; 
+               price = "₹2499 only"; 
                description = "Get your GST number and start invoicing legally across India.";
-               features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Digital Filing Support"];
+               features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"];
                timeline = "1-2 days";
             }
             else if (heading.includes("Company Registration")) { 
                imgPath = "/business3.png";
-               price = "₹11999/yr"; 
+               price = "₹11999 only"; 
                description = "Register your private limited company with end-to-end legal setup.";
-               features = ["Company Name Approval", "Incorporation Certificate", "MOA & AOA Filing"];
+               features = ["Company Name Approval", "Incorporation Certificate", "PAN & TAN", "MOA & AOA Filing"];
                timeline = "10-15 days";
             }
             else if (heading.includes("MSME")) { 
                imgPath = "/business4.png";
-               price = "₹1499/yr"; 
+               price = "₹1499 only"; 
                description = "Unlock MSME benefits, subsidies, and government schemes.";
-               features = ["Udyam Registration", "MSME Certificate", "Loan Benefits"];
+               features = ["Udyam Registration", "MSME Certificate", "Loan Benefits", "Priority Lending Support"];
                timeline = "1-2 days";
             }
             else if (heading === "Startup India Registration") { 
                imgPath = "/business2.png";
-               price = "₹1499/yr"; 
+               price = "₹1499 only"; 
                description = "Get DPIIT recognition and startup tax benefits.";
-               features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification"];
+               features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification", "Investor Ready Setup"];
                timeline = "5-7 days";
             }
             else if (heading === "FSSAI Registration") { 
                imgPath = "/business1.png";
-               price = "₹2999/yr"; 
+               price = "₹2999 only"; 
                description = "Food business license and compliance support for restaurants & brands.";
-               features = ["Food License Support", "State/Central License", "Compliance Guidance"];
+               features = ["Food License Support", "State/Central License", "Compliance Guidance", "Renewal Support"];
                timeline = "20-30 days";
             }
             else if (heading === "GST Filing") {
                imgPath = "/business5.png";
-               price = "₹999/yr";
+               price = "₹1999/month";
                description = "Monthly and annual GST return filing handled by experts.";
-               features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation"];
+               features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"];
                timeline = "Monthly / Quarterly";
             }
             else if (heading === "LLP Compliance") {
                imgPath = "/business3.png";
-               price = "₹4999/yr";
+               price = "₹14999 only";
                description = "Stay compliant with annual LLP filing and legal requirements.";
-               features = ["Annual Filing", "Form 8 & 11", "ROC Compliance"];
+               features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
                timeline = "Ongoing Annual Compliance";
             }
             else if (heading === "MCA Compliance") {
                imgPath = "/business4.png";
-               price = "₹5999/yr";
+               price = "₹17999 only";
                description = "Complete MCA compliance and ROC filing support for companies.";
-               features = ["ROC Filing", "Board Resolution Support", "Director KYC"];
+               features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
                timeline = "Monthly / Annual";
+            }
+            else if (heading === "Section 8 Registration") {
+               imgPath = "/business1.png";
+               price = "₹14999 only";
+               description = "Register your NGO or non-profit organization as a Section 8 company.";
+               features = ["NGO Registration", "80G & 12A Support", "MOA & AOA Filing", "PAN & TAN"];
+               timeline = "15-20 days";
             }
             
             return {
@@ -1369,7 +1378,7 @@ const GetWorkspaces = () => {
   }
 
   const renderTaxableAmount = Math.max(selectedBusinessBaseAmount - renderCouponDiscount, 0);
-  const selectedBusinessTaxAmount = Math.round(renderTaxableAmount * 0.18);
+  const selectedBusinessTaxAmount = Number((renderTaxableAmount * 0.18).toFixed(2));
   const selectedBusinessTotalAmount = renderTaxableAmount + selectedBusinessTaxAmount;
 
   const typeLabel: Record<string, string> = {
@@ -1514,42 +1523,42 @@ const GetWorkspaces = () => {
         >
           <div className="py-5 pr-5 sm:pr-8">
             {/* Results text + view toggle */}
-            <div className="flex items-center justify-between mb-4">
-              {workspaceType !== "business-setup" && (
+            {workspaceType !== "business-setup" && (
+              <div className="flex items-center justify-between mb-4">
                 <p className="text-sm text-muted-foreground">
-                Showing{" "}
-                <span className="font-semibold text-foreground">
-                  {sortedWorkspaces.length} of {totalResults} result(s)
-                </span>{" "}
-                for {(typeLabel[workspaceType] || "Workspace").toLowerCase()} in{" "}
-                <span className="font-medium text-foreground">
-                  {activeCity}
-                </span>
-              </p>
-              )}
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
-                  <button
-                    onClick={() => setViewMode("list")}
-                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "list"
-                      ? "bg-card text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                      }`}
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "grid"
-                      ? "bg-card text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                      }`}
-                  >
-                    <LayoutGrid className="w-4 h-4" />
-                  </button>
+                  Showing{" "}
+                  <span className="font-semibold text-foreground">
+                    {sortedWorkspaces.length} of {totalResults} result(s)
+                  </span>{" "}
+                  for {(typeLabel[workspaceType] || "Workspace").toLowerCase()} in{" "}
+                  <span className="font-medium text-foreground">
+                    {activeCity}
+                  </span>
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "list"
+                        ? "bg-card text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "grid"
+                        ? "bg-card text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                        }`}
+                    >
+                      <LayoutGrid className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             {loading ? (
               <div
                 className={
