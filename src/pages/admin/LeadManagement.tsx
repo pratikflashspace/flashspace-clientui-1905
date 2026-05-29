@@ -194,7 +194,6 @@ const LeadManagement = () => {
 
   const handleCall = (phone: string) => (window.location.href = `tel:${phone}`);
   const handleEmail = (email: string) => (window.location.href = `mailto:${email}`);
-  const handleEmail = (email: string) => (window.location.href = `mailto:${email}`);
 
   const renderLeadTable = () => (
     <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
