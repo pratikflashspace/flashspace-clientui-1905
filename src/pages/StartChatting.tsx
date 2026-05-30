@@ -1259,6 +1259,13 @@ const StartChatting = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] dark:text-gray-100 flex flex-col overflow-x-hidden font-grotesk">
+      <style>{`
+        @media (max-width: 768px) {
+          chat-widget {
+            display: none !important;
+          }
+        }
+      `}</style>
 
       {showUpdates && (
         <div

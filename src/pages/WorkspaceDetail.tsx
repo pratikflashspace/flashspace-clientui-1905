@@ -624,7 +624,7 @@ const getPhotos = () => {
 
         {/* Gallery */}
         {photos.length > 0 ? (
-          <div className={`grid gap-2 mb-10 rounded-2xl overflow-hidden h-[420px] ${
+          <div className={`grid gap-1 md:gap-2 mb-8 md:mb-10 rounded-2xl overflow-hidden h-[260px] md:h-[420px] ${
             photos.length === 1 ? "grid-cols-1" :
             photos.length === 2 ? "grid-cols-2" :
             photos.length === 3 ? "grid-cols-3" : "grid-cols-4 grid-rows-2"
@@ -677,7 +677,7 @@ const getPhotos = () => {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-75"
                 />
                 <div className="absolute inset-0 flex flex-col items-center justify-center top-0 left-0 bg-black/40 hover:bg-black/20 transition-colors">
-                  <span className="text-white font-medium">+{photos.length - 4} more photos</span>
+                  <span className="text-white font-medium text-xs md:text-base">+{photos.length - 4}</span>
                 </div>
               </div>
             )}

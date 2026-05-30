@@ -134,10 +134,9 @@ const FAQSection = ({ faqs = SALES_FAQS }: FAQSectionProps) => {
                     onClick={() => setSelectedCategory(category.key)}
                     className={`
                       group px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2 justify-center
-                      ${
-                        selectedCategory === category.key
-                          ? "bg-[#0D9488] text-white shadow-lg transform scale-105"
-                          : "bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-[#0D9488] dark:hover:border-[#0D9488] hover:text-[#172A3A] dark:hover:text-white hover:scale-105"
+                      ${selectedCategory === category.key
+                        ? "bg-[#0D9488] text-white shadow-lg transform scale-105"
+                        : "bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-[#0D9488] dark:hover:border-[#0D9488] hover:text-[#172A3A] dark:hover:text-white hover:scale-105"
                       }
                     `}
                   >
@@ -212,7 +211,7 @@ const FAQSection = ({ faqs = SALES_FAQS }: FAQSectionProps) => {
               Call Support
             </a>
             <a
-              href="mailto:support@flashspace.co"
+              href="mailto:support@flashspace.ai"
               className="bg-white dark:bg-[#1f1f1f] border-2 border-gray-200 dark:border-white/10 text-[#172A3A] dark:text-white hover:bg-[#172A3A] hover:text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:scale-105 shadow-md"
             >
               Email Us

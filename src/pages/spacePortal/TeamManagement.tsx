@@ -424,7 +424,7 @@ export default function TeamManagement() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@flashspace.com"
+                    placeholder="name@flashspace.aim"
                     className="rounded-xl"
                     value={newMember.email}
                     onChange={(e) =>

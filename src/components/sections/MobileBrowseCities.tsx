@@ -9,7 +9,6 @@ export const MobileBrowseCities = () => {
   const navigate = useNavigate();
   const [showAllCities, setShowAllCities] = useState(false);
   const allCitiesList = [...popularCities, ...otherCities];
-  const visibleCities = showAllCities ? allCitiesList : allCitiesList.slice(0, 11);
 
   const navigateToOption = (city: string) => {
     // Navigate to Coworking Space by default, or Virtual Office.
@@ -19,29 +18,35 @@ export const MobileBrowseCities = () => {
 
   return (
     <section className="lg:hidden bg-white py-8">
-      <div className="fs-container">
-        <h2 className="text-[22px] font-extrabold tracking-[-0.03em] text-[#1A1A1A] mb-5 text-center">
-          Browse by cities
-        </h2>
-        <div className="flex flex-wrap justify-center gap-2.5">
-          {visibleCities.map((city) => (
+      <div className="fs-container px-2">
+        <div className="flex items-center justify-between mb-5 px-2">
+          <h2 className="text-[22px] font-extrabold tracking-[-0.03em] text-[#1A1A1A]">
+            Browse by cities
+          </h2>
+          <button
+            onClick={() => setShowAllCities(!showAllCities)}
+            className="text-sm font-semibold text-[#36503F] underline"
+          >
+            {showAllCities ? "View less" : "View all"}
+          </button>
+        </div>
+        <div
+          className={
+            showAllCities
+              ? "flex flex-wrap gap-2.5 px-2"
+              : "grid grid-rows-2 grid-flow-col gap-2.5 overflow-x-auto pb-4 px-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+          }
+        >
+          {allCitiesList.map((city) => (
             <button
               key={city}
               onClick={() => navigateToOption(city)}
-              className="flex items-center gap-1.5 rounded-full border border-[#D4E0D0] bg-[#F0F4EE] px-4 py-2 text-[13px] font-medium text-[#36503F] hover:border-[#36503F] hover:bg-[#E5F3EB] transition-colors"
+              className="flex items-center justify-center gap-1.5 rounded-full border border-[#D4E0D0] bg-[#F0F4EE] px-4 py-2 text-[13px] font-medium text-[#36503F] hover:border-[#36503F] hover:bg-[#E5F3EB] transition-colors whitespace-nowrap snap-start"
             >
-              <MapPin className="w-3.5 h-3.5" />
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
               {city}
             </button>
           ))}
-          {allCitiesList.length > 11 && (
-            <button
-              onClick={() => setShowAllCities(!showAllCities)}
-              className="flex items-center gap-1.5 rounded-full bg-[#E5F3EB] px-4 py-2 text-[13px] font-bold text-[#36503F] hover:bg-[#D4E0D0] transition-colors"
-            >
-              {showAllCities ? "View less" : `+ ${allCitiesList.length - 11} more`}
-            </button>
-          )}
         </div>
       </div>
     </section>

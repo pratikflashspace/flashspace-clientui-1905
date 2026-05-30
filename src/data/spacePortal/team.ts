@@ -12,7 +12,7 @@ export const TEAM_MEMBERS: TeamMember[] = [
     {
         id: "TM001",
         name: "John Smith",
-        email: "john.smith@flashspace.com",
+        email: "john.smith@flashspace.aim",
         role: "ADMIN",
         joinedDate: "2023-10-15",
     },
@@ -26,21 +26,21 @@ export const TEAM_MEMBERS: TeamMember[] = [
     {
         id: "TM003",
         name: "Michael Chen",
-        email: "m.chen@flashspace.com",
+        email: "m.chen@flashspace.aim",
         role: "STAFF",
         joinedDate: "2023-12-10",
     },
     {
         id: "TM004",
         name: "Emma Wilson",
-        email: "emma.w@flashspace.com",
+        email: "emma.w@flashspace.aim",
         role: "STAFF",
         joinedDate: "2024-01-20",
     },
     {
         id: "TM005",
         name: "David Brown",
-        email: "david.b@flashspace.com",
+        email: "david.b@flashspace.aim",
         role: "MANAGER",
         joinedDate: "2023-09-05",
     },

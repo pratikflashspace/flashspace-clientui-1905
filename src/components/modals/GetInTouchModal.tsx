@@ -15,7 +15,7 @@ const contactCards = [
         icon: Headphones,
         description: "Need technical help or facing issues with our platform? Our support team is here 24×7 to assist you with queries and troubleshooting.",
         contacts: [
-            { label: "Support Mail:", value: "support@flashspace.co", href: "mailto:support@flashspace.co", icon: Mail },
+            { label: "Support Mail:", value: "support@flashspace.ai", href: "mailto:support@flashspace.ai", icon: Mail },
         ],
     },
     {
@@ -23,7 +23,7 @@ const contactCards = [
         icon: TrendingUp,
         description: "Want to explore FlashSpace solutions for your business? Our sales experts will help you find the right plan and growth strategy.",
         contacts: [
-            { label: "Sales Mail:", value: "sales@flashspace.co", href: "mailto:sales@flashspace.co", icon: Mail },
+            { label: "Sales Mail:", value: "sales@flashspace.ai", href: "mailto:sales@flashspace.ai", icon: Mail },
             { label: "Contact:", value: "8100888777", icon: Phone },
         ],
     },
@@ -32,7 +32,7 @@ const contactCards = [
         icon: Handshake,
         description: "Interested in collaborating or becoming a FlashSpace partner? Let's innovate together and build future-ready digital solutions.",
         contacts: [
-            { label: "Partnership Mail:", value: "partner@flashspace.co", href: "mailto:partner@flashspace.co", icon: Mail },
+            { label: "Partnership Mail:", value: "partner@flashspace.ai", href: "mailto:partner@flashspace.ai", icon: Mail },
         ],
     },
 ];
@@ -56,7 +56,7 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Basic 10-digit validation
         const phoneRegex = /^[0-9]{10}$/;
         if (!phoneRegex.test(phone)) {
@@ -68,36 +68,36 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
         try {
             const rawBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
             const base = rawBase.replace(/\/$/, "");
-            
+
             const res = await fetch(`${base}/api/leads`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-api-key": "flashspace123", // must match backend
-                "x-flashspace-csrf": "true",
-              },
-              body: JSON.stringify({
-                name: name,
-                email: email,
-                phone: phone,
-                city: "Get In Touch", // Using city field for context
-                source: "Get In Touch Modal",
-                page: window.location.href,
-              }),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": "flashspace123", // must match backend
+                    "x-flashspace-csrf": "true",
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    city: "Get In Touch", // Using city field for context
+                    source: "Get In Touch Modal",
+                    page: window.location.href,
+                }),
             });
 
             const data = await res.json();
 
             if (data.ok) {
-              localStorage.setItem("hasFilledGetInTouch", "true");
-              toast.success("Thank you! We will get in touch soon.");
-              onClose();
-              // Reset form
-              setName("");
-              setPhone("");
-              setEmail("");
+                localStorage.setItem("hasFilledGetInTouch", "true");
+                toast.success("Thank you! We will get in touch soon.");
+                onClose();
+                // Reset form
+                setName("");
+                setPhone("");
+                setEmail("");
             } else {
-              toast.error(data.message || "Something went wrong. Please try again.");
+                toast.error(data.message || "Something went wrong. Please try again.");
             }
         } catch (error: any) {
             console.error(error);

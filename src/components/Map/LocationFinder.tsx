@@ -32,7 +32,7 @@ const LocationFinder: React.FC = () => {
       rating: 4.8,
       amenities: ['Mail Handling', 'Phone Answering', 'Meeting Rooms', 'Business Address'],
       phone: '+91 98765 43210',
-      email: 'connaught@flashspace.com'
+      email: 'connaught@flashspace.aim'
     },
     {
       id: '2',
@@ -44,7 +44,7 @@ const LocationFinder: React.FC = () => {
       rating: 4.6,
       amenities: ['Mail Handling', 'Phone Answering', 'Reception Services', 'Business Address'],
       phone: '+91 98765 43211',
-      email: 'noida@flashspace.com'
+      email: 'noida@flashspace.aim'
     },
     {
       id: '3',
@@ -56,7 +56,7 @@ const LocationFinder: React.FC = () => {
       rating: 4.9,
       amenities: ['Mail Handling', 'Phone Answering', 'Meeting Rooms', 'Business Address', 'Coworking Access'],
       phone: '+91 98765 43212',
-      email: 'gurgaon@flashspace.com'
+      email: 'gurgaon@flashspace.aim'
     }
   ];
 
@@ -139,9 +139,9 @@ const LocationFinder: React.FC = () => {
                     <MapPin className="w-5 h-5 text-blue-600" />
                     <span className="text-lg">{selectedLocation.name}</span>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={() => setSelectedLocation(null)}
                     className="hover:bg-white/50"
                   >
@@ -155,7 +155,7 @@ const LocationFinder: React.FC = () => {
                     <MapPin className="w-4 h-4 mt-0.5 text-gray-400" />
                     {selectedLocation.address}
                   </p>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
                       <Star className="w-5 h-5 text-yellow-500 fill-current" />
@@ -186,7 +186,7 @@ const LocationFinder: React.FC = () => {
                 {(selectedLocation.phone || selectedLocation.email) && (
                   <div className="border-t pt-4 space-y-2">
                     {selectedLocation.phone && (
-                      <a 
+                      <a
                         href={`tel:${selectedLocation.phone}`}
                         className="flex items-center gap-2 text-sm hover:text-blue-600 transition-colors"
                       >
@@ -195,7 +195,7 @@ const LocationFinder: React.FC = () => {
                       </a>
                     )}
                     {selectedLocation.email && (
-                      <a 
+                      <a
                         href={`mailto:${selectedLocation.email}`}
                         className="flex items-center gap-2 text-sm hover:text-blue-600 transition-colors"
                       >
@@ -222,11 +222,11 @@ const LocationFinder: React.FC = () => {
                 <h3 className="text-lg font-semibold mb-1">Available Locations</h3>
                 <p className="text-sm text-gray-600">Click on any location to view details</p>
               </div>
-              
+
               <div className="max-h-[550px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
                 {locations.map((location) => (
-                  <Card 
-                    key={location.id} 
+                  <Card
+                    key={location.id}
                     className="cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all duration-200 border-0 shadow-md"
                     onClick={() => setSelectedLocation(location)}
                   >
@@ -244,7 +244,7 @@ const LocationFinder: React.FC = () => {
                           <span className="text-sm font-medium">{location.rating}</span>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between pt-2 border-t">
                         <span className="text-xs text-gray-500">{location.amenities.length} amenities</span>
                         <span className="font-bold text-blue-600">{location.price}</span>
