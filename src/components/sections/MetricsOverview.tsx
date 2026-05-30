@@ -46,7 +46,15 @@ export const MetricsOverview = () => {
           transition={{ duration: 0.55 }}
           className="mb-16 text-center"
         >
-          <p className="text-base font-medium text-[#6B8F78] sm:text-lg">
+          <div className="flex justify-center mb-4">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#35503F]/10 border border-[#35503F]/20 text-[#35503F] text-xs font-bold uppercase tracking-wider">
+              Performance Analytics
+            </span>
+          </div>
+          <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#1F2E26] mb-4 tracking-tight">
+            Data-Driven Excellence.
+          </h2>
+          <p className="text-base font-medium text-[#6B8F78] sm:text-lg max-w-2xl mx-auto">
             Our commitment to excellence reflected in every metric
           </p>
         </motion.div>
