@@ -319,9 +319,8 @@ export default function AboutUs() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5 }}
-                  className={`grid items-center gap-8 rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8 lg:grid-cols-[220px_1fr] ${
-                    i % 2 === 1 ? "lg:[&>div:first-child]:order-2" : ""
-                  }`}
+                  className={`grid items-center gap-8 rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8 lg:grid-cols-[220px_1fr] ${i % 2 === 1 ? "lg:[&>div:first-child]:order-2" : ""
+                    }`}
                 >
                   <div className="overflow-hidden rounded-2xl border border-border">
                     <img src={t.img} alt={t.title} className="h-40 w-full object-cover" />
@@ -483,7 +482,7 @@ export default function AboutUs() {
                     <div>
                       <p className="mb-1 text-lg font-bold text-slate-900 dark:text-slate-100">Get in Touch</p>
                       <p className="text-slate-700 dark:text-slate-300">+91 98765 43210</p>
-                      <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">support@flashspace.com</p>
+                      <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">support@flashspace.aim</p>
                     </div>
                   </div>
                 </div>

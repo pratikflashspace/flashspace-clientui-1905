@@ -517,8 +517,8 @@ const HelpCenter = () => {
                                     key={group.label}
                                     onClick={() => setActiveGroup(group.label)}
                                     className={`px-4 py-2 text-sm rounded-lg border transition-colors ${activeGroup === group.label
-                                            ? "bg-primary text-primary-foreground border-primary"
-                                            : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground bg-background"
+                                        ? "bg-primary text-primary-foreground border-primary"
+                                        : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground bg-background"
                                         }`}
                                 >
                                     {group.label}
@@ -707,7 +707,7 @@ const HelpCenter = () => {
                                         <Mail className="w-5 h-5 text-primary" />
                                     </div>
                                     <h3 className="text-sm font-semibold text-foreground mb-1">Email Support</h3>
-                                    <p className="text-xs text-muted-foreground mb-3">support@flashspace.com</p>
+                                    <p className="text-xs text-muted-foreground mb-3">support@flashspace.aim</p>
                                     <Button size="sm" variant="outline" className="w-full">Send Email</Button>
                                 </div>
 

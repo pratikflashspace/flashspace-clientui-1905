@@ -23,7 +23,7 @@ export default function Logout() {
   };
 
   return (
- <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 flex items-center justify-center "> 
+    <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 flex items-center justify-center ">
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
           {/* Icon */}
@@ -84,8 +84,8 @@ export default function Logout() {
           {/* Footer note */}
           <p className="text-xs text-gray-400 mt-8">
             Need help? Contact{" "}
-            <a href="mailto:support@flashspace.co" className="text-yellow-600 hover:underline">
-              support@flashspace.co
+            <a href="mailto:support@flashspace.ai" className="text-yellow-600 hover:underline">
+              support@flashspace.ai
             </a>
           </p>
         </div>

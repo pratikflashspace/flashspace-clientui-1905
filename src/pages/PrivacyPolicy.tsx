@@ -99,12 +99,12 @@ const PrivacyPolicy = () => {
                   <strong>Website</strong> refers to Flash Space, accessible
                   from{" "}
                   <a
-                    href="https://www.flashspace.co"
+                    href="https://www.flashspace.ai"
                     className="text-primary hover:underline"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    https://www.flashspace.co
+                    https://www.flashspace.ai
                   </a>
                 </li>
                 <li>
@@ -646,10 +646,10 @@ const PrivacyPolicy = () => {
               <p>
                 By visiting this page on our website:{" "}
                 <a
-                  href="https://flashspace.co/privacy-policy"
+                  href="https://flashspace.ai/privacy-policy"
                   className="text-primary hover:underline"
                 >
-                  flashspace.co/privacy-policy
+                  flashspace.ai/privacy-policy
                 </a>
               </p>
             </section>

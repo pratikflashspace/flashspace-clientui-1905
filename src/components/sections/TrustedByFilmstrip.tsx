@@ -11,37 +11,37 @@ const clientLogos: LogoItem[] = [
   {
     name: "Agrizy",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/agrizy_vpn5mj.png",
-    className: "h-16 sm:h-24",
+    className: "h-24 sm:h-24",
   },
   {
     name: "Adda247",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/Adda247_bbmaft.png",
-    className: "h-12 sm:h-16",
+    className: "h-32 sm:h-16",
   },
   {
     name: "Flipkart",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/Flipkart-Logo_uzked4.png",
-    className: "h-12 sm:h-20",
+    className: "h-32 sm:h-20",
   },
   {
     name: "Growth School",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/growthschool_-_Copy_iip2zr.png",
-    className: "h-10 sm:h-12",
+    className: "h-24 sm:h-12",
   },
   {
     name: "Plum",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/plum_logo_lstdop.png",
-    className: "h-10 sm:h-14",
+    className: "h-24 sm:h-14",
   },
   {
     name: "Study IQ",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/study_iq_xdxdkd.png",
-    className: "h-14 sm:h-18",
+    className: "h-20 sm:h-18",
   },
   {
     name: "Truly Madly",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/truly_madly_b78smk.png",
-    className: "h-16 sm:h-20",
+    className: "h-24 sm:h-20",
   },
 ];
 
@@ -55,8 +55,7 @@ const LogoCard = ({ logo, index }: { logo: LogoItem; index: number }) => {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className="group relative flex items-center justify-center cursor-pointer"
-      style={{ minWidth: "220px", padding: "0 40px" }}
+      className="group relative flex shrink-0 items-center justify-center cursor-pointer min-w-[340px] sm:min-w-[220px] px-2 sm:px-10"
     >
       {/* Glassmorphic background card */}
       <div
@@ -67,12 +66,12 @@ const LogoCard = ({ logo, index }: { logo: LogoItem; index: number }) => {
         }}
       />
 
-      <div className="relative z-10 flex items-center justify-center py-6 px-4 transition-all duration-500">
+      <div className="relative z-10 flex items-center justify-center py-6 px-2 sm:px-4 transition-all duration-500 w-full h-full">
         <img
           src={logo.src}
           alt={logo.name}
           className={`${logo.className || "h-10 sm:h-14"
-            } w-auto object-contain grayscale opacity-80 brightness-110 contrast-125 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500`}
+            } w-auto max-w-none object-contain grayscale opacity-80 brightness-110 contrast-125 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500`}
         />
       </div>
     </motion.div>
@@ -149,9 +148,9 @@ export const TrustedByFilmstrip = () => {
     >
 
       {/* Section Heading */}
-      <div className="text-center mb-8 px-4 relative z-10">
-        <h2 className="text-[24px] md:text-[32px] font-extrabold tracking-[-0.03em] text-[#1A1A1A]">
-          Trusted by partners
+      <div className="text-center mb-8 px-4 relative z-10 md:hidden">
+        <h2 className="text-[24px] md:text-[36px] font-bold tracking-[-0.02em] text-[#1A1A1A]">
+          Trusted by Elite
         </h2>
       </div>
 
@@ -187,17 +186,17 @@ export const TrustedByFilmstrip = () => {
         </div>
 
         {/* Mobile Static Collage */}
-        <div className="md:hidden flex flex-wrap justify-center items-center gap-x-8 gap-y-8 px-4 py-2">
+        <div className="md:hidden grid grid-cols-2 justify-items-center items-center gap-x-6 gap-y-8 px-4 py-4">
           {clientLogos.map((logo, index) => {
             // Individually tune mobile heights to perfectly balance wide vs square logos
-            let mobileHeight = "h-[28px]";
-            if (logo.name === "Agrizy") mobileHeight = "h-[44px]";
-            if (logo.name === "Adda247") mobileHeight = "h-[36px]";
-            if (logo.name === "Flipkart") mobileHeight = "h-[36px]";
-            if (logo.name === "Growth School") mobileHeight = "h-[22px]";
-            if (logo.name === "Plum") mobileHeight = "h-[26px]";
-            if (logo.name === "Study IQ") mobileHeight = "h-[38px]";
-            if (logo.name === "Truly Madly") mobileHeight = "h-[28px]";
+            let mobileHeight = "h-[48px]";
+            if (logo.name === "Agrizy") mobileHeight = "h-[64px]";
+            if (logo.name === "Adda247") mobileHeight = "h-[56px]";
+            if (logo.name === "Flipkart") mobileHeight = "h-[56px]";
+            if (logo.name === "Growth School") mobileHeight = "h-[32px]";
+            if (logo.name === "Plum") mobileHeight = "h-[36px]";
+            if (logo.name === "Study IQ") mobileHeight = "h-[48px]";
+            if (logo.name === "Truly Madly") mobileHeight = "h-[48px]";
 
             return (
               <motion.div
@@ -205,12 +204,14 @@ export const TrustedByFilmstrip = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : {}}
                 transition={{ delay: index * 0.08, duration: 0.5, ease: "easeOut" }}
-                className="flex items-center justify-center"
+                className={`flex items-center justify-center w-full ${
+                  index === clientLogos.length - 1 && clientLogos.length % 2 !== 0 ? 'col-span-2' : ''
+                }`}
               >
                 <img
                   src={logo.src}
                   alt={logo.name}
-                  className={`${mobileHeight} w-auto object-contain brightness-105 contrast-[1.1] transition-all duration-300`}
+                  className={`${mobileHeight} w-auto max-w-full object-contain brightness-105 contrast-[1.1] transition-all duration-300`}
                 />
               </motion.div>
             );

@@ -19,7 +19,7 @@ export const virtualOfficeLocations = [
       'High-Speed Internet'
     ],
     phone: '+91 98765 43210',
-    email: 'connaught@flashspace.com',
+    email: 'connaught@flashspace.aim',
     description: 'Premium virtual office in the heart of Delhi\'s business district.',
     availability: 'Immediate',
     officeHours: '9 AM - 6 PM'
@@ -41,7 +41,7 @@ export const virtualOfficeLocations = [
       'Parking Available'
     ],
     phone: '+91 98765 43211',
-    email: 'noida@flashspace.com',
+    email: 'noida@flashspace.aim',
     description: 'Modern virtual office facility in Noida\'s tech hub.',
     availability: 'Immediate',
     officeHours: '9 AM - 7 PM'
@@ -65,7 +65,7 @@ export const virtualOfficeLocations = [
       'Cafeteria Access'
     ],
     phone: '+91 98765 43212',
-    email: 'gurgaon@flashspace.com',
+    email: 'gurgaon@flashspace.aim',
     description: 'Premium virtual office in Gurgaon\'s corporate hub.',
     availability: 'Immediate',
     officeHours: '8 AM - 8 PM'

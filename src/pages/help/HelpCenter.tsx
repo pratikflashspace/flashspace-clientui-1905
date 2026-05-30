@@ -670,9 +670,8 @@ const HelpCenter = () => {
                         <button
                           key={i}
                           onClick={() => setCategoryPage(i)}
-                          className={`w-2 h-2 rounded-full transition-colors ${
-                            i === categoryPage ? "bg-primary" : "bg-border"
-                          }`}
+                          className={`w-2 h-2 rounded-full transition-colors ${i === categoryPage ? "bg-primary" : "bg-border"
+                            }`}
                         />
                       ))}
                     </div>
@@ -770,9 +769,8 @@ const HelpCenter = () => {
                         <button
                           key={i}
                           onClick={() => setArticlePage(i)}
-                          className={`w-2 h-2 rounded-full transition-colors ${
-                            i === articlePage ? "bg-primary" : "bg-border"
-                          }`}
+                          className={`w-2 h-2 rounded-full transition-colors ${i === articlePage ? "bg-primary" : "bg-border"
+                            }`}
                         />
                       ))}
                     </div>
@@ -812,11 +810,10 @@ const HelpCenter = () => {
                     <button
                       key={group.label}
                       onClick={() => setActiveGroup(group.label)}
-                      className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
-                        activeGroup === group.label
+                      className={`px-4 py-2 text-sm rounded-lg border transition-colors ${activeGroup === group.label
                           ? "bg-primary text-primary-foreground border-primary"
                           : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground bg-background"
-                      }`}
+                        }`}
                     >
                       {group.label}
                     </button>
@@ -962,11 +959,10 @@ const HelpCenter = () => {
                           {q.answers.map((ans, ai) => (
                             <div key={ai} className="flex items-start gap-3">
                               <div
-                                className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[10px] font-semibold ${
-                                  ans.isOfficial
+                                className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[10px] font-semibold ${ans.isOfficial
                                     ? "bg-primary text-primary-foreground"
                                     : "bg-secondary text-foreground"
-                                }`}
+                                  }`}
                               >
                                 {ans.avatar}
                               </div>
@@ -1112,15 +1108,15 @@ const HelpCenter = () => {
                         Email Support
                       </h3>
                       <p className="text-xs text-muted-foreground mb-3">
-                        support@flashspace.com
+                        support@flashspace.aim
                       </p>
                       <Button
                         size="sm"
                         variant="outline"
                         className="w-full"
                         onClick={() =>
-                          (window.location.href =
-                            "mailto:support@flashspace.com")
+                        (window.location.href =
+                          "mailto:support@flashspace.aim")
                         }
                       >
                         Send Email

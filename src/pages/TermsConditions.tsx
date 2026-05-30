@@ -148,10 +148,10 @@ const TermsConditions = () => {
           <section className="mt-8 rounded-3xl bg-[#35503F] px-6 py-8 text-center text-white sm:px-10">
             <p className="text-sm font-medium text-white/70">Questions or Complaints?</p>
             <a
-              href="mailto:support@flashspace.co"
+              href="mailto:support@flashspace.ai"
               className="mt-2 inline-block text-lg font-bold text-[#EDB003] hover:underline"
             >
-              support@flashspace.co
+              support@flashspace.ai
             </a>
           </section>
         </div>

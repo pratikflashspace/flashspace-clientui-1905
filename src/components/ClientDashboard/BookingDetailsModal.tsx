@@ -1020,8 +1020,8 @@ export default function BookingDetailsModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-[24px] max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-2 md:p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-[20px] md:rounded-[24px] max-w-2xl w-full max-h-[92vh] md:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         
         {/* Header Section */}
         <div className="relative shrink-0">
@@ -1032,18 +1032,18 @@ export default function BookingDetailsModal({
               "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400"
             }
             alt={getWorkspaceDisplayName(booking)}
-            className="w-full h-40 object-cover"
+            className="w-full h-28 md:h-40 object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/40 transition-colors"
+            className="absolute top-3 md:top-4 right-3 md:right-4 w-7 h-7 md:w-8 md:h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/40 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
           
-          <div className="absolute bottom-4 left-6 right-6">
+          <div className="absolute bottom-3 md:bottom-4 left-4 md:left-6 right-4 md:right-6">
             <div className="flex items-end justify-between">
               <div>
                 <span
@@ -1057,10 +1057,10 @@ export default function BookingDetailsModal({
                     ? "Virtual Office"
                     : "Coworking"}
                 </span>
-                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-bold text-white drop-shadow-md">
+                <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-xl md:text-2xl font-bold text-white drop-shadow-md">
                   {getWorkspaceDisplayName(booking)}
                 </h2>
-                <p className="text-white/80 flex items-center gap-1.5 mt-1 text-sm font-medium">
+                <p className="text-white/80 flex items-center gap-1 mt-0.5 md:mt-1 text-xs md:text-sm font-medium">
                   <MapPin className="w-3.5 h-3.5" /> 
                   {booking.spaceSnapshot?.address}
                 </p>
@@ -1077,7 +1077,7 @@ export default function BookingDetailsModal({
         </div>
 
         {/* Stepper */}
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 shrink-0">
+        <div className="px-3 md:px-6 py-3 md:py-4 border-b border-gray-100 bg-gray-50/50 shrink-0">
           <input 
         type="file" 
         ref={fileInputRef} 
@@ -1098,13 +1098,13 @@ export default function BookingDetailsModal({
                     onClick={() => setStep(num)}
                     className={`flex flex-col items-center transition-all ${isActive ? 'opacity-100' : 'opacity-60 hover:opacity-100'}`}
                   >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mb-1.5 transition-all
-                      ${isActive ? 'bg-[#35503F] text-[#FEF8C3] ring-4 ring-[#35503F]/20' : 
+                    <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center font-bold text-xs md:text-sm mb-1 md:mb-1.5 transition-all
+                      ${isActive ? 'bg-[#35503F] text-[#FEF8C3] ring-2 md:ring-4 ring-[#35503F]/20' : 
                         isPast ? 'bg-[#35503F] text-white' : 'bg-gray-200 text-gray-500'}`}
                     >
-                      {isPast ? <Check className="w-4 h-4" /> : num}
+                      {isPast ? <Check className="w-3 h-3 md:w-4 md:h-4" /> : num}
                     </div>
-                    <span className="text-[10px] sm:text-xs font-bold text-gray-700 text-center">{label}</span>
+                    <span className="text-[9px] sm:text-[10px] md:text-xs font-bold text-gray-700 text-center leading-tight">{label}</span>
                   </button>
                   {num < 4 && (
                     <div className={`flex-1 h-1 rounded-full mx-1 sm:mx-4 ${isPast ? 'bg-[#35503F]' : 'bg-gray-200'}`} />
@@ -1116,7 +1116,7 @@ export default function BookingDetailsModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
+        <div className="p-4 md:p-6 overflow-y-auto flex-1 custom-scrollbar">
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
           {step === 3 && renderStep3()}

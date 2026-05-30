@@ -17,9 +17,9 @@ import {
 
 // --- Static Data for Future Backend Integration ---
 const PERFORMANCE_DATA = [
-  { name: "Main Referral Link", link: "flashspace.com/ref/AFF123", clicks: 245, conv: 34, rate: "14%" },
-  { name: "Virtual Office Campaign", link: "flashspace.com/ref/AFF123-vo", clicks: 89, conv: 18, rate: "20%" },
-  { name: "Team Space Promo", link: "flashspace.com/ref/AFF123-ts", clicks: 56, conv: 8, rate: "14%" },
+  { name: "Main Referral Link", link: "flashspace.aim/ref/AFF123", clicks: 245, conv: 34, rate: "14%" },
+  { name: "Virtual Office Campaign", link: "flashspace.aim/ref/AFF123-vo", clicks: 89, conv: 18, rate: "20%" },
+  { name: "Team Space Promo", link: "flashspace.aim/ref/AFF123-ts", clicks: 56, conv: 8, rate: "14%" },
 ];
 
 const ASSETS_DATA = [
@@ -31,15 +31,15 @@ const ASSETS_DATA = [
 ];
 
 const QR_CODES_DATA = [
-  { title: "Main Referral QR", link: "https://flashspace.com/ref/AFF123" },
-  { title: "Virtual Office QR", link: "https://flashspace.com/ref/AFF123-vo" },
-  { title: "Team Space QR", link: "https://flashspace.com/ref/AFF123-ts" },
-  { title: "Event Promo QR", link: "https://flashspace.com/ref/AFF123-event" },
+  { title: "Main Referral QR", link: "https://flashspace.aim/ref/AFF123" },
+  { title: "Virtual Office QR", link: "https://flashspace.aim/ref/AFF123-vo" },
+  { title: "Team Space QR", link: "https://flashspace.aim/ref/AFF123-ts" },
+  { title: "Event Promo QR", link: "https://flashspace.aim/ref/AFF123-event" },
 ];
 
 const MarketingTools = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const referralLink = "https://flashspace.com/ref/AFF123";
+  const referralLink = "https://flashspace.aim/ref/AFF123";
 
   /* Refactored Handlers */
   const handleCopy = (text: string, id: string) => {

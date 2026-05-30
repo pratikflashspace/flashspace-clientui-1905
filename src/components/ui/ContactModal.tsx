@@ -59,7 +59,7 @@ export default function ContactModal({ isOpen, onClose }: Props) {
               Need technical help or facing issues with our platform? Our support team is here 24×7.
             </p>
             <p className="text-[#1F2E26] text-sm">
-              <span className="font-bold">Support Mail:</span> <a href="mailto:support@flashspace.co" className="text-[#35503F] underline underline-offset-2">support@flashspace.co</a>
+              <span className="font-bold">Support Mail:</span> <a href="mailto:support@flashspace.ai" className="text-[#35503F] underline underline-offset-2">support@flashspace.ai</a>
             </p>
           </div>
 
@@ -70,7 +70,7 @@ export default function ContactModal({ isOpen, onClose }: Props) {
               Want to explore FlashSpace solutions? Our sales experts will help you find the right plan.
             </p>
             <p className="text-[#1F2E26] text-sm mb-1">
-              <span className="font-bold">Sales Mail:</span> <a href="mailto:sales@flashspace.co" className="text-[#35503F] underline underline-offset-2">sales@flashspace.co</a>
+              <span className="font-bold">Sales Mail:</span> <a href="mailto:sales@flashspace.ai" className="text-[#35503F] underline underline-offset-2">sales@flashspace.ai</a>
             </p>
             <p className="text-[#1F2E26] text-sm">
               <span className="font-bold">Contact:</span> <span className="text-[#1F2E26]">8100888777</span>
@@ -84,7 +84,7 @@ export default function ContactModal({ isOpen, onClose }: Props) {
               Interested in collaborating or becoming a partner? Let's build future-ready solutions.
             </p>
             <p className="text-[#1F2E26] text-sm">
-              <span className="font-bold">Partnership Mail:</span> <a href="mailto:partner@flashspace.co" className="text-[#35503F] underline underline-offset-2">partner@flashspace.co</a>
+              <span className="font-bold">Partnership Mail:</span> <a href="mailto:partner@flashspace.ai" className="text-[#35503F] underline underline-offset-2">partner@flashspace.ai</a>
             </p>
           </div>
 

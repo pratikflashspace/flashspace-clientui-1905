@@ -85,11 +85,11 @@ export default function Footer() {
           <p className="text-sm font-semibold text-slate-900">Support</p>
           <div className="mt-3 space-y-3 text-sm text-slate-600">
             <a
-              href="mailto:support@flashspace.co"
+              href="mailto:support@flashspace.ai"
               className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 hover:bg-slate-50"
             >
               <Mail size={16} />
-              support@flashspace.co
+              support@flashspace.ai
             </a>
             <a
               href="tel:+919999999999"

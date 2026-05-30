@@ -79,8 +79,8 @@ const contactOptions = [
     icon: Mail,
     title: "Email Support",
     description: "24/7 Support",
-    value: "support@flashspace.co",
-    action: "mailto:support@flashspace.co",
+    value: "support@flashspace.ai",
+    action: "mailto:support@flashspace.ai",
     color: "bg-blue-100 text-blue-600",
   },
   {
@@ -124,7 +124,7 @@ export default function Support() {
       if (response.success && response.data) {
         toast.success("Message sent! Redirecting to chat...");
         const ticketId = (response.data as any)._id || (response.data as any).id;
-        
+
         setTimeout(() => {
           setContactFormData(prev => ({ ...prev, subject: "", message: "" }));
           if (ticketId) {
@@ -172,7 +172,7 @@ export default function Support() {
   };
 
   return (
- <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 "> 
+    <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 ">
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
@@ -238,11 +238,10 @@ export default function Support() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
-                activeTab === tab.id
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab.id
                   ? "bg-white text-gray-900 shadow-sm ring-1 ring-black/5"
                   : "text-gray-500 hover:text-gray-700 hover:bg-gray-50/50"
-              }`}
+                }`}
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
@@ -295,12 +294,12 @@ export default function Support() {
             {contactSubmitted ? <div className="text-center py-12">Message Sent!</div> : (
               <form onSubmit={handleContactSubmit} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <input type="text" required value={contactFormData.name} onChange={(e) => setContactFormData({...contactFormData, name: e.target.value})} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Name" />
-                  <input type="email" required value={contactFormData.email} onChange={(e) => setContactFormData({...contactFormData, email: e.target.value})} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Email" />
+                  <input type="text" required value={contactFormData.name} onChange={(e) => setContactFormData({ ...contactFormData, name: e.target.value })} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Name" />
+                  <input type="email" required value={contactFormData.email} onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Email" />
                 </div>
-                <input type="tel" value={contactFormData.phone} onChange={(e) => setContactFormData({...contactFormData, phone: e.target.value})} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Phone" />
-                <input type="text" required value={contactFormData.subject} onChange={(e) => setContactFormData({...contactFormData, subject: e.target.value})} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Subject" />
-                <textarea required rows={5} value={contactFormData.message} onChange={(e) => setContactFormData({...contactFormData, message: e.target.value})} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Message" />
+                <input type="tel" value={contactFormData.phone} onChange={(e) => setContactFormData({ ...contactFormData, phone: e.target.value })} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Phone" />
+                <input type="text" required value={contactFormData.subject} onChange={(e) => setContactFormData({ ...contactFormData, subject: e.target.value })} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Subject" />
+                <textarea required rows={5} value={contactFormData.message} onChange={(e) => setContactFormData({ ...contactFormData, message: e.target.value })} className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-[#35503F]" placeholder="Message" />
                 <button type="submit" className="w-full py-3 bg-[#35503F] text-[#FEF8C3] rounded-xl font-semibold hover:bg-black transition-all">Send Message</button>
               </form>
             )}

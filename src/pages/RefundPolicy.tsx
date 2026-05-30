@@ -128,7 +128,7 @@ const RefundPolicy = () => {
               How to Request a Refund
             </h2>
             <div className="inline-block bg-yellow-50 border border-yellow-200 rounded-3xl p-8 sm:px-12">
-              <p className="text-gray-700 mb-4">Email <strong>support@flashspace.co</strong> with the subject:</p>
+              <p className="text-gray-700 mb-4">Email <strong>support@flashspace.ai</strong> with the subject:</p>
               <p className="text-xl font-bold text-[#35503F] mb-6">"Refund Request - [Your Business Name]"</p>
               <div className="text-sm text-gray-500 space-y-1">
                 <p>Include Booking ID, Payment Date, and Reason with Evidence.</p>

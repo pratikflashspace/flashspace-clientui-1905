@@ -84,7 +84,7 @@ const faqs: FaqItem[] = [
     },
     {
         question: "How do I raise a support request?",
-        answer: "You can raise a support ticket through the FlashSpace app, email us at support@flashspace.co, or call +91 8100888777. We're available 24/7.",
+        answer: "You can raise a support ticket through the FlashSpace app, email us at support@flashspace.ai, or call +91 8100888777. We're available 24/7.",
         category: "support",
     },
     {
@@ -171,16 +171,16 @@ export const FAQSection = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: -40 }}
                                 transition={{ duration: 0.25 }}
-                                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-xl sm:rounded-full border border-[#D4E0D0] overflow-hidden p-1 sm:p-0"
+                                className="flex flex-row items-center bg-white rounded-full border border-[#D4E0D0] overflow-hidden p-1 sm:p-0"
                             >
                                 <div className="relative flex-1">
-                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                    <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
                                     <input
                                         type="text"
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         placeholder="Search questions..."
-                                        className="w-full pl-11 pr-4 py-3 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                                        className="w-full pl-8 sm:pl-11 pr-2 sm:pr-4 py-2 sm:py-3 bg-transparent text-xs sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                                     />
                                 </div>
                                 <button
@@ -188,10 +188,10 @@ export const FAQSection = () => {
                                         setAiMode(true);
                                         setTimeout(() => aiInputRef.current?.focus(), 100);
                                     }}
-                                    className="flex items-center justify-center gap-2 border border-[#36503F] bg-[#36503F] text-[#FEF8C5] px-5 py-2.5 sm:py-2 rounded-full text-sm font-semibold sm:mr-1.5 hover:bg-[#1F2E26] transition-colors shrink-0 mt-1 sm:mt-0"
+                                    className="flex items-center justify-center gap-1.5 sm:gap-2 border border-[#36503F] bg-[#36503F] text-[#FEF8C5] px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold sm:mr-1.5 hover:bg-[#1F2E26] transition-colors shrink-0"
                                 >
-                                    <Sparkles className="w-4 h-4" />
-                                    Chat with AI
+                                    <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                    <span className="whitespace-nowrap">Chat with AI</span>
                                 </button>
                             </motion.div>
                         ) : (
@@ -201,9 +201,9 @@ export const FAQSection = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 exit={{ opacity: 0, x: 40 }}
                                 transition={{ duration: 0.25 }}
-                                className="flex flex-col sm:flex-row items-stretch sm:items-center bg-white rounded-xl sm:rounded-full border border-[#36503F] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] p-1 sm:p-0"
+                                className="flex flex-row items-center bg-white rounded-full border border-[#36503F] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] p-1 sm:p-0"
                             >
-                                <div className="flex items-center gap-2 px-4 border-b sm:border-b-0 sm:border-r border-border shrink-0 py-2 sm:py-3">
+                                <div className="hidden sm:flex items-center gap-2 px-4 border-r border-border shrink-0 py-3">
                                     <Sparkles className="w-4 h-4 text-primary" />
                                     <span className="text-sm font-medium text-primary">AI</span>
                                 </div>
@@ -222,12 +222,12 @@ export const FAQSection = () => {
                                         }
                                     }}
                                     placeholder="Ask AI anything..."
-                                    className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground px-4 py-3"
+                                    className="flex-1 bg-transparent text-xs sm:text-sm outline-none placeholder:text-muted-foreground px-3 sm:px-4 py-2 sm:py-3"
                                 />
-                                <div className="flex items-center gap-2 sm:mr-1.5">
+                                <div className="flex items-center gap-1 sm:gap-2 sm:mr-1.5">
                                     <button
                                         onClick={() => { setAiMode(false); setAiQuery(""); }}
-                                        className="flex-1 sm:flex-none rounded-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] text-sm px-3 py-2.5 transition-colors shrink-0"
+                                        className="rounded-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] text-xs sm:text-sm px-2.5 sm:px-3 py-1.5 sm:py-2.5 transition-colors shrink-0"
                                     >
                                         Cancel
                                     </button>
@@ -238,9 +238,9 @@ export const FAQSection = () => {
                                             }
                                         }}
                                         disabled={!aiQuery.trim()}
-                                            className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#36503F] text-[#FEF8C5] px-5 py-2 rounded-full text-sm font-medium hover:bg-[#1F2E26] transition-colors shrink-0 disabled:opacity-40"
+                                        className="flex items-center justify-center gap-1.5 sm:gap-2 bg-[#36503F] text-[#FEF8C5] px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium hover:bg-[#1F2E26] transition-colors shrink-0 disabled:opacity-40"
                                     >
-                                        <Search className="w-4 h-4" />
+                                        <Search className="w-3 h-3 sm:w-4 sm:h-4" />
                                         Ask
                                     </button>
                                 </div>
@@ -256,8 +256,8 @@ export const FAQSection = () => {
                             key={cat.value}
                             onClick={() => setActiveCategory(cat.value)}
                             className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${activeCategory === cat.value
-                                    ? "border-[#36503F] bg-[#36503F] text-[#FEF8C5]"
-                                    : "border-[#D4E0D0] bg-white text-[#36503F] hover:border-[#36503F] hover:bg-[#F0F4EE]"
+                                ? "border-[#36503F] bg-[#36503F] text-[#FEF8C5]"
+                                : "border-[#D4E0D0] bg-white text-[#36503F] hover:border-[#36503F] hover:bg-[#F0F4EE]"
                                 }`}
                         >
                             {cat.label}
