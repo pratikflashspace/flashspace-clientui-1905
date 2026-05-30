@@ -14,6 +14,9 @@ import { TrustedByFilmstrip } from "@/components/sections/TrustedByFilmstrip";
 import { motion } from "framer-motion";
 import { ReactNode, useEffect } from "react";
 
+import { MobileBrowseCities } from "@/components/sections/MobileBrowseCities";
+import { WeGotFeatured } from "@/components/sections/WeGotFeatured";
+
 const FadeInSection = ({
   children,
   delay = 0,
@@ -66,10 +69,10 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         <FadeInSection>
           <Stats />
         </FadeInSection>
-        <TrustedByFilmstrip />
         <FadeInSection>
           <PlanLocationsShowcase />
         </FadeInSection>
+        <MobileBrowseCities />
         <ScrollNavLayout />
         <FadeInSection>
           <ScaleSection />
@@ -77,12 +80,11 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         <FadeInSection>
           <MetricsOverview />
         </FadeInSection>
-        <FadeInSection>
-
-        </FadeInSection>
+        <TrustedByFilmstrip />
         <FadeInSection>
           <FounderTestimonial />
         </FadeInSection>
+        <WeGotFeatured />
         <FadeInSection>
           <FAQSection />
         </FadeInSection>

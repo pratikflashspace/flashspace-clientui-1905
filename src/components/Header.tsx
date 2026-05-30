@@ -256,9 +256,9 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
               className="group flex h-10 w-10 items-center justify-center lg:hidden transition-all active:scale-95 bg-transparent -ml-3"
             >
               <div className="flex flex-col items-start gap-[6px]">
-                <span className="h-[2.5px] w-[12px] rounded-full bg-[#36503F] transition-all duration-300 group-hover:w-[24px]" />
-                <span className="h-[2.5px] w-[18px] rounded-full bg-[#36503F] transition-all duration-300 group-hover:w-[24px]" />
                 <span className="h-[2.5px] w-[24px] rounded-full bg-[#36503F] transition-all duration-300" />
+                <span className="h-[2.5px] w-[18px] rounded-full bg-[#36503F] transition-all duration-300 group-hover:w-[24px]" />
+                <span className="h-[2.5px] w-[12px] rounded-full bg-[#36503F] transition-all duration-300 group-hover:w-[24px]" />
               </div>
             </button>
 

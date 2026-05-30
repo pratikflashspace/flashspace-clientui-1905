@@ -148,6 +148,12 @@ export const TrustedByFilmstrip = () => {
       className="relative py-8 overflow-hidden bg-[#FAFAF7]"
     >
 
+      {/* Section Heading */}
+      <div className="text-center mb-8 px-4 relative z-10">
+        <h2 className="text-[24px] md:text-[32px] font-extrabold tracking-[-0.03em] text-[#1A1A1A]">
+          Trusted by partners
+        </h2>
+      </div>
 
       {/* Logo scroll rows */}
       <div className="relative z-10 fs-container space-y-2 sm:space-y-3 overflow-hidden">
@@ -181,11 +187,6 @@ export const TrustedByFilmstrip = () => {
         </div>
 
         {/* Mobile Static Collage */}
-        <div className="md:hidden text-center mb-6 px-4">
-          <h2 className="inline-block text-[12px] font-bold text-[#228B22] uppercase tracking-[0.05em] border border-[#228B22] rounded-full px-5 py-2 bg-[#228B22]/5">
-            Trusted by top companies
-          </h2>
-        </div>
         <div className="md:hidden flex flex-wrap justify-center items-center gap-x-8 gap-y-8 px-4 py-2">
           {clientLogos.map((logo, index) => {
             // Individually tune mobile heights to perfectly balance wide vs square logos
