@@ -343,7 +343,7 @@ export default function Notifications() {
           <section className="space-y-8">
             <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
               <div className="space-y-1">
-                <h1 className="text-3xl font-extrabold tracking-tight text-[#35503F] md:text-4xl">
+                <h1 className="text-[30px] font-extrabold tracking-tight text-black" style={{ fontFamily: "'Inter', sans-serif" }}>
                   My <span className="italic text-primary">Notifications</span>
                 </h1>
                 <p className="text-sm font-medium text-gray-500 md:text-base">

@@ -182,7 +182,7 @@ const TrackProgress = () => {
       </div>
 
       <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto custom-scrollbar">
+        <div className="overflow-x-auto custom-scrollbar" data-lenis-prevent="true" onWheel={(e) => e.stopPropagation()}>
           <table className="w-full min-w-[950px]">
             <thead className="bg-muted/40 border-b border-border text-nowrap">
               <tr>

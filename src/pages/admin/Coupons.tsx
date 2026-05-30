@@ -200,7 +200,7 @@ export default function Coupons() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div className="space-y-1">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
+            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
               Coupons <span className="text-primary italic">& Vouchers</span>
             </h1>
             <p className="text-sm md:text-base text-muted-foreground font-medium">

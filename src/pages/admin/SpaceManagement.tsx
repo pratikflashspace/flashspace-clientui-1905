@@ -272,11 +272,11 @@ export default function SpaceManagement() {
       portalDescription="Complete platform management"
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="space-y-8 animate-in fade-in duration-500" style={{ fontFamily: "'Inter', sans-serif" }}>
         {/* Header Section */}
         <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            <h1 className="text-[30px] font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
               Space <span className="text-primary italic">Management</span>
             </h1>
             <p className="text-sm md:text-base text-muted-foreground font-medium">

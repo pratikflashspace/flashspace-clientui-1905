@@ -360,7 +360,7 @@ const BookingManagement = () => {
                                 </button>
                             </div>
                         ) : (
-                            <div className="overflow-x-auto">
+                            <div className="overflow-x-auto" data-lenis-prevent="true">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="border-b-[3px] border-[#f1f2ed] bg-[#f6f6f4]">

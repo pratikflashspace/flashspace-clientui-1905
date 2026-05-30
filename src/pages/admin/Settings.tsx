@@ -379,9 +379,9 @@ export default function AdminSettings() {
       portalDescription="Complete platform management"
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="space-y-8 animate-in fade-in duration-500 [&_*]:![font-family:'Inter',sans-serif]">
         <div className="space-y-2">
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+          <h1 className="text-[30px] font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
             Settings
           </h1>
           <p className="text-sm md:text-base text-muted-foreground font-medium max-w-2xl">

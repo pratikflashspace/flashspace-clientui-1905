@@ -42,7 +42,7 @@ export const DashboardLayout = ({
   }, [collapsed]);
 
   useEffect(() => {
-    const scrollContainer = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
+    const scrollContainer = scrollAreaRef.current;
     const savedScrollPos = sessionStorage.getItem("admin-sidebar-scroll");
     if (savedScrollPos && scrollContainer) {
       scrollContainer.scrollTop = parseInt(savedScrollPos, 10);
@@ -74,7 +74,7 @@ export const DashboardLayout = ({
   );
 
   return (
-    <div className="flex h-screen bg-[#FAFAF7] overflow-hidden font-sans" data-lenis-prevent>
+    <div className="flex h-screen bg-[#FAFAF7] overflow-hidden" style={{ fontFamily: "'Inter', sans-serif" }} data-lenis-prevent>
       {/* Mobile Overlay */}
       {mobileMenuOpen && (
         <div
@@ -141,6 +141,7 @@ export const DashboardLayout = ({
                       "text-[14px] font-semibold whitespace-nowrap transition-all duration-200",
                       collapsed ? "w-0 opacity-0 overflow-hidden absolute" : "w-auto opacity-100 static"
                     )}
+                    style={{ fontFamily: "'Inter', sans-serif" }}
                   >
                     {item.label}
                   </span>
@@ -158,6 +159,7 @@ export const DashboardLayout = ({
                             ? "bg-[#334d3d]/10 text-[#1a2d1d] font-bold"
                             : "text-[#677e73] hover:bg-gray-50 hover:text-[#1a2d1d] font-medium"
                         )}
+                        style={{ fontFamily: "'Inter', sans-serif" }}
                       >
                         {child.label}
                       </Link>
@@ -183,7 +185,7 @@ export const DashboardLayout = ({
             ) : (
               <>
                 <ChevronLeft size={20} />
-                <span className="text-[15px] font-bold">Collapse</span>
+                <span className="text-[15px] font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>Collapse</span>
               </>
             )}
           </button>
@@ -196,7 +198,7 @@ export const DashboardLayout = ({
           >
             <Home size={20} />
             {!collapsed && (
-              <span className="whitespace-nowrap">Back to Home</span>
+              <span className="whitespace-nowrap" style={{ fontFamily: "'Inter', sans-serif" }}>Back to Home</span>
             )}
           </button>
         </div>
@@ -218,7 +220,7 @@ export const DashboardLayout = ({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 min-h-0 overflow-y-auto relative custom-scrollbar p-4 md:p-6 lg:p-8" data-lenis-prevent>
+        <main className="flex-1 min-h-0 overflow-y-auto relative custom-scrollbar p-4 md:p-6 lg:p-8 [&_*]:![font-family:'Inter',sans-serif]" data-lenis-prevent>
           {children}
         </main>
       </div>

@@ -54,10 +54,10 @@ export const Stats = () => {
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
 
   return (
-    <section ref={sectionRef} className="bg-[#F0F4EE] py-4 md:py-8">
+    <section ref={sectionRef} className="bg-[#F0F4EE] py-6 md:py-8">
       <div className="fs-container flex justify-between items-start md:grid md:grid-cols-4 md:divide-x md:divide-[#D4E0D0] px-2 md:px-8">
         {stats.map((stat, index) => (
-          <div key={stat.label} className="px-1 md:px-4 py-2 md:py-2 text-center flex-1">
+          <div key={stat.label} className="px-1 md:px-4 py-3 md:py-2 text-center flex-1">
             <div
               className="text-[16px] sm:text-[18px] font-bold leading-none text-[#36503F] md:text-[40px]"
               style={{

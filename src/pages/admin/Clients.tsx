@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { AdminPageSkeleton } from "@/components/ui/skeleton-loaders";
 import { toast } from "@/hooks/use-toast";
 import { getUploadedFileUrl } from "@/utils/fileUrl";
-import { Eye, Loader2, RotateCcw, Search } from "lucide-react";
+import { Eye, Loader2, RotateCcw, Search, Users } from "lucide-react";
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat("en-IN", {
@@ -130,9 +130,14 @@ const ClientManagement = () => {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-1 mb-8">
-        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
-          <p className="text-2xl font-extrabold text-foreground">{allStats.total}</p>
-          <p className="text-sm text-muted-foreground">Total Clients</p>
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Total Clients</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Users className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{allStats.total}</h3>
         </div>
       </div>
 

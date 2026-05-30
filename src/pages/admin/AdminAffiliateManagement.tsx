@@ -103,15 +103,15 @@ const StatCard = ({
   isActive?: boolean;
   sub?: string;
 }) => (
-  <div className={`rounded-2xl border p-5 shadow-sm flex items-start gap-4 transition-all duration-300 ${isActive ? 'bg-primary/5 border-primary/20 scale-[1.02]' : 'bg-background border-border hover:border-primary/20'}`}>
-    <div className={`p-3 rounded-xl ${isActive ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'bg-muted text-muted-foreground'}`}>
-      <Icon className="w-5 h-5" />
+  <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+    <div className="flex items-center justify-between mb-4">
+      <span className="text-sm font-medium text-muted-foreground">{label}</span>
+      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+        <Icon className="w-4 h-4" />
+      </div>
     </div>
-    <div>
-      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{label}</p>
-      <p className={`text-xl font-black mt-0.5 ${isActive ? 'text-primary' : 'text-foreground'}`}>{value}</p>
-      {sub && <p className="text-[10px] text-muted-foreground/60 mt-1 font-bold italic">{sub}</p>}
-    </div>
+    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-[24px] font-extrabold tracking-tight ${isActive ? 'text-primary' : 'text-foreground'}`}>{value}</h3>
+    {sub && <p className="text-[10px] text-muted-foreground/60 mt-1 font-bold italic">{sub}</p>}
   </div>
 );
 

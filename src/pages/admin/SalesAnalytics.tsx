@@ -318,18 +318,14 @@ export default function BookingManagement() {
           { label: "Pending Review", value: metrics.pending, icon: Clock },
           { label: "Booking Revenue", value: formatCurrency(metrics.revenue), icon: Building2 },
         ].map((item) => (
-          <div key={item.label} className="rounded-xl border border-border bg-background p-5 shadow-sm">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  {item.label}
-                </p>
-                <p className="mt-3 text-2xl font-bold text-foreground">{item.value}</p>
-              </div>
-              <div className="rounded-lg bg-primary/10 p-2.5 text-primary">
-                <item.icon className="h-5 w-5" />
+          <div key={item.label} className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <item.icon className="w-4 h-4 text-primary" />
               </div>
             </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{item.value}</h3>
           </div>
         ))}
       </div>
@@ -435,7 +431,7 @@ export default function BookingManagement() {
           </div>
         </div>
 
-        <div className="overflow-x-auto custom-scrollbar">
+        <div className="overflow-x-auto custom-scrollbar" data-lenis-prevent="true" onWheel={(e) => e.stopPropagation()}>
           <table className="w-full min-w-[1100px] border-collapse">
             <thead className="bg-muted/40 border-b border-border text-nowrap">
               <tr>

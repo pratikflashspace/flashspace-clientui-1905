@@ -47,15 +47,15 @@ export const HeroWithSearch = () => {
   return (
     <section className="relative bg-[#FAFAF7] md:bg-white overflow-hidden lg:mt-8">
       
-      {/* Mobile Background Image */}
+      {/* Mobile Background Gradient */}
       <div 
         className="absolute inset-0 z-0 lg:hidden" 
-        style={{ backgroundImage: `url(${heroImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-      >
-        <div className="absolute inset-0 bg-[#1F2E26]/75"></div> {/* Dark overlay for readability */}
-      </div>
+        style={{ 
+          background: `linear-gradient(135deg, #36503F 0%, #486652 35%, #6F866F 60%, #FEF6C5 100%)`
+        }}
+      ></div>
 
-      <div className="fs-container relative z-10 grid items-center gap-8 md:gap-12 pb-12 pt-[100px] lg:grid-cols-[0.92fr_1.08fr] lg:pb-12 lg:pt-16 min-h-[500px] lg:min-h-0">
+      <div className="fs-container relative z-10 grid items-center gap-8 md:gap-12 pb-12 pt-[100px] lg:grid-cols-[0.92fr_1.08fr] lg:pb-12 lg:pt-16 min-h-[550px] lg:min-h-0">
         
         {/* Text Content */}
         <div className="mx-auto max-w-[800px] lg:max-w-[680px] w-full text-center lg:mx-0 lg:text-left">
@@ -68,7 +68,7 @@ export const HeroWithSearch = () => {
           </p>
 
           {/* Mobile Search Container (Hidden on Desktop) */}
-          <div className="lg:hidden mt-8 md:mt-10 rounded-xl border border-[#D4E0D0] bg-white/95 backdrop-blur-md p-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.15)] max-w-3xl mx-auto text-left relative z-20">
+          <div className="lg:hidden mt-12 md:mt-10 rounded-xl border border-[#D4E0D0] bg-white/95 backdrop-blur-md p-2.5 shadow-[0_8px_32px_rgba(0,0,0,0.15)] max-w-3xl mx-auto text-left relative z-20">
             {/* Tabs */}
             <div className="flex p-1 bg-[#F0F4EE] rounded-lg mb-3">
               <button

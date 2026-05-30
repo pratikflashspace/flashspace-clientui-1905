@@ -685,32 +685,34 @@ const Invoices = () => {
         <TabsContent value="received" className="outline-none space-y-6">
           {/* Stats */}
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-            <div className="bg-background border border-border rounded-2xl p-6 hover:border-primary/20 transition-all shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-primary/10 text-primary"><Clock className="w-6 h-6" /></div>
-                <div>
-                  <p className="text-2xl font-black text-foreground">{loading ? "—" : pendingCount}</p>
-                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Pending (This Page)</p>
+            <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-muted-foreground">Pending (This Page)</span>
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-primary" />
                 </div>
               </div>
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{loading ? "—" : pendingCount}</h3>
             </div>
-            <div className="bg-background border border-border rounded-2xl p-6 hover:border-emerald-200 transition-all shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-emerald-100 text-emerald-600"><CheckCircle2 className="w-6 h-6" /></div>
-                <div>
-                  <p className="text-2xl font-black text-emerald-600">{loading ? "—" : formatCurrency(totalRevenue)}</p>
-                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Cleared (This Page)</p>
+
+            <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-muted-foreground">Cleared (This Page)</span>
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 </div>
               </div>
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-emerald-600 tracking-tight">{loading ? "—" : formatCurrency(totalRevenue)}</h3>
             </div>
-            <div className="bg-background border border-border rounded-2xl p-6 hover:border-primary/20 transition-all shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-muted text-foreground"><FileText className="w-6 h-6" /></div>
-                <div>
-                  <p className="text-2xl font-black text-foreground">{loading ? "—" : total}</p>
-                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Total Records</p>
+
+            <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-medium text-muted-foreground">Total Records</span>
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-foreground" />
                 </div>
               </div>
+              <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{loading ? "—" : total}</h3>
             </div>
           </div>
 
