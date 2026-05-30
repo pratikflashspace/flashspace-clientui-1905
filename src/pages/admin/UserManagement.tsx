@@ -288,11 +288,11 @@ export default function UserManagement() {
       portalDescription="Complete platform management"
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="space-y-8 animate-in fade-in duration-500" style={{ fontFamily: "'Inter', sans-serif" }}>
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
+            <h1 className="text-[30px] font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
               User <span className="text-primary italic">Management</span>
             </h1>
             <p className="text-muted-foreground mt-2">
@@ -334,49 +334,37 @@ export default function UserManagement() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  {viewMode === "active" ? "Total Users" : "Deleted Users"}
-                </p>
-                <h3 className="text-3xl font-bold text-foreground mt-1">
-                  {displayTotal}
-                </h3>
-              </div>
-              <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                <Users className="w-6 h-6" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">
+                {viewMode === "active" ? "Total Users" : "Deleted Users"}
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                <Users className="w-4 h-4 text-blue-600" />
               </div>
             </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{displayTotal}</h3>
           </div>
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Verified</p>
-                <h3 className="text-3xl font-bold text-foreground mt-1">
-                  {verifiedUsersCount}
-                </h3>
-              </div>
-              <div className="p-3 bg-green-50 text-green-600 rounded-xl">
-                <UserCheck className="w-6 h-6" />
+
+          <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">Verified</span>
+              <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                <UserCheck className="w-4 h-4 text-green-600" />
               </div>
             </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{verifiedUsersCount}</h3>
           </div>
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  New This Month
-                </p>
-                <h3 className="text-3xl font-bold text-foreground mt-1">
-                  {newUsersCount}
-                </h3>
-              </div>
-              <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
-                <UserPlus className="w-6 h-6" />
+
+          <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">New This Month</span>
+              <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                <UserPlus className="w-4 h-4 text-purple-600" />
               </div>
             </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{newUsersCount}</h3>
           </div>
         </div>
 
@@ -464,7 +452,7 @@ export default function UserManagement() {
                                   {user.profilePicture && (
                                     <AvatarImage src={getUploadedFileUrl(user.profilePicture)} alt={user.fullName} className="object-cover" />
                                   )}
-                                  <AvatarFallback className={`bg-gradient-to-br ${getRandomGradient(user.fullName)} text-white font-black text-xs`}>
+                                  <AvatarFallback className="bg-[#334d3d] text-[#FEF8C3] font-black text-xs">
                                     {getInitials(user.fullName)}
                                   </AvatarFallback>
                                 </Avatar>
@@ -567,7 +555,7 @@ export default function UserManagement() {
                               {user.profilePicture && (
                                 <AvatarImage src={getUploadedFileUrl(user.profilePicture)} alt={user.fullName} className="object-cover" />
                               )}
-                              <AvatarFallback className={`bg-gradient-to-br ${getRandomGradient(user.fullName)} text-white font-black text-xs`}>
+                              <AvatarFallback className="bg-[#334d3d] text-[#FEF8C3] font-black text-xs">
                                 {getInitials(user.fullName)}
                               </AvatarFallback>
                             </Avatar>

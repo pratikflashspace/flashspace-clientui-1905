@@ -618,29 +618,44 @@ export default function TicketSystem() {
 
       {/* Stats */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
-          <p className="text-2xl font-extrabold text-foreground">
-            {stats.open}
-          </p>
-          <p className="text-sm text-muted-foreground">Open Tickets</p>
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Open Tickets</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <AlertCircle className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{stats.open}</h3>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-blue-200 transition-colors">
-          <p className="text-2xl font-extrabold text-blue-600">
-            {stats.in_progress}
-          </p>
-          <p className="text-sm text-muted-foreground">In Progress</p>
+
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">In Progress</span>
+            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-blue-600" />
+            </div>
+          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-blue-600 tracking-tight">{stats.in_progress}</h3>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-green-200 transition-colors">
-          <p className="text-2xl font-extrabold text-green-600">
-            {stats.resolvedThisMonth}
-          </p>
-          <p className="text-sm text-muted-foreground">Resolved (MTD)</p>
+
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Resolved (MTD)</span>
+            <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
+              <CheckCircle className="w-4 h-4 text-green-600" />
+            </div>
+          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-green-600 tracking-tight">{stats.resolvedThisMonth}</h3>
         </div>
-        <div className="bg-background border border-border rounded-xl p-5 hover:border-primary/20 transition-colors">
-          <p className="text-2xl font-extrabold text-foreground">
-            {stats.totalTickets}
-          </p>
-          <p className="text-sm text-muted-foreground">Total Tickets</p>
+
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Total Tickets</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Search className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{stats.totalTickets}</h3>
         </div>
       </div>
 

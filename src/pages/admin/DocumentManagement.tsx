@@ -189,11 +189,11 @@ const DocumentManagement = () => {
   );
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-20" style={{ fontFamily: "'Inter', sans-serif" }}>
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-          Document Management
+        <h1 className="text-[30px] font-extrabold text-black tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          Document <span className="text-[#35503F] italic">Management</span>
         </h1>
         <p className="text-gray-500 font-medium mt-1">
           Review and oversight all uploaded documents grouped by user.

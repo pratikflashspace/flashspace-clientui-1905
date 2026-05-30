@@ -266,46 +266,44 @@ const LeadManagement = () => {
 
       {/* Stats */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4 mb-8">
-        <div className="bg-background border border-border rounded-2xl p-5 shadow-sm flex items-center justify-between group hover:border-primary/35 transition-all">
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-muted-foreground">Total Leads</p>
-            <p className="text-3xl font-extrabold text-foreground tracking-tight">{stats.total}</p>
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Total Leads</span>
+            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+              <Users className="w-4 h-4 text-indigo-600" />
+            </div>
           </div>
-          <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100/50">
-            <Users className="w-6 h-6" />
-          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{stats.total}</h3>
         </div>
 
-        <div className="bg-background border border-border rounded-2xl p-5 shadow-sm flex items-center justify-between group hover:border-primary/35 transition-all">
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-muted-foreground">Converted (Paid)</p>
-            <p className="text-3xl font-extrabold text-foreground tracking-tight">{stats.paid}</p>
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Converted (Paid)</span>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            </div>
           </div>
-          <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100/50">
-            <CheckCircle2 className="w-6 h-6" />
-          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{stats.paid}</h3>
         </div>
 
-        <div className="bg-background border border-border rounded-2xl p-5 shadow-sm flex items-center justify-between group hover:border-primary/35 transition-all">
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-muted-foreground">Pending Leads</p>
-            <p className="text-3xl font-extrabold text-foreground tracking-tight">{stats.pending}</p>
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Pending Leads</span>
+            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center">
+              <Clock className="w-4 h-4 text-amber-600" />
+            </div>
           </div>
-          <div className="h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 border border-amber-100/50">
-            <Clock className="w-6 h-6" />
-          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{stats.pending}</h3>
         </div>
 
-        <div className="bg-background border border-border rounded-2xl p-5 shadow-sm flex items-center justify-between group hover:border-primary/35 transition-all">
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-muted-foreground">Conversion Rate</p>
-            <p className="text-3xl font-extrabold text-foreground tracking-tight">
-              {stats.conversionRate}%
-            </p>
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Conversion Rate</span>
+            <div className="w-8 h-8 rounded-lg bg-violet-50 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-violet-600" />
+            </div>
           </div>
-          <div className="h-12 w-12 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600 border border-violet-100/50">
-            <TrendingUp className="w-6 h-6" />
-          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{stats.conversionRate}%</h3>
         </div>
       </div>
 

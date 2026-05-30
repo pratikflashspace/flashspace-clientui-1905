@@ -616,11 +616,11 @@ export default function KYCRequests() {
       portalDescription="Complete platform management"
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="space-y-8 animate-in fade-in duration-500">
+      <div className="space-y-8 animate-in fade-in duration-500" style={{ fontFamily: "'Inter', sans-serif" }}>
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="text-center md:text-left">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
+            <h1 className="text-[30px] font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
               {viewMode === "user_partners" ? (
                 <>
                   Partners{" "}
@@ -674,38 +674,45 @@ export default function KYCRequests() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-border flex flex-col justify-center">
-            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-yellow-600">
-              {stats.pending}
-            </h3>
-            <p className="text-muted-foreground font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
-              Pending
-            </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">Pending</span>
+              <div className="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-yellow-600" />
+              </div>
+            </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-yellow-600 tracking-tight">{stats.pending}</h3>
           </div>
-          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-border flex flex-col justify-center">
-            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-green-600">
-              {stats.approved}
-            </h3>
-            <p className="text-muted-foreground font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
-              Approved
-            </p>
+
+          <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">Approved</span>
+              <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-green-600" />
+              </div>
+            </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-green-600 tracking-tight">{stats.approved}</h3>
           </div>
-          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-border flex flex-col justify-center">
-            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-red-600">
-              {stats.rejected}
-            </h3>
-            <p className="text-muted-foreground font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
-              Rejected
-            </p>
+
+          <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">Rejected</span>
+              <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
+                <XCircle className="w-4 h-4 text-red-600" />
+              </div>
+            </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-red-600 tracking-tight">{stats.rejected}</h3>
           </div>
-          <div className="bg-white rounded-[24px] p-4 md:p-6 shadow-sm border border-border flex flex-col justify-center">
-            <h3 className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground">
-              {stats.total}
-            </h3>
-            <p className="text-muted-foreground font-medium mt-1 text-[10px] md:text-sm uppercase tracking-wider">
-              Total
-            </p>
+
+          <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">Total</span>
+              <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                <FileText className="w-4 h-4 text-foreground" />
+              </div>
+            </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{stats.total}</h3>
           </div>
         </div>
 

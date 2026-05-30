@@ -155,7 +155,7 @@ const TrackProgress = () => {
       </div>
 
       <div className="bg-white border border-[#DDE5DA] rounded-2xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto custom-scrollbar">
+        <div className="overflow-x-auto custom-scrollbar" data-lenis-prevent="true">
           <table className="w-full min-w-[1000px] border-collapse text-left text-base">
             <thead className="bg-[#F8FAF7]">
               <tr className="border-b border-[#DDE5DA] text-[#1F2E26]">
