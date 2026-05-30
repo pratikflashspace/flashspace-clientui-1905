@@ -308,7 +308,7 @@ const WorkspaceCard = ({
 
   if (type === "business-setup") {
     return (
-      <div className="group bg-[#F8FAF9] rounded-[24px] overflow-hidden border border-[#E9EFEA] hover:-translate-y-1.5 transition-all duration-200 ease-out shadow-sm hover:shadow-md aspect-square flex flex-col p-6 cursor-default">
+      <div className="group bg-[#F8FAF9] rounded-[24px] overflow-hidden border border-[#E9EFEA] hover:-translate-y-1.5 transition-all duration-200 ease-out shadow-sm hover:shadow-md sm:aspect-square flex flex-col p-6 cursor-default h-full">
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
           <div className="pr-2">
