@@ -156,14 +156,14 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
       inactivityTimer = setTimeout(showInactivityModal, 60000); // 60 seconds of inactivity
     };
 
-    const activityEvents = ["mousedown", "keydown", "touchstart"];
+    const activityEvents = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
 
     // Initial timer start
     resetInactivityTimer();
 
     // Set up listeners for activity
     activityEvents.forEach(event => {
-      window.addEventListener(event, resetInactivityTimer, { passive: true });
+      window.addEventListener(event, resetInactivityTimer);
     });
 
     return () => {

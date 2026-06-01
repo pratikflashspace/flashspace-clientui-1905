@@ -22,9 +22,6 @@ export const FloatingAiButton = () => {
       if (window.innerWidth <= 768) {
         const widget = document.querySelector("chat-widget") as HTMLElement;
         if (widget) {
-          // Disconnect to prevent infinite loop when we modify styles!
-          if (observer) observer.disconnect();
-
           const pastHero = window.scrollY > window.innerHeight * 0.7;
           const targetBottom = pastHero ? "90px" : "20px";
 
@@ -56,9 +53,6 @@ export const FloatingAiButton = () => {
               }
             `;
           }
-
-          // Reconnect observer
-          if (observer) observer.observe(widget, { attributes: true, attributeFilter: ["style"] });
         }
       }
     };
