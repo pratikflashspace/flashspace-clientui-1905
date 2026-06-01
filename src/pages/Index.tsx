@@ -69,7 +69,7 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
       <Header openLogin={openLogin} openSignup={openSignup} />
       <main className="flex-1 w-full relative">
         <HeroWithSearch />
-        <FadeInSection>
+        {/* <FadeInSection>
           <Stats />
         </FadeInSection>
         <div className="hidden lg:block">
@@ -98,7 +98,7 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         </FadeInSection>
         <FadeInSection>
           <CTA />
-        </FadeInSection>
+        </FadeInSection> */}
 
 
 
