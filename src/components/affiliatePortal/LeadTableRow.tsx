@@ -17,16 +17,7 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import LeadDetailsModal from "./LeadDetailsModal";
-
-export interface Lead {
-    id: string;
-    name: string;
-    phone: string;
-    company: string;
-    interest: string;
-    status: "Hot" | "Warm" | "Cold" | "Converted";
-    lastContact: string;
-}
+import { Lead } from "./LeadTypes";
 
 const StatusBadge = ({ status }: { status: Lead['status'] }) => {
     const styles = {
