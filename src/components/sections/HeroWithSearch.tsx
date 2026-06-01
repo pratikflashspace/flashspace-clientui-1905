@@ -73,19 +73,19 @@ export const HeroWithSearch = () => {
             <div className="flex p-1 bg-[#F0F4EE] rounded-lg mb-3">
               <button
                 onClick={() => setActiveTab("virtual-office")}
-                className={`flex-1 py-1.5 px-1 md:py-2 md:px-3 text-[11px] sm:text-xs md:text-sm font-semibold rounded-md transition-all ${activeTab === "virtual-office" ? "bg-[#36503F] text-white shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
+                className={`flex-1 py-1.5 px-1 md:py-2 md:px-3 text-[11px] sm:text-xs md:text-sm font-semibold rounded-md transition-all ${activeTab === "virtual-office" ? "bg-[#36503F] text-[#FEF8C5] shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
               >
                 Virtual Office
               </button>
               <button
                 onClick={() => setActiveTab("coworking-space")}
-                className={`flex-1 py-1.5 px-1 md:py-2 md:px-3 text-[11px] sm:text-xs md:text-sm font-semibold rounded-md transition-all ${activeTab === "coworking-space" ? "bg-[#36503F] text-white shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
+                className={`flex-1 py-1.5 px-1 md:py-2 md:px-3 text-[11px] sm:text-xs md:text-sm font-semibold rounded-md transition-all ${activeTab === "coworking-space" ? "bg-[#36503F] text-[#FEF8C5] shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
               >
                 Coworking Space
               </button>
               <button
                 onClick={() => setActiveTab("business-setup")}
-                className={`flex-1 py-1.5 px-1 md:py-2 md:px-3 text-[11px] sm:text-xs md:text-sm font-semibold rounded-md transition-all ${activeTab === "business-setup" ? "bg-[#36503F] text-white shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
+                className={`flex-1 py-1.5 px-1 md:py-2 md:px-3 text-[11px] sm:text-xs md:text-sm font-semibold rounded-md transition-all ${activeTab === "business-setup" ? "bg-[#36503F] text-[#FEF8C5] shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
               >
                 Business Setup
               </button>
@@ -162,19 +162,19 @@ export const HeroWithSearch = () => {
             <div className="flex p-1 bg-[#F0F4EE] rounded-lg mb-2">
               <button
                 onClick={() => setActiveTab("virtual-office")}
-                className={`flex-1 py-2 px-3 text-sm font-semibold rounded-md transition-colors ${activeTab === "virtual-office" ? "bg-[#36503F] text-white shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
+                className={`flex-1 py-2 px-3 text-sm font-semibold rounded-md transition-colors ${activeTab === "virtual-office" ? "bg-[#36503F] text-[#FEF8C5] shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
               >
                 Virtual Office
               </button>
               <button
                 onClick={() => setActiveTab("coworking-space")}
-                className={`flex-1 py-2 px-3 text-sm font-semibold rounded-md transition-colors ${activeTab === "coworking-space" ? "bg-[#36503F] text-white shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
+                className={`flex-1 py-2 px-3 text-sm font-semibold rounded-md transition-colors ${activeTab === "coworking-space" ? "bg-[#36503F] text-[#FEF8C5] shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
               >
                 Coworking Space
               </button>
               <button
                 onClick={() => setActiveTab("business-setup")}
-                className={`flex-1 py-2 px-3 text-sm font-semibold rounded-md transition-colors ${activeTab === "business-setup" ? "bg-[#36503F] text-white shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
+                className={`flex-1 py-2 px-3 text-sm font-semibold rounded-md transition-colors ${activeTab === "business-setup" ? "bg-[#36503F] text-[#FEF8C5] shadow-sm" : "text-[#6B8F78] hover:text-[#1A1A1A]"}`}
               >
                 Business Setup
               </button>

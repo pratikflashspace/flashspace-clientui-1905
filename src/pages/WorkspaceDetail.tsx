@@ -274,7 +274,7 @@ const getPhotos = () => {
 
 
         <button
-          onClick={() => window.dispatchEvent(new CustomEvent('open-contact-modal'))}
+          onClick={() => window.location.href = "tel:+919888687898"}
           className="w-full mt-3 py-3 rounded-[10px] border border-[#36503F] bg-[#36503F] text-[#FEF8C5] text-sm font-semibold flex items-center justify-center gap-2 hover:bg-[#1F2E26] active:bg-[#17211B] transition-colors"
         >
           <Phone className="w-4 h-4" /> Contact Sales

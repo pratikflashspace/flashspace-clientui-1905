@@ -364,7 +364,7 @@ const WorkspaceCard = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                window.location.href = "tel:+919888687898";
               }}
               className="flex-1 flex items-center justify-center gap-2 border border-[#36503F] bg-transparent text-[#36503F] text-[14px] font-semibold py-3 px-2 rounded-[12px] hover:bg-[#36503F]/5 transition-colors"
             >
@@ -501,7 +501,7 @@ const WorkspaceCard = ({
                 if (type === "business-setup") {
                   onBusinessSetupBuy?.(ws);
                 } else {
-                  window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                  window.location.href = "tel:+919888687898";
                 }
               }}
               className={`py-2 px-4 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center justify-center gap-1 whitespace-nowrap ${type === "business-setup" ? "flex-1" : "flex-1"}`}
@@ -513,7 +513,7 @@ const WorkspaceCard = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                  window.location.href = "tel:+919888687898";
                 }}
                 className="py-2 px-4 text-xs font-semibold rounded-lg border border-[#36503F] bg-white text-[#36503F] hover:bg-[#36503F]/10 transition-all duration-200 flex flex-1 items-center justify-center gap-1 whitespace-nowrap"
               >
@@ -675,7 +675,7 @@ const WorkspaceCard = ({
               if (type === "business-setup") {
                 onBusinessSetupBuy?.(ws);
               } else {
-                window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                window.location.href = "tel:+919888687898";
               }
             }}
             className={`py-2.5 px-3 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center justify-center gap-1.5 ${type === "business-setup" ? "flex-1" : "flex-1"}`}
@@ -687,7 +687,7 @@ const WorkspaceCard = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                window.location.href = "tel:+919888687898";
               }}
               className="flex-1 py-2.5 px-3 text-xs font-semibold rounded-lg border border-[#36503F] bg-white text-[#36503F] hover:bg-[#36503F]/10 transition-all duration-200 flex items-center justify-center gap-1.5"
             >

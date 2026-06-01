@@ -237,6 +237,11 @@
   li {
     line-height: 1.7;
   }
+
+  ::selection {
+    background-color: var(--flash-yellow);
+    color: var(--flash-forest);
+  }
 }
 
 @layer components {

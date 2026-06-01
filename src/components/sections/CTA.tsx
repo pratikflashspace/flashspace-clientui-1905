@@ -55,7 +55,7 @@ export const CTA = () => {
               <button onClick={() => setIsContactOpen(true)} className="fs-primary-btn">
                 Get started <ArrowRight className="h-4 w-4" />
               </button>
-              <button onClick={() => setIsContactOpen(true)} className="fs-secondary-btn">
+              <button onClick={() => window.location.href = "tel:+919888687898"} className="fs-secondary-btn">
                 Talk to sales
               </button>
             </div>
