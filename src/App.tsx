@@ -194,7 +194,7 @@ const App = () => (
             <NotificationProvider>
                 <ChatProvider>
                   <ScrollToTop />
-                  <FloatingAiButton />
+                  {/* <FloatingAiButton /> */}
                   {/* <MouseFollower/> */}
                   <Suspense fallback={<LoadingScreen />}>
                     <ErrorBoundary>
