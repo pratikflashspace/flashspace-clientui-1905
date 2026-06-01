@@ -7,7 +7,7 @@ import { DarkModeProvider } from "./contexts/DarkModeContext.tsx";
 import { initLenis } from "@/lib/lenis";
 
 // Initialize Lenis smooth scroll
-initLenis();
+// initLenis();
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 

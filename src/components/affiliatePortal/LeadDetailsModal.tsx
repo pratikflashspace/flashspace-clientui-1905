@@ -17,7 +17,7 @@ import {
     MessageSquare,
     Globe
 } from "lucide-react";
-import type { Lead } from "./LeadTableRow";
+import { Lead } from "./LeadTypes";
 
 interface LeadDetailsModalProps {
     lead: Lead | null;
