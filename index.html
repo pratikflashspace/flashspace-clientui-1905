@@ -4,8 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <script>
-    window.onerror = function(message, source, lineno, colno, error) {
+    const showError = function(message, source, lineno, colno, error, type) {
+      if (document.getElementById('ios-crash-report')) return; // Show only first error
       var errorDiv = document.createElement('div');
+      errorDiv.id = 'ios-crash-report';
       errorDiv.style.position = 'fixed';
       errorDiv.style.top = '0';
       errorDiv.style.left = '0';
@@ -16,12 +18,26 @@
       errorDiv.style.zIndex = '999999';
       errorDiv.style.padding = '20px';
       errorDiv.style.overflow = 'auto';
-      errorDiv.innerHTML = '<h2>iOS Crash Report</h2>' + 
-        '<p><b>Msg:</b> ' + message + '</p>' +
-        '<p><b>Line:</b> ' + lineno + ':' + colno + '</p>' +
-        '<pre style="white-space: pre-wrap; font-size: 11px;">' + (error ? error.stack : 'No stack') + '</pre>';
+      errorDiv.style.fontFamily = 'monospace';
       
-      // Try to append to body, if body doesn't exist yet, wait for DOMContentLoaded
+      let errorDetails = '';
+      try {
+        if (error) {
+          errorDetails = Object.getOwnPropertyNames(error)
+            .map(key => key + ': ' + String(error[key]))
+            .join('\n');
+        }
+      } catch(e) { errorDetails = 'Could not stringify error'; }
+
+      errorDiv.innerHTML = '<h2>iOS Crash (' + type + ')</h2>' + 
+        '<p><b>Msg:</b> ' + message + '</p>' +
+        '<p><b>Source:</b> ' + source + ' (' + lineno + ':' + colno + ')</p>' +
+        '<p><b>Agent:</b> ' + navigator.userAgent + '</p>' +
+        '<h3>Stack / Details:</h3>' +
+        '<pre style="white-space: pre-wrap; font-size: 11px; background: rgba(0,0,0,0.2); padding: 10px;">' + 
+        (error && error.stack ? error.stack : errorDetails || 'No stack trace') + 
+        '</pre>';
+      
       if (document.body) {
         document.body.appendChild(errorDiv);
       } else {
@@ -30,6 +46,14 @@
         });
       }
     };
+
+    window.onerror = function(message, source, lineno, colno, error) {
+      showError(message, source, lineno, colno, error, 'onerror');
+    };
+
+    window.addEventListener('unhandledrejection', function(event) {
+      showError(event.reason ? event.reason.message || event.reason : 'Unhandled Rejection', 'Promise', 0, 0, event.reason, 'unhandledrejection');
+    });
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" href="/favicon.png" type="image/png">
