@@ -385,7 +385,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                window.location.href = "tel:+919888687898";
               }}
               className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 border border-[#36503F] bg-[#36503F] text-[#FEF8C5] text-[11px] sm:text-sm font-semibold py-2 sm:py-2.5 px-1 sm:px-2 rounded-[10px] sm:rounded-xl hover:bg-[#1F2E26] transition-all active:scale-[0.98] whitespace-nowrap"
             >

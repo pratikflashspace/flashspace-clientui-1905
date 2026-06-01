@@ -91,7 +91,7 @@ const BusinessSetupHomeCard = ({ item, onClick }: { item: any; onClick: () => vo
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                            window.location.href = "tel:+919888687898";
                         }}
                         className="flex-1 flex items-center justify-center gap-1 sm:gap-2 border border-[#36503F] bg-transparent text-[#36503F] text-[11px] sm:text-[14px] font-semibold py-2 sm:py-3 px-1 sm:px-2 rounded-[10px] sm:rounded-[12px] hover:bg-[#36503F]/5 transition-colors whitespace-nowrap"
                     >
