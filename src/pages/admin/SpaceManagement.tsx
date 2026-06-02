@@ -117,6 +117,12 @@ export default function SpaceManagement() {
   const [cityFilter, setCityFilter] = useState<string>("all");
   const [partners, setPartners] = useState<PartnerOption[]>([]);
   const [assigningSpaceId, setAssigningSpaceId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const SPACES_PER_PAGE = 15;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, typeFilter, cityFilter, viewMode]);
 
   useEffect(() => {
     fetchSpaces();
@@ -266,6 +272,28 @@ export default function SpaceManagement() {
     return matchesSearch && matchesType && matchesCity;
   });
 
+  const totalPages = Math.ceil(filteredSpaces.length / SPACES_PER_PAGE);
+  const paginatedSpaces = filteredSpaces.slice(
+    (currentPage - 1) * SPACES_PER_PAGE,
+    currentPage * SPACES_PER_PAGE
+  );
+
+  const generatePagination = () => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    
+    if (currentPage <= 4) {
+      return [1, 2, 3, 4, 5, '...', totalPages];
+    }
+    
+    if (currentPage >= totalPages - 3) {
+      return [1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    }
+    
+    return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+  };
+
   return (
     <DashboardLayout
       portalName="FlashSpace Admin"
@@ -377,7 +405,7 @@ export default function SpaceManagement() {
         {/* Spaces Grid */}
         {!loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
-            {filteredSpaces.map((space) => (
+            {paginatedSpaces.map((space) => (
               <div
                 key={space._id}
                 className={`group bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-100/50 hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 overflow-hidden flex flex-col ${
@@ -565,6 +593,44 @@ export default function SpaceManagement() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && filteredSpaces.length > SPACES_PER_PAGE && (
+          <div className="flex justify-center items-center gap-2 mt-12 mb-8">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              Previous
+            </button>
+            <div className="flex items-center gap-1">
+              {generatePagination().map((page, index) => (
+                <button
+                  key={index}
+                  onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                  disabled={page === '...'}
+                  className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${
+                    page === '...'
+                      ? "text-gray-400 cursor-default bg-transparent border-none"
+                      : currentPage === page
+                      ? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary/20"
+                      : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-xl text-sm font-bold bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              Next
+            </button>
           </div>
         )}
 
