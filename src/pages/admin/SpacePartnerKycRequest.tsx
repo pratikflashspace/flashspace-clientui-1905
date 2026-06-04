@@ -377,7 +377,7 @@ export default function SpacePartnerKycRequest({
             e.target === e.currentTarget && setShowDocumentModal(false)
           }
         >
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-6 border-b flex justify-between items-center bg-muted/30">
               <h3 className="text-xl font-bold">Document Verification</h3>
               <button onClick={() => setShowDocumentModal(false)}>

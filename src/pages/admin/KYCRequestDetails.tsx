@@ -267,7 +267,7 @@ export default function KYCRequestDetails() {
             {/* {isPartnerProfile ? "Partner KYC Profile" : "KYC Profile"} */}
             KYC Profile
           </h1>
-          <p className="text-gray-500 mt-1 text-sm">
+          <p className="text-[#6B7280] mt-1 text-sm">
             Review all details, documents, and take an approval decision.
           </p>
           {isKycVerified && (
@@ -541,7 +541,7 @@ export default function KYCRequestDetails() {
                       />
                     </div>
                   ) : isPDFFile(selectedDocument.fileUrl) ? (
-                    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                       <iframe
                         src={getFullUrl(selectedDocument.fileUrl)}
                         className="w-full h-[26rem]"

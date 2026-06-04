@@ -53,6 +53,7 @@ const BookingPage = lazy(() => import("./pages/BookingPage"));
 const CompleteBookingPage = lazy(() => import("./pages/CompleteBookingPage"));
 const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const PaymentFailedPage = lazy(() => import("./pages/PaymentFailedPage"));
+const OAuthConsent = lazy(() => import("./pages/auth/OAuthConsent"));
 const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 
 // Admin Pages
@@ -87,6 +88,7 @@ const AdminPartnerInvoices = lazy(() => import("./pages/admin/PartnerInvoices"))
 const AdminInvoices = lazy(() => import("./pages/admin/Invoices"));
 const DocumentManagement = lazy(() => import("./pages/admin/DocumentManagement"));
 const TrackProgress = lazy(() => import("./pages/admin/TrackProgress"));
+const AIIntegrations = lazy(() => import("./pages/admin/AIIntegrations"));
 
 // Space Partner Pages
 const SpacePortalClients = lazy(() => import("@/pages/spacePortal/Clients"));
@@ -150,6 +152,7 @@ const App = () => (
       <Sonner />
       <HotToaster
         position="top-center"
+        containerStyle={{ zIndex: 999999 }}
         toastOptions={{
           duration: 3500,
           style: {
@@ -202,6 +205,7 @@ const App = () => (
                         {/* Public Routes */}
 
                       <Route path="/" element={<Index />} />
+                      <Route path="/oauth/authorize" element={<OAuthConsent />} />
                       <Route path="/services" element={<Services />} />
 
                       <Route
@@ -430,6 +434,18 @@ const App = () => (
                           />
                           <Route path="track-progress" element={<TrackProgress />} />
                           <Route path="partner-invoices" element={<AdminPartnerInvoices />} />
+                          <Route
+                            path="ai-integrations"
+                            element={
+                              <DashboardLayout
+                                portalName="FlashSpace Admin"
+                                portalDescription="Complete platform management"
+                                navItems={ADMIN_NAV_ITEMS}
+                              >
+                                <AIIntegrations />
+                              </DashboardLayout>
+                            }
+                          />
                           <Route
                             path="documents"
                             element={

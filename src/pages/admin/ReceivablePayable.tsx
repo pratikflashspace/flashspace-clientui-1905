@@ -161,7 +161,7 @@ const ReceivablePayable = () => {
         <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
           Receivable / <span className="text-primary italic">Payable</span>
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-[#6B7280] mt-2">
           Track outstanding client payments and partner payouts
         </p>
       </div>

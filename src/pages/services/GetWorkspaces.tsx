@@ -175,7 +175,7 @@ const CityDropdown = ({
       <button
         onClick={() => !disabled && setOpen(!open)}
         disabled={loading || disabled}
-        className={`flex items-center gap-1.5 border border-border/60 rounded-xl h-10 text-sm font-medium px-4 w-full transition-all duration-200 bg-card text-foreground ${disabled ? "opacity-50 cursor-not-allowed" : "hover:border-border hover:shadow-sm"}`}
+        className={`flex items-center gap-1.5 border border-border/60 rounded-xl h-10 text-sm font-medium px-4 w-full transition-all duration-200 bg-card text-foreground focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] ${open ? "ring-[3px] ring-[#36503F]/20 border-[#36503F]" : ""} ${disabled ? "opacity-50 cursor-not-allowed" : "hover:border-border hover:shadow-sm"}`}
       >
         <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
         <span className="flex-1 text-left truncate">{loading ? "Loading..." : activeCity}</span>
@@ -1420,7 +1420,7 @@ const GetWorkspaces = () => {
                 onValueChange={handleWorkspaceTypeChange}
               >
                 <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${workspaceType !== "virtual-office"
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${workspaceType !== "virtual-office"
                     ? "bg-muted/50 border-border text-foreground"
                     : "border-border/60 hover:border-border hover:shadow-sm"
                     }`}
@@ -1449,7 +1449,7 @@ const GetWorkspaces = () => {
 
             {/* Search Location */}
             <div className="relative flex-1 min-w-[140px]">
-              <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-hidden transition-all duration-200 focus-within:ring-2 focus-within:ring-primary/20">
+              <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-hidden transition-all duration-200 focus-within:ring-[3px] focus-within:ring-[#36503F]/20 focus-within:border-[#36503F]">
                 <MapPin className="w-4 h-4 text-muted-foreground ml-3 flex-shrink-0" />
                 <Input
                   value={searchLocation}
@@ -1476,7 +1476,7 @@ const GetWorkspaces = () => {
             <div className="sm:w-[160px]">
               <Select value={pricingFilter} onValueChange={setPricingFilter} disabled={workspaceType === "business-setup"}>
                 <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${pricingFilter !== "all"
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${pricingFilter !== "all"
                     ? "bg-muted/50 border-border text-foreground"
                     : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
                     }`}
@@ -1496,7 +1496,7 @@ const GetWorkspaces = () => {
             <div className="sm:w-[180px]">
               <Select value={sortBy} onValueChange={setSortBy} disabled={workspaceType === "business-setup"}>
                 <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 ${sortBy !== "rating"
+                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${sortBy !== "rating"
                     ? "bg-muted/50 border-border text-foreground"
                     : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
                     }`}

@@ -151,7 +151,7 @@ const TrackProgress = () => {
         <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
           Track <span className="text-primary italic">Progress</span>
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-[#6B7280] mt-2">
           Monitor the lifecycle progress of all user bookings across KYC and documentation stages.
         </p>
       </div>
@@ -170,7 +170,7 @@ const TrackProgress = () => {
           variant="outline"
           onClick={() => void fetchData(true)}
           disabled={refreshing}
-          className="h-11 px-6 font-semibold"
+          className="h-11 px-6 font-semibold hover:bg-primary hover:text-[#FEF8C5]"
         >
           {refreshing ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -181,7 +181,7 @@ const TrackProgress = () => {
         </Button>
       </div>
 
-      <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
+      <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto custom-scrollbar" data-lenis-prevent="true" onWheel={(e) => e.stopPropagation()}>
           <table className="w-full min-w-[950px]">
             <thead className="bg-muted/40 border-b border-border text-nowrap">
@@ -192,7 +192,7 @@ const TrackProgress = () => {
                 <th className="text-left px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   User Name
                 </th>
-                <th className="text-left px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Space Booked
                 </th>
                 <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -220,7 +220,7 @@ const TrackProgress = () => {
                 paginatedData.map((item) => (
                   <tr key={item.id} className="hover:bg-muted/20 transition-colors group">
                     <td className="px-4 py-4">
-                      <span className="font-mono text-xs font-bold text-primary px-1.5 py-0.5 bg-primary/5 rounded border border-primary/10">
+                      <span className="font-mono text-xs font-bold text-primary px-1.5 py-0.5 bg-primary/5 rounded border border-primary/10 inline-block align-middle" title={item.bookingId}>
                         {item.bookingId}
                       </span>
                     </td>
@@ -234,11 +234,13 @@ const TrackProgress = () => {
                             {item.userName?.split(" ").map(n => n[0]).join("").toUpperCase() || "CL"}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="font-bold text-sm text-foreground line-clamp-1">{item.userName}</span>
+                        <div className="font-bold text-sm text-foreground truncate max-w-[120px]" title={item.userName}>{item.userName}</div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-xs font-semibold text-muted-foreground line-clamp-1 max-w-[150px]" title={item.spaceBooked}>
-                      {item.spaceBooked}
+                    <td className="px-4 py-4 text-center">
+                      <div className="text-xs font-semibold text-muted-foreground truncate max-w-[150px] mx-auto" title={item.spaceBooked}>
+                        {item.spaceBooked}
+                      </div>
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex justify-center">
@@ -292,7 +294,7 @@ const TrackProgress = () => {
                 size="sm"
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="font-medium"
+                className="font-medium hover:bg-primary hover:text-[#FEF8C5]"
               >
                 Previous
               </Button>
@@ -303,7 +305,7 @@ const TrackProgress = () => {
                     variant={currentPage === page ? "default" : "outline"}
                     size="sm"
                     onClick={() => setCurrentPage(page)}
-                    className={`w-8 h-8 p-0 ${currentPage === page ? 'shadow-md' : ''}`}
+                    className={`w-8 h-8 p-0 hover:bg-primary hover:text-[#FEF8C5] ${currentPage === page ? 'shadow-md bg-primary text-[#FEF8C5]' : ''}`}
                   >
                     {page}
                   </Button>
@@ -314,7 +316,7 @@ const TrackProgress = () => {
                 size="sm"
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="font-medium"
+                className="font-medium hover:bg-primary hover:text-[#FEF8C5]"
               >
                 Next
               </Button>

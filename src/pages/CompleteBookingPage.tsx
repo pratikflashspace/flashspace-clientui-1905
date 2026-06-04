@@ -209,7 +209,7 @@ const CompleteBookingPage = () => {
         userEmail: user!.email,
         userName: user!.fullName || user!.email,
         userPhone: (user as any)?.phoneNumber,
-        spaceId: id!,
+        spaceId: (spaceDetails as any)?._id || spaceDetails?.id || id!,
         spaceName: spaceDetails!.name,
         planName: planDisplayName,
         planKey: planKeyId,
@@ -219,8 +219,8 @@ const CompleteBookingPage = () => {
         discountPercent: appliedCoupon?.discountValue || 0,
         discountAmount: couponDiscount,
         paymentType: spaceType === 'coworking' ? 'coworking_space' as const : 'virtual_office' as const,
-        couponCode: appliedCoupon?.code,
-        affiliateId: appliedCoupon?.affiliateId,
+        couponCode: appliedCoupon?.code || undefined,
+        affiliateId: appliedCoupon?.affiliateId || undefined,
     });
 
     // ─── STEP 1: Process Payment ─
@@ -236,7 +236,7 @@ const CompleteBookingPage = () => {
         if (!spaceDetails || !selectedOption) return;
 
         try {
-            await axiosInstance.post('/api/leads/booking-lead', {
+            await axiosInstance.post('/leads/booking-lead', {
                 userId: user.id || (user as any)._id,
                 name: user.fullName || user.email.split('@')[0],
                 email: user.email,
@@ -314,7 +314,7 @@ const CompleteBookingPage = () => {
 
         // --- CAPTURE BOOKING LEAD ---
         try {
-            await axiosInstance.post('/api/leads/booking-lead', {
+            await axiosInstance.post('/leads/booking-lead', {
                 userId: user.id || (user as any)._id,
                 name: user.fullName || user.email.split('@')[0],
                 email: user.email,

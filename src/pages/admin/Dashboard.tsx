@@ -113,7 +113,7 @@ export default function AdminDashboard() {
           {/* Stats Grid Skeleton */}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-background border border-border rounded-[24px] p-6 shadow-sm space-y-3">
+              <div key={i} className="bg-background border border-border rounded-xl p-6 shadow-sm space-y-3">
                 <div className="w-10 h-10 bg-muted/30 rounded-xl" />
                 <div className="h-8 w-24 bg-muted/50 rounded-lg" />
                 <div className="h-4 w-16 bg-muted/10 rounded-md" />
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
             Admin <span className="text-primary italic">Portal</span>
           </h1>
-          <p className="text-sm md:text-base text-muted-foreground mt-2">
+          <p className="text-sm md:text-base text-[#6B7280] mt-2">
             Complete control over sales, support, and finance operations
           </p>
         </div>
@@ -187,13 +187,13 @@ export default function AdminDashboard() {
 
       <div className="grid gap-6 lg:grid-cols-2 mt-8 animate-in slide-in-from-bottom-4 duration-700">
         {/* Recent Leads */}
-        <div className="bg-background border border-border rounded-[24px] overflow-hidden shadow-sm flex flex-col h-full">
+        <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm flex flex-col h-full">
           <div className="p-6 border-b border-border flex justify-between items-center bg-muted/20">
             <div>
               <h3 className="text-lg font-bold text-foreground">Recent Leads</h3>
               <p className="text-xs text-muted-foreground mt-0.5">Latest enquiries from the website</p>
             </div>
-            <Button variant="ghost" size="sm" className="text-primary font-bold" onClick={() => navigate("/admin/leads")}>
+            <Button variant="ghost" size="sm" className="text-primary font-bold hover:bg-primary hover:text-[#FEF8C5]" onClick={() => navigate("/admin/leads")}>
               View All <ArrowRight className="ml-1 w-4 h-4" />
             </Button>
           </div>
@@ -239,13 +239,13 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Bookings */}
-        <div className="bg-background border border-border rounded-[24px] overflow-hidden shadow-sm flex flex-col h-full">
+        <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm flex flex-col h-full">
           <div className="p-6 border-b border-border flex justify-between items-center bg-muted/20">
             <div>
               <h3 className="text-lg font-bold text-foreground">Recent Bookings</h3>
               <p className="text-xs text-muted-foreground mt-0.5">Latest successful transactions</p>
             </div>
-            <Button variant="ghost" size="sm" className="text-primary font-bold" onClick={() => navigate("/admin/sales-analytics")}>
+            <Button variant="ghost" size="sm" className="text-primary font-bold hover:bg-primary hover:text-[#FEF8C5]" onClick={() => navigate("/admin/sales-analytics")}>
               View All <ArrowRight className="ml-1 w-4 h-4" />
             </Button>
           </div>

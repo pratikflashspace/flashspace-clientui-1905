@@ -307,7 +307,7 @@ export default function SpaceManagement() {
             <h1 className="text-[30px] font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
               Space <span className="text-primary italic">Management</span>
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground font-medium">
+            <p className="text-sm md:text-base text-[#6B7280] font-medium">
               Manage and organize all your office listings in one place.
             </p>
           </div>
@@ -346,7 +346,7 @@ export default function SpaceManagement() {
         </div>
 
         {/* Controls & Filters */}
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 overflow-visible">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-100/50 overflow-visible">
           <div className="p-4 md:p-6 flex flex-col lg:flex-row gap-4 justify-between items-center">
             {/* Search */}
             <div className="relative flex-1 w-full lg:max-w-md">
@@ -356,13 +356,13 @@ export default function SpaceManagement() {
                 placeholder="Search spaces by name, city, or area..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-4 py-2.5 bg-muted/30 border-none rounded-xl focus:ring-4 focus:ring-primary/5 focus:bg-background transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground h-11"
+                className="w-full pl-11 pr-4 py-2.5 bg-white !border !border-gray-200 hover:!border-gray-300 shadow-sm rounded-xl focus:!ring-0 focus:!border-gray-300 focus:!shadow-none !outline-none transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground h-11"
               />
             </div>
 
             {/* Filters */}
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
-              <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 border-none rounded-xl w-full sm:flex-1 lg:w-auto h-11">
+              <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 shadow-sm hover:border-gray-300 transition-colors rounded-xl w-full sm:flex-1 lg:w-auto h-11">
                 <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
                 <select
                   value={cityFilter}
@@ -378,7 +378,7 @@ export default function SpaceManagement() {
                 </select>
               </div>
 
-              <div className="flex items-center gap-2 px-4 py-2 bg-muted/30 border-none rounded-xl w-full sm:flex-1 lg:w-auto h-11">
+              <div className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 shadow-sm hover:border-gray-300 transition-colors rounded-xl w-full sm:flex-1 lg:w-auto h-11">
                 <Star className="w-3.5 h-3.5 text-muted-foreground" />
                 <select
                   value={typeFilter}
@@ -408,7 +408,7 @@ export default function SpaceManagement() {
             {paginatedSpaces.map((space) => (
               <div
                 key={space._id}
-                className={`group bg-white rounded-[32px] border border-gray-100 shadow-lg shadow-gray-100/50 hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 overflow-hidden flex flex-col ${
+                className={`group bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 hover:shadow-2xl hover:shadow-gray-200/50 transition-all duration-500 overflow-hidden flex flex-col ${
                   viewMode === "deleted" ? "opacity-80 grayscale-[0.3]" : ""
                 }`}
               >

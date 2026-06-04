@@ -328,7 +328,7 @@ export default function SupportChat() {
         <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
           Support <span className="text-primary italic">Chats</span>
         </h1>
-        <p className="text-sm md:text-muted-foreground mt-1 md:mt-2">
+        <p className="text-sm md:text-[#6B7280] mt-1 md:mt-2">
           Manage live chats and take over from AI when needed
         </p>
       </div>

@@ -110,4 +110,9 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     href: "/admin/settings",
     icon: <Settings className="w-5 h-5" />,
   },
+  {
+    label: "AI Integrations",
+    href: "/admin/ai-integrations",
+    icon: <Network className="w-5 h-5" />,
+  },
 ];

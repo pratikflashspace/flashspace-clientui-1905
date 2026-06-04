@@ -267,7 +267,7 @@ export default function SpaceDetail() {
             <h1 className="text-3xl font-extrabold text-blue-700 tracking-tight">
               Space Profile
             </h1>
-            <p className="text-gray-500 mt-2 text-lg font-light">
+            <p className="text-[#6B7280] mt-2 text-lg font-light">
               Review all details, documents, and take an approval decision.
             </p>
           </div>

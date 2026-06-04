@@ -413,7 +413,7 @@ export default function KYCDetail() {
               <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
                 KYC <span className="text-[#35503F] italic">Verification</span>
               </h1>
-              <p className="text-gray-500 mt-2 text-sm md:text-base">
+              <p className="text-[#6B7280] mt-2 text-sm md:text-base">
                 Review all details, documents, and take an approval decision.
               </p>
             </div>

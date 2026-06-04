@@ -34,7 +34,7 @@ export const StatsCard = ({
           </div>
         )}
       </div>
-      <div className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+      <div className="text-[24px] font-extrabold text-foreground tracking-tight">
         {value}
       </div>
     </motion.div>

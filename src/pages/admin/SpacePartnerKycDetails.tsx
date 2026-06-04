@@ -476,7 +476,7 @@ export default function SpacePartnerKycDetails() {
             <h1 className="text-2xl md:text-3xl font-extrabold text-foreground leading-tight">
               KYC <span className="text-primary italic">Verification</span>
             </h1>
-            <p className="text-muted-foreground mt-2 text-sm md:text-base">
+            <p className="text-[#6B7280] mt-2 text-sm md:text-base">
               {propertyId
                 ? `Reviewing property: ${focusedProperty?.name || "..."}`
                 : "Review all details, documents, and take an approval decision."}

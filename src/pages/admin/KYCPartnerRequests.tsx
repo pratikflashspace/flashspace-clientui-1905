@@ -108,7 +108,7 @@ export default function KYCPartnerRequests() {
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight font-[Poppins]">
               Partner KYC Requests
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[#6B7280] mt-1">
               Review partner-level KYC snapshots derived from individual
               profiles.
             </p>
@@ -125,7 +125,7 @@ export default function KYCPartnerRequests() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Handshake className="w-4 h-4 text-blue-600" />

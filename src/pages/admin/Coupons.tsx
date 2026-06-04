@@ -61,6 +61,7 @@ export default function Coupons() {
 
   // Create Modal State
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isGlobalCoupon, setIsGlobalCoupon] = useState(false);
   const [openCombobox, setOpenCombobox] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clients, setClients] = useState<any[]>([]);
@@ -110,7 +111,7 @@ export default function Coupons() {
     setIsSubmitting(true);
     try {
       await createCoupon({
-        assignedClientId: newCoupon.assignedClientId,
+        assignedClientId: isGlobalCoupon ? undefined : newCoupon.assignedClientId,
         discountValue: Number(newCoupon.discountValue),
         expiryDate: newCoupon.expiryDate,
         manualCode: newCoupon.manualCode,
@@ -203,23 +204,32 @@ export default function Coupons() {
             <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
               Coupons <span className="text-primary italic">& Vouchers</span>
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground font-medium">
+            <p className="text-sm md:text-base text-[#6B7280] font-medium">
               Manage discount coupons for your clients.
             </p>
           </div>
-          <Button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="w-full md:w-auto h-12 px-6 rounded-2xl shadow-lg shadow-primary/10 flex justify-center items-center gap-2 font-bold"
-          >
-            <Plus className="w-5 h-5" />
-            Create Coupon
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <Button
+              onClick={() => { setIsGlobalCoupon(false); setIsCreateModalOpen(true); }}
+              className="w-full sm:w-auto h-12 px-6 rounded-2xl shadow-lg shadow-primary/10 flex justify-center items-center gap-2 font-bold"
+            >
+              <Plus className="w-5 h-5" />
+              Create Coupon
+            </Button>
+            <Button
+              onClick={() => { setIsGlobalCoupon(true); setIsCreateModalOpen(true); }}
+              className="w-full sm:w-auto h-12 px-6 rounded-2xl shadow-lg shadow-primary/10 flex justify-center items-center gap-2 font-bold bg-[#35503F] hover:bg-[#35503F]/90 text-white"
+            >
+              <Plus className="w-5 h-5" />
+              Create Global Coupon
+            </Button>
+          </div>
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-background rounded-3xl border border-border shadow-xl shadow-muted/20 overflow-visible">
+        <div className="bg-background rounded-[24px] border border-border shadow-xl shadow-muted/20 overflow-visible">
           {/* Toolbar */}
-          <div className="p-4 md:p-6 border-b border-border flex flex-col md:flex-row gap-4 justify-between items-center bg-background rounded-t-3xl">
+          <div className="p-4 md:p-6 border-b border-border flex flex-col md:flex-row gap-4 justify-between items-center bg-background rounded-t-[24px]">
             <div className="relative flex-1 w-full md:max-w-md">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
@@ -227,7 +237,7 @@ export default function Coupons() {
                 placeholder="Search by code..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-11 pr-4 py-2.5 bg-muted/50 border-none rounded-xl focus:ring-4 focus:ring-primary/5 focus:bg-background transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground h-11 border border-transparent hover:border-border"
+                className="w-full pl-11 pr-4 py-2.5 bg-background border border-border rounded-xl focus:border-primary/50 focus:ring-4 focus:ring-primary/5 transition-all text-sm font-medium text-foreground placeholder:text-muted-foreground h-11"
               />
             </div>
 
@@ -328,10 +338,10 @@ export default function Coupons() {
                                 </div>
                                 <div>
                                   <p className="text-sm font-bold text-foreground leading-none mb-1">
-                                    {client ? client.fullName : "Unknown Client"}
+                                    {(!coupon.assignedClientId || coupon.assignedClientId === "global") ? "Everyone" : (client ? client.fullName : "Unknown Client")}
                                   </p>
                                   <p className="text-[10px] text-muted-foreground font-medium">
-                                    {client ? client.email : "N/A"}
+                                    {(!coupon.assignedClientId || coupon.assignedClientId === "global") ? "Applicable to all" : (client ? client.email : "N/A")}
                                   </p>
                                 </div>
                               </div>
@@ -356,7 +366,7 @@ export default function Coupons() {
                             <td className="px-6 py-4 text-right px-8">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <button className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-white hover:shadow-md transition-all opacity-0 group-hover:opacity-100">
+                                  <button className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-white hover:shadow-md transition-all">
                                     <MoreVertical className="w-5 h-5" />
                                   </button>
                                 </DropdownMenuTrigger>
@@ -382,7 +392,7 @@ export default function Coupons() {
                 </div>
 
                 {/* Mobile/Tablet Card View */}
-                <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/20 rounded-b-3xl">
+                <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-muted/20 rounded-b-[24px]">
                   {filteredCoupons.map((coupon) => {
                     const client = clients.find(
                       (c) => (c._id || c.id) === coupon.assignedClientId,
@@ -390,7 +400,7 @@ export default function Coupons() {
                     return (
                       <div
                         key={coupon._id}
-                        className="bg-background border border-border rounded-3xl p-5 space-y-5 shadow-sm hover:shadow-md transition-all border-l-4 border-l-primary/10"
+                        className="bg-background border border-border rounded-2xl p-5 space-y-5 shadow-sm hover:shadow-md transition-all border-l-4 border-l-primary/10"
                       >
                         <div className="flex justify-between items-start">
                           <div>
@@ -403,10 +413,10 @@ export default function Coupons() {
                               </div>
                               <div>
                                 <h3 className="font-black text-foreground leading-none mb-1">
-                                  {client ? client.fullName : "Unknown Client"}
+                                  {(!coupon.assignedClientId || coupon.assignedClientId === "global") ? "Everyone" : (client ? client.fullName : "Unknown Client")}
                                 </h3>
                                 <p className="text-[11px] text-muted-foreground font-bold truncate max-w-[150px]">
-                                  {client ? client.email : "N/A"}
+                                  {(!coupon.assignedClientId || coupon.assignedClientId === "global") ? "Applicable to all" : (client ? client.email : "N/A")}
                                 </p>
                               </div>
                             </div>
@@ -481,10 +491,10 @@ export default function Coupons() {
               <div className="p-6 md:p-8 border-b border-border flex justify-between items-center bg-muted/30 shrink-0">
                 <div>
                   <h2 className="text-xl md:text-2xl font-black text-foreground tracking-tight">
-                    Create New <span className="text-primary italic">Coupon</span>
+                    Create New <span className="text-primary italic">{isGlobalCoupon ? 'Global Coupon' : 'Coupon'}</span>
                   </h2>
                   <p className="text-xs md:text-sm text-muted-foreground font-medium">
-                    Generate a discount code for a client.
+                    {isGlobalCoupon ? 'Generate a discount code that anyone can use.' : 'Generate a discount code for a specific client.'}
                   </p>
                 </div>
                 <button
@@ -497,6 +507,7 @@ export default function Coupons() {
  
               <form onSubmit={handleCreateCoupon} className="p-6 md:p-8 space-y-6 overflow-y-auto">
                 <div className="space-y-6">
+                  {!isGlobalCoupon && (
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground ml-1 flex items-center gap-2">
                       <UserIcon className="w-4 h-4 text-primary" />
@@ -546,10 +557,10 @@ export default function Coupons() {
                           className="w-[--radix-popover-trigger-width] p-0 rounded-xl shadow-xl border-border z-[200] bg-background"
                           align="start"
                         >
-                          <Command className="rounded-xl border border-border">
+                          <Command className="rounded-xl">
                             <CommandInput
                               placeholder="Search client by name or email..."
-                              className="rounded-t-xl"
+                              className="!border-none focus:!border-transparent focus:!shadow-none !outline-none !shadow-none !ring-0 focus:!ring-0"
                             />
                             <CommandList className="max-h-[300px] overflow-y-auto">
                               <CommandEmpty>No client found.</CommandEmpty>
@@ -604,6 +615,7 @@ export default function Coupons() {
                       The coupon will be exclusive to this client.
                     </p>
                   </div>
+                  )}
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground ml-1 flex items-center gap-2">

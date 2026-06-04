@@ -25,7 +25,7 @@ export interface Coupon {
 }
 
 export interface CreateCouponDTO {
-    assignedClientId: string;
+    assignedClientId?: string;
     discountValue: number;
     expiryDate: string;
     manualCode?: string;

@@ -151,10 +151,15 @@ const PartnersManagementTab = () => {
 
   return (
     <div className="animate-in fade-in duration-500">
-      <div className="grid gap-4 sm:grid-cols-1 mb-8">
-        <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
-          <p className="text-2xl font-extrabold text-foreground">{pagination.total}</p>
-          <p className="text-sm text-muted-foreground">Total Partners</p>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-sm font-medium text-muted-foreground">Total Partners</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Building2 className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{pagination.total}</h3>
         </div>
       </div>
 
@@ -497,7 +502,7 @@ interface PaymentDetails {
   markedPaidAt?: string;
 }
 
-const paymentMethods = ["Bank Transfer", "UPI", "NEFT", "RTGS", "IMPS", "Other"];
+const paymentMethods = ["Bank Transfer", "NEFT", "RTGS", "IMPS", "Paytm", "PhonePe", "GooglePay", "UPI", "Other"];
 const todayInputValue = () => new Date().toISOString().slice(0, 10);
 const normalizeInvoiceStatus = (status?: string) =>
   String(status || "").toLowerCase() === "paid" ? "Paid" : "Pending";
@@ -722,49 +727,45 @@ const PartnerInvoicesTab = () => {
     <div className="animate-in fade-in duration-500">
       {stats && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-background border border-border p-5 rounded-2xl shadow-sm relative overflow-hidden group hover:border-primary/20 transition-all">
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
-            <div className="flex flex-col gap-3 relative">
-              <div className="p-2.5 bg-primary/10 rounded-xl w-fit text-primary"><FileText className="w-5 h-5" /></div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Invoices</p>
-                <h3 className="text-2xl font-bold text-foreground">{formatCurrency(stats.totalAmount)}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{stats.totalCount} invoices</p>
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">Total Invoices</span>
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <FileText className="w-4 h-4 text-primary" />
               </div>
             </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{formatCurrency(stats.totalAmount)}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{stats.totalCount} invoices</p>
           </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-background border border-border p-5 rounded-2xl shadow-sm relative overflow-hidden group hover:border-emerald-500/20 transition-all">
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
-            <div className="flex flex-col gap-3 relative">
-              <div className="p-2.5 bg-emerald-500/10 rounded-xl w-fit text-emerald-600"><CheckCircle2 className="w-5 h-5" /></div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Paid</p>
-                <h3 className="text-2xl font-bold text-foreground">{formatCurrency(stats.totalPaid)}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{stats.countPaid} paid</p>
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">Total Paid</span>
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               </div>
             </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{formatCurrency(stats.totalPaid)}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{stats.countPaid} paid</p>
           </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-background border border-border p-5 rounded-2xl shadow-sm relative overflow-hidden group hover:border-amber-500/20 transition-all">
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-amber-500/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
-            <div className="flex flex-col gap-3 relative">
-              <div className="p-2.5 bg-amber-500/10 rounded-xl w-fit text-amber-600"><Clock className="w-5 h-5" /></div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Pending</p>
-                <h3 className="text-2xl font-bold text-foreground">{formatCurrency(stats.totalPending)}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{stats.countPending} pending</p>
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">Total Pending</span>
+              <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-amber-600" />
               </div>
             </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{formatCurrency(stats.totalPending)}</h3>
+            <p className="text-xs text-muted-foreground mt-1">{stats.countPending} pending</p>
           </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }} className="bg-background border border-border p-5 rounded-2xl shadow-sm relative overflow-hidden group hover:border-blue-500/20 transition-all">
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/5 rounded-full group-hover:scale-150 transition-transform duration-500" />
-            <div className="flex flex-col gap-3 relative">
-              <div className="p-2.5 bg-blue-500/10 rounded-xl w-fit text-blue-600"><TrendingUp className="w-5 h-5" /></div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Paid Rate</p>
-                <h3 className="text-2xl font-bold text-foreground">{stats.totalCount > 0 ? Math.round((stats.countPaid / stats.totalCount) * 100) : 0}%</h3>
-                <p className="text-xs text-muted-foreground mt-1">{stats.countPaid} of {stats.totalCount}</p>
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }} className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-muted-foreground">Paid Rate</span>
+              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-blue-600" />
               </div>
             </div>
+            <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-foreground tracking-tight">{stats.totalCount > 0 ? Math.round((stats.countPaid / stats.totalCount) * 100) : 0}%</h3>
+            <p className="text-xs text-muted-foreground mt-1">{stats.countPaid} of {stats.totalCount}</p>
           </motion.div>
         </div>
       )}
@@ -781,7 +782,7 @@ const PartnerInvoicesTab = () => {
         </div>
       </div>
 
-      <div className="bg-background border border-border rounded-2xl shadow-sm overflow-hidden min-h-[450px]">
+      <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden min-h-[450px]">
         {loading ? <div className="p-8"><TableSkeleton rows={8} cols={7} /></div> : (
           <AnimatePresence mode="wait">
             <motion.div key="table" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
@@ -868,17 +869,17 @@ const PartnerInvoicesTab = () => {
       {paymentModalOpen && (
         <Dialog open={paymentModalOpen} onOpenChange={(open) => !open && closePaymentModal()}>
           <DialogContent className="sm:max-w-3xl max-h-[92vh] overflow-hidden p-0 border-none bg-transparent shadow-none">
-            <div className="relative w-full overflow-hidden rounded-2xl border border-border bg-background text-foreground shadow-2xl flex flex-col">
+            <div className="relative w-full overflow-hidden rounded-xl border border-border bg-background text-foreground shadow-2xl flex flex-col">
               <button type="button" onClick={closePaymentModal} disabled={!!processingId || extractingUtr} className="absolute right-4 top-4 z-10 rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-50"><X className="h-4 w-4" /></button>
               <div className="border-b border-border px-6 py-5 pr-14">
-                <h2 className="flex items-center gap-3 text-xl font-extrabold"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><CreditCard className="h-5 w-5" /></span>Payment Settlement</h2>
+                <DialogTitle asChild><h2 className="flex items-center gap-3 text-xl font-extrabold"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><CreditCard className="h-5 w-5" /></span>Payment Settlement</h2></DialogTitle>
                 <p className="text-sm text-muted-foreground">{selectedInvoice ? `${selectedInvoice.invoiceNumber} - ${formatCurrency(selectedInvoice.amount)}` : "Confirm partner invoice payment"}</p>
               </div>
               <div className="overflow-y-auto px-6 py-5 max-h-[70vh]">
                 <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
                   <div className="space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-2"><Label>Payment Method</Label><Select value={paymentForm.paymentMethod} onValueChange={(v) => setPaymentForm(p => ({ ...p, paymentMethod: v }))}><SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Select method" /></SelectTrigger><SelectContent>{paymentMethods.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent></Select></div>
+                      <div className="space-y-2"><Label>Payment Method</Label><Select value={paymentForm.paymentMethod || "none"} onValueChange={(v) => setPaymentForm(p => ({ ...p, paymentMethod: v === "none" ? "" : v }))}><SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Select method" /></SelectTrigger><SelectContent><SelectItem value="none" className="hidden">Select method</SelectItem>{paymentMethods.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent></Select></div>
                       <div className="space-y-2"><Label>Amount Paid</Label><Input type="number" className="h-11 rounded-xl" value={paymentForm.amountPaid} onChange={(e) => setPaymentForm(p => ({ ...p, amountPaid: e.target.value }))} /></div>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -942,7 +943,7 @@ const PartnersPage = () => {
                 <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
                   Partner <span className="text-primary italic">Management</span>
                 </h1>
-                <p className="text-muted-foreground mt-2">
+                <p className="text-[#6B7280] mt-2">
                   View all space partners, their contact details, and allotted spaces.
                 </p>
               </>
@@ -951,7 +952,7 @@ const PartnersPage = () => {
                 <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
                   Partner Invoices <span className="text-primary italic">Management</span>
                 </h1>
-                <p className="text-sm md:text-base text-muted-foreground mt-1">
+                <p className="text-sm md:text-base text-[#6B7280] mt-1">
                   Review invoices submitted by Space Partners and manage payouts.
                 </p>
               </>

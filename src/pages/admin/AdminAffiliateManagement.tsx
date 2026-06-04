@@ -103,7 +103,7 @@ const StatCard = ({
   isActive?: boolean;
   sub?: string;
 }) => (
-  <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
+  <div className="bg-background border border-border rounded-2xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
     <div className="flex items-center justify-between mb-4">
       <span className="text-sm font-medium text-muted-foreground">{label}</span>
       <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
@@ -203,6 +203,13 @@ const AffiliateDetailPanel = ({
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
@@ -238,11 +245,11 @@ const AffiliateDetailPanel = ({
       {/* Panel */}
       <div className="w-full max-w-3xl bg-background h-full shadow-2xl flex flex-col overflow-hidden border-l border-border">
         {/* Header */}
-        <div className="px-8 py-8 border-b border-border bg-gradient-to-br from-primary to-primary/80 text-primary-foreground relative overflow-hidden">
+        <div className="px-6 py-6 border-b border-border bg-gradient-to-br from-primary to-primary/80 text-primary-foreground relative overflow-hidden">
           <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none" />
           <button
             onClick={onClose}
-            className="mb-6 flex items-center gap-2 text-primary-foreground/80 hover:text-white text-xs font-black uppercase tracking-widest transition-all hover:-translate-x-1"
+            className="mb-4 flex items-center gap-2 text-primary-foreground/80 hover:text-white text-xs font-black uppercase tracking-widest transition-all hover:-translate-x-1"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Partners
           </button>
@@ -262,20 +269,20 @@ const AffiliateDetailPanel = ({
 
           {/* Mini Stats */}
           {data && (
-            <div className="mt-8 grid grid-cols-3 gap-4">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/10 shadow-inner">
-                <p className="text-[10px] text-primary-foreground/60 uppercase font-black tracking-widest mb-1">Total Clients</p>
-                <p className="text-2xl font-black">{data.stats.totalClients}</p>
+            <div className="mt-5 grid grid-cols-3 gap-3">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 text-center border border-white/10 shadow-inner">
+                <p className="text-[10px] text-primary-foreground/60 uppercase font-black tracking-widest mb-0.5">Total Clients</p>
+                <p className="text-xl font-black">{data.stats.totalClients}</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/10 shadow-inner">
-                <p className="text-[10px] text-primary-foreground/60 uppercase font-black tracking-widest mb-1">Revenue</p>
-                <p className="text-2xl font-black">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 text-center border border-white/10 shadow-inner">
+                <p className="text-[10px] text-primary-foreground/60 uppercase font-black tracking-widest mb-0.5">Revenue</p>
+                <p className="text-xl font-black">
                   {formatCurrency(data.stats.totalRevenue)}
                 </p>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-center border border-white/10 shadow-inner">
-                <p className="text-[10px] text-primary-foreground/60 uppercase font-black tracking-widest mb-1">Commission</p>
-                <p className="text-2xl font-black text-emerald-300">
+              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 text-center border border-white/10 shadow-inner">
+                <p className="text-[10px] text-primary-foreground/60 uppercase font-black tracking-widest mb-0.5">Commission</p>
+                <p className="text-xl font-black text-emerald-300">
                   {formatCurrency(data.stats.totalCommission)}
                 </p>
               </div>
@@ -283,28 +290,7 @@ const AffiliateDetailPanel = ({
           )}
         </div>
 
-        {/* Coupon Info */}
-        {data?.coupon && (
-          <div className="px-8 py-5 bg-primary/5 border-b border-primary/10 flex items-center gap-5">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-               <Tag className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-              <p className="text-[10px] text-primary/60 font-black uppercase tracking-widest">
-                Referral Coupon Code
-              </p>
-              <p className="font-mono font-black text-primary text-base">
-                {data.coupon.code}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Total Uses</p>
-              <p className="text-lg font-black text-foreground">
-                {data.coupon.usageCount}
-              </p>
-            </div>
-          </div>
-        )}
+
 
         {/* Client List */}
         <div className="flex-1 overflow-y-auto scrollbar-none bg-background">
@@ -460,7 +446,7 @@ export default function AdminAffiliateManagement() {
             <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
               Affiliate <span className="text-primary italic">Management</span>
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground font-medium">
+            <p className="text-sm md:text-base text-[#6B7280] font-medium">
               Monitor partners, verification status, clients, and commission earnings.
             </p>
           </div>
@@ -487,7 +473,7 @@ export default function AdminAffiliateManagement() {
         </div>
 
         {/* Table Card */}
-        <div className="bg-background rounded-3xl border border-border shadow-xl shadow-muted/20 overflow-hidden">
+        <div className="bg-background rounded-2xl border border-border shadow-xl shadow-muted/20 overflow-hidden">
           {/* Toolbar */}
           <div className="px-6 py-5 border-b border-border flex flex-col md:flex-row items-center gap-5 bg-background">
             <div className="flex-1 relative w-full">

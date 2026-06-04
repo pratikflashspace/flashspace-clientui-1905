@@ -124,12 +124,12 @@ const ClientManagement = () => {
         <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
           Client <span className="text-primary italic">Management</span>
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-[#6B7280] mt-2">
           View all clients who have placed bookings and track their booking activity.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-1 mb-8">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-muted-foreground">Total Clients</span>

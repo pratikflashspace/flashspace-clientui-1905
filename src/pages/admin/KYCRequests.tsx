@@ -641,7 +641,7 @@ export default function KYCRequests() {
                 </>
               )}
             </h1>
-            <p className="text-sm md:text-lg text-muted-foreground mt-2 font-light">
+            <p className="text-sm md:text-lg text-[#6B7280] mt-2 font-light">
               {viewMode === "user_partners"
                 ? "Review partner applications for this user"
                 : viewMode === "user_business"
@@ -718,7 +718,7 @@ export default function KYCRequests() {
 
         {viewMode === "user_partners" ? (
           /* Partner View Mode - Keep existing structure but maybe update container style if needed */
-          <div className="bg-white rounded-[24px] border border-border shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
             <div className="p-6 border-b border-border flex items-center gap-4">
               <button
                 onClick={handleBackToRequests}
@@ -821,7 +821,7 @@ export default function KYCRequests() {
           </div>
         ) : viewMode === "user_business" ? (
           /* Business View Mode */
-          <div className="bg-white rounded-[24px] border border-border shadow-sm overflow-hidden">
+          <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
             <div className="p-6 border-b border-border flex items-center gap-4">
               <button
                 onClick={handleBackToRequests}
@@ -960,7 +960,7 @@ export default function KYCRequests() {
                 {loading ? (
                   <KYCRequestGridSkeleton count={kycPageSize} />
                 ) : filteredRequests.length === 0 ? (
-                  <div className="bg-white rounded-[24px] border border-border shadow-sm p-16 text-center">
+                  <div className="bg-white rounded-2xl border border-border shadow-sm p-12 text-center">
                     <div className="w-20 h-20 bg-muted/30 rounded-full flex items-center justify-center mx-auto mb-4">
                       <CheckCircle2 className="w-10 h-10 text-gray-300" />
                     </div>
@@ -977,11 +977,11 @@ export default function KYCRequests() {
                     {paginatedRequests.map((request) => (
                       <div
                         key={request._id}
-                        className="bg-white rounded-[24px] border border-border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group flex flex-col h-full"
+                        className="bg-white rounded-2xl border border-border shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden group flex flex-col h-full"
                       >
                         {/* Card Content */}
                         {/* Header */}
-                        <div className="p-6 border-b border-border bg-gradient-to-r from-gray-50 to-white">
+                        <div className="p-5 border-b border-border bg-gradient-to-r from-gray-50 to-white">
                           <div className="flex items-center justify-between mb-4 gap-3">
                             <div className="flex items-center gap-3 min-w-0">
                               <Avatar className="w-12 h-12 ring-2 ring-background shadow-md group-hover:scale-105 transition-transform shrink-0 border border-border">
@@ -1053,7 +1053,7 @@ export default function KYCRequests() {
                         </div>
 
                         {/* Personal/Business Info */}
-                        <div className="p-6 space-y-4 flex-grow">
+                        <div className="p-5 space-y-3 flex-grow">
                           {request.personalInfo && (
                             <div
                               className="bg-[#35503f]/5 rounded-xl p-4 cursor-pointer hover:bg-[#35503f]/10 transition-colors group/personal relative"
@@ -1220,7 +1220,7 @@ export default function KYCRequests() {
 
                         {/* Actions - Only show if NOT approved */}
                         {request.overallStatus !== "approved" && (
-                          <div className="p-6 pt-0">
+                          <div className="p-5 pt-0">
                             <div className="grid grid-cols-2 gap-3">
                               <button
                                 onClick={() =>
@@ -1422,7 +1422,7 @@ export default function KYCRequests() {
                         />
                       </div>
                     ) : isPDFFile(selectedDocument.fileUrl) ? (
-                      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                         <iframe
                           src={getFullUrl(selectedDocument.fileUrl)}
                           className="w-full h-96"

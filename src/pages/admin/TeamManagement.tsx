@@ -314,7 +314,7 @@ export default function TeamManagement() {
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight font-[Poppins]">
               Team Management
             </h1>
-            <p className="text-gray-500 mt-2 text-lg">
+            <p className="text-[#6B7280] mt-2 text-lg">
               Oversee, manage, and assign roles to internal team members.
             </p>
           </div>

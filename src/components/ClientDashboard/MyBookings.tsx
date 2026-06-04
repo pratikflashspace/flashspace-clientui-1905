@@ -603,7 +603,7 @@ const MyBookings: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
             <h1 className="text-3xl md:text-3xl font-extrabold text-[#35503F] tracking-tight">
-              My Bookings
+              <span className="text-black">My</span> Bookings
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your virtual offices and coworking spaces

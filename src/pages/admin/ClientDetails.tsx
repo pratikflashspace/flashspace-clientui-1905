@@ -183,7 +183,7 @@ const ClientDetails = () => {
       >
         <div className="mx-auto max-w-3xl space-y-4 py-24 text-center">
           <h1 className="text-2xl font-bold text-foreground">Client not found</h1>
-          <p className="text-muted-foreground">
+          <p className="text-[#6B7280]">
             This client does not exist or you do not have access to view the details.
           </p>
           <Button onClick={() => navigate("/admin/clients")}>Back to Client Management</Button>
@@ -207,7 +207,7 @@ const ClientDetails = () => {
         <section className="rounded-2xl border border-[#DDE5DA] bg-white px-6 py-5 shadow-sm">
           <div>
             <h1 className="text-xl font-extrabold text-[#123025]">Client Details</h1>
-            <p className="mt-1 text-sm font-medium text-[#607067]">
+            <p className="text-[#6B7280] mt-1 text-sm font-medium text-[#607067]">
               Review client profile and booking activity.
             </p>
           </div>
@@ -236,7 +236,7 @@ const ClientDetails = () => {
               <div className="min-w-0">
                 <h1 className="break-words text-3xl font-bold text-[#10251A]">{client.name}</h1>
 
-              <p className="mt-2 text-[#607067]">
+              <p className="text-[#6B7280] mt-2 text-[#607067]">
                 Client ID:{" "}
                 <span className="font-semibold text-[#35503F]">{client.id}</span>
               </p>
