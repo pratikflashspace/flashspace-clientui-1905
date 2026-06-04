@@ -147,13 +147,13 @@ const RevenueDashboard = () => {
               <table className="w-full">
                 <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       City
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Revenue
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Share
                     </th>
                   </tr>

@@ -435,25 +435,25 @@ export default function BookingManagement() {
           <table className="w-full min-w-[1100px] border-collapse">
             <thead className="bg-muted/40 border-b border-border text-nowrap">
               <tr>
-                <th className="text-center px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-5 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Booking Info
                 </th>
-                <th className="text-left px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-5 pl-[64px] py-4 text-sm font-bold capitalize text-muted-foreground">
                   Client Details
                 </th>
-                <th className="text-center px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-5 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Space & Partner
                 </th>
-                <th className="text-center px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-5 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Plan & Type
                 </th>
-                <th className="text-right px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-right px-5 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Amount
                 </th>
-                <th className="text-center px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-5 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Status
                 </th>
-                <th className="text-center px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground w-36">
+                <th className="text-center px-5 py-4 text-sm font-bold capitalize text-muted-foreground w-36">
                   Actions
                 </th>
               </tr>
@@ -462,8 +462,8 @@ export default function BookingManagement() {
               {paginatedBookings.length > 0 ? (
                 paginatedBookings.map((booking) => (
                   <tr key={booking._id} className="hover:bg-muted/10 transition-colors group">
-                    <td className="px-5 py-3 align-middle text-center">
-                      <div className="flex flex-col items-center gap-1 mx-auto text-center">
+                    <td className="px-5 py-3 align-middle text-left">
+                      <div className="flex flex-col items-start gap-1 text-left">
                         <span className="inline-flex w-fit rounded-lg bg-primary/5 px-2 py-0.5 font-mono text-[11px] font-bold text-primary border border-primary/10">
                           {booking.bookingNumber || booking._id.slice(-8).toUpperCase()}
                         </span>

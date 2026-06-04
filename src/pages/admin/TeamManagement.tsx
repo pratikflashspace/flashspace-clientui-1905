@@ -444,19 +444,19 @@ export default function TeamManagement() {
             <table className="min-w-[800px] w-full text-left">
               <thead className="bg-gray-50/50">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-500 capitalize ">
                     Team Member
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-500 capitalize ">
                     Role
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-500 capitalize ">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-sm font-semibold text-gray-500 capitalize ">
                     Joined Date
                   </th>
-                  {/* <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th> */}
+                  {/* <th className="px-6 py-4 text-sm font-semibold text-gray-500 capitalize text-right">Actions</th> */}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">

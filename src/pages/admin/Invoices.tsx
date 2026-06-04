@@ -849,12 +849,12 @@ const InvoiceTable = ({
         <table className="w-full">
           <thead>
             <tr className="bg-muted/30 border-b border-border">
-              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Invoice / ID</th>
-              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Client</th>
-              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Service / Type</th>
-              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground">Amount</th>
-              <th className="text-left p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground text-center">Status</th>
-              <th className="text-right p-5 text-[10px] font-black uppercase tracking-wider text-muted-foreground pr-8">Actions</th>
+              <th className="text-sm text-left p-5 text-[10px] font-black capitalize text-muted-foreground">Invoice / ID</th>
+              <th className="text-sm text-left p-5 pl-[64px] text-[10px] font-black capitalize text-muted-foreground">Client</th>
+              <th className="text-sm text-left p-5 text-[10px] font-black capitalize text-muted-foreground">Service / Type</th>
+              <th className="text-sm text-left p-5 text-[10px] font-black capitalize text-muted-foreground">Amount</th>
+              <th className="text-sm text-left p-5 text-[10px] font-black capitalize text-muted-foreground text-center">Status</th>
+              <th className="text-sm text-right p-5 text-[10px] font-black capitalize text-muted-foreground pr-8">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">

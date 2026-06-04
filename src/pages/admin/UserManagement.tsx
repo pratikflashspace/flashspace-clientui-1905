@@ -429,11 +429,11 @@ export default function UserManagement() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-gray-50 border-b border-gray-100">
-                        <th className="px-6 py-4 text-sm font-semibold text-foreground"><div className="ml-[60px]">User Profile</div></th>
-                        <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">Role</th>
-                        <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">Verification</th>
-                        <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">Joined Date</th>
-                        <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-widest text-right">Actions</th>
+                        <th className="capitalize px-6 py-4 text-sm font-semibold text-foreground"><div className="ml-[60px]">User Profile</div></th>
+                        <th className="capitalize px-6 py-4 text-sm font-semibold text-foreground text-center">Role</th>
+                        <th className="capitalize px-6 py-4 text-sm font-semibold text-foreground text-center">Verification</th>
+                        <th className="capitalize px-6 py-4 text-sm font-semibold text-foreground text-center">Joined Date</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-muted-foreground capitalize text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">

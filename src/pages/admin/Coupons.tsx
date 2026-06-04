@@ -276,22 +276,22 @@ export default function Coupons() {
                   <table className="w-full text-left">
                     <thead className="bg-muted/50">
                       <tr>
-                        <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-widest">
+                        <th className="px-6 py-4 text-sm font-black text-muted-foreground capitalize ">
                           Coupon Code
                         </th>
-                        <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-widest">
+                        <th className="px-6 py-4 text-sm font-black text-muted-foreground capitalize ">
                           Discount
                         </th>
-                        <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-widest">
+                        <th className="px-6 py-4 text-sm font-black text-muted-foreground capitalize ">
                           Status
                         </th>
-                        <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-widest">
+                        <th className="px-6 py-4 text-center text-sm font-black text-muted-foreground capitalize ">
                           Assigned To
                         </th>
-                        <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-widest">
+                        <th className="px-6 py-4 text-center text-sm font-black text-muted-foreground capitalize ">
                           Expiry
                         </th>
-                        <th className="px-6 py-4 text-xs font-black text-muted-foreground uppercase tracking-widest text-right px-8">
+                        <th className="px-6 py-4 text-sm font-black text-muted-foreground capitalize text-right px-8">
                           Actions
                         </th>
                       </tr>
@@ -332,11 +332,11 @@ export default function Coupons() {
                               </div>
                             </td>
                             <td className="px-6 py-4">
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center justify-center gap-3">
                                 <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground border border-border group-hover:bg-background group-hover:shadow-md transition-all">
                                   <UserIcon className="w-4 h-4" />
                                 </div>
-                                <div>
+                                <div className="text-left">
                                   <p className="text-sm font-bold text-foreground leading-none mb-1">
                                     {(!coupon.assignedClientId || coupon.assignedClientId === "global") ? "Everyone" : (client ? client.fullName : "Unknown Client")}
                                   </p>
@@ -347,7 +347,7 @@ export default function Coupons() {
                               </div>
                             </td>
                             <td className="px-6 py-4">
-                              <div className="flex items-center gap-2 text-muted-foreground">
+                              <div className="flex items-center justify-center gap-2 text-muted-foreground">
                                 <CalendarDays className="w-4 h-4 text-muted-foreground/60" />
                                 <span className="text-xs font-bold text-foreground">
                                   {(() => {
