@@ -676,11 +676,11 @@ export default function AdminPropertyDetails() {
               <table className="w-full text-left text-sm">
                 <thead className="bg-slate-50 text-slate-600">
                   <tr>
-                    <th className="px-6 py-4 font-semibold">Booking ID</th>
-                    <th className="px-6 py-4 font-semibold">User</th>
-                    <th className="px-6 py-4 font-semibold">Space Type</th>
-                    <th className="px-6 py-4 font-semibold">Amount</th>
-                    <th className="px-6 py-4 font-semibold">Status</th>
+                    <th className="text-sm capitalize px-6 py-4 font-semibold">Booking ID</th>
+                    <th className="text-sm capitalize px-6 py-4 font-semibold">User</th>
+                    <th className="text-sm capitalize px-6 py-4 font-semibold">Space Type</th>
+                    <th className="text-sm capitalize px-6 py-4 font-semibold">Amount</th>
+                    <th className="text-sm capitalize px-6 py-4 font-semibold">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">

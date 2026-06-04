@@ -405,26 +405,26 @@ export default function TicketSystem() {
         <table className="w-full">
           <thead className="bg-muted/50">
             <tr>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">
                 Ticket
               </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">
                 Client
               </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">
                 Category
               </th>
 
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">
                 Assignee
               </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">
                 Created
               </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">
                 Status
               </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">
                 Actions
               </th>
             </tr>

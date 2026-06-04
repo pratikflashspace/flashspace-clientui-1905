@@ -147,12 +147,12 @@ export default function KYCPartnerRequests() {
               <table className="min-w-full text-sm">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                    <th className="px-4 py-3">Partner</th>
-                    <th className="px-4 py-3">Contact</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Progress</th>
-                    <th className="px-4 py-3">Created</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
+                    <th className="text-sm capitalize px-4 py-3">Partner</th>
+                    <th className="text-sm capitalize px-4 py-3">Contact</th>
+                    <th className="text-sm capitalize px-4 py-3">Status</th>
+                    <th className="text-sm capitalize px-4 py-3">Progress</th>
+                    <th className="text-sm capitalize px-4 py-3">Created</th>
+                    <th className="text-sm capitalize px-4 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">

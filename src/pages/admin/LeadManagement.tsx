@@ -14,6 +14,7 @@ import {
   Users,
   CheckCircle2,
   Clock,
+  RotateCcw,
 } from "lucide-react";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 import { Badge } from "@/components/ui/badge";
@@ -201,12 +202,12 @@ const LeadManagement = () => {
         <table className="w-full">
           <thead className="bg-muted/50 border-b border-border">
             <tr>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">Name</th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">Email</th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">Mobile Number</th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">Date of Enquiry</th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">Time of Enquiry</th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground text-right">Status</th>
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">Name</th>
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">Email</th>
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">Mobile Number</th>
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">Date of Enquiry</th>
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178]">Time of Enquiry</th>
+              <th className="capitalize text-left p-4 text-sm font-semibold text-[#699178] text-right">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -323,6 +324,14 @@ const LeadManagement = () => {
               <Input type="date" className="w-[150px]" value={dateRange.end} onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))} />
             </div>
           </div>
+
+          <Button
+            onClick={() => void fetchLeads(pagination.page, false)}
+            className="h-10 px-4 font-semibold bg-primary text-[#FEF8C5] hover:bg-primary/90 hover:text-[#FEF8C5] ml-auto"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Refresh Data
+          </Button>
 
           {(searchQuery || dateRange.start || dateRange.end) && (
             <Button variant="ghost" onClick={() => { setSearchQuery(""); setDateRange({ start: "", end: "" }); }} className="text-muted-foreground hover:text-foreground">Clear Filters</Button>

@@ -257,16 +257,16 @@ const BalanceSheet = () => {
               <table className="w-full">
                 <thead className="bg-muted/50 border-b border-border">
                   <tr>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Month
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Revenue
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Expenses
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Net Profit
                     </th>
                   </tr>
@@ -349,19 +349,19 @@ const BalanceSheet = () => {
               <table className="w-full">
                 <thead className="bg-muted/50 border-b border-border">
                   <tr>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       City
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Revenue
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Expenses
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Profit
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Margin
                     </th>
                   </tr>

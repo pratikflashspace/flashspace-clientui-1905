@@ -110,7 +110,7 @@ const StatCard = ({
         <Icon className="w-4 h-4" />
       </div>
     </div>
-    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-[24px] font-extrabold tracking-tight ${isActive ? 'text-primary' : 'text-foreground'}`}>{value}</h3>
+    <h3 style={{ fontFamily: "'Inter', sans-serif" }} className={`text-[24px] font-extrabold tracking-tight ${isActive ? 'text-[#1A1A1A]' : 'text-foreground'}`}>{value}</h3>
     {sub && <p className="text-[10px] text-muted-foreground/60 mt-1 font-bold italic">{sub}</p>}
   </div>
 );
@@ -512,14 +512,14 @@ export default function AdminAffiliateManagement() {
             <div className="overflow-x-auto scrollbar-none">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-muted/50 text-left text-xs font-black text-muted-foreground uppercase tracking-widest border-b border-border">
-                    <th className="px-5 py-4">Affiliate Partner</th>
-                    <th className="px-5 py-4">Verified Status</th>
-                    <th className="px-5 py-4 text-center">Clients</th>
-                    <th className="px-5 py-4">Revenue</th>
-                    <th className="px-5 py-4">Commission</th>
-                    <th className="px-5 py-4">Joined On</th>
-                    <th className="px-5 py-4" />
+                  <tr className="bg-muted/50 text-left border-b border-border text-[#699178]">
+                    <th className="text-sm capitalize px-5 py-4 pl-[64px]">Affiliate Partner</th>
+                    <th className="text-sm capitalize px-5 py-4">Verified Status</th>
+                    <th className="text-sm capitalize px-5 py-4 text-center">Clients</th>
+                    <th className="text-sm capitalize px-5 py-4">Revenue</th>
+                    <th className="text-sm capitalize px-5 py-4">Commission</th>
+                    <th className="text-sm capitalize px-5 py-4">Joined On</th>
+                    <th className="text-sm capitalize px-5 py-4" />
                   </tr>
                 </thead>
                 <tbody>

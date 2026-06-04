@@ -522,25 +522,25 @@ const AdminPartnerInvoices = () => {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-border bg-muted/30">
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">
                           Invoice #
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">
                           Partner Details
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">
                           Date
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">
                           Amount
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">
                           Status
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">
                           Payment Details
                         </th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase text-center">
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize text-center">
                           Action
                         </th>
                       </tr>

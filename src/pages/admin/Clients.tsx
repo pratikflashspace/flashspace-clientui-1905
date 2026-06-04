@@ -171,14 +171,14 @@ const ClientManagement = () => {
       </p>
 
       <div className="hidden md:block overflow-hidden rounded-xl border border-border bg-background shadow-sm">
-        <div className="grid grid-cols-[minmax(230px,1.25fr)_minmax(220px,1.1fr)_92px_120px_112px_92px_112px] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-          <span>Client</span>
-          <span>Contact</span>
-          <span>Bookings</span>
+        <div className="grid grid-cols-[minmax(230px,1.25fr)_minmax(220px,1.1fr)_92px_120px_112px_92px_112px] gap-4 border-b border-border bg-muted/40 px-4 py-3 text-sm capitalize font-semibold text-[#699178]">
+          <span className="pl-[48px]">Client</span>
+          <span className="text-center">Contact</span>
+          <span className="text-center">Bookings</span>
           <span>Revenue</span>
           <span>Last Booking</span>
           <span>Status</span>
-          <span className="text-right">Action</span>
+          <span className="text-center">Action</span>
         </div>
 
         <div className="divide-y divide-border">
@@ -209,7 +209,7 @@ const ClientManagement = () => {
                   </div>
                 </div>
 
-                <div className="min-w-0">
+                <div className="min-w-0 text-center">
                   <p className="truncate text-sm font-semibold text-foreground">
                     {client.email}
                   </p>
@@ -218,7 +218,7 @@ const ClientManagement = () => {
                   </p>
                 </div>
 
-                <p className="text-sm font-extrabold text-foreground">
+                <p className="text-sm font-extrabold text-foreground text-center">
                   {client.bookingCount}
                 </p>
                 <p className="truncate text-sm font-extrabold text-foreground">
@@ -228,7 +228,7 @@ const ClientManagement = () => {
                   {formatDate(client.lastBookingDate)}
                 </p>
                 <div>{renderStatusBadge(client.statusLabel)}</div>
-                <div className="flex justify-end">
+                <div className="flex justify-center">
                   <span className="inline-flex h-9 items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 text-xs font-extrabold text-primary transition-colors group-hover:bg-primary/10">
                     <Eye className="h-3.5 w-3.5" />
                     View

@@ -221,25 +221,25 @@ const ReceivablePayable = () => {
               <table className="w-full">
                 <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Client
                     </th>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Booking
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Amount
                     </th>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Due Date
                     </th>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Age
                     </th>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Status
                     </th>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Actions
                     </th>
                   </tr>
@@ -326,25 +326,25 @@ const ReceivablePayable = () => {
               <table className="w-full">
                 <thead className="bg-muted/50">
                   <tr>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Partner
                     </th>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       City
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Payout (70%)
                     </th>
-                    <th className="text-right p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-right p-4 text-sm font-semibold text-foreground">
                       Bookings
                     </th>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Due Date
                     </th>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Status
                     </th>
-                    <th className="text-left p-4 text-sm font-semibold text-foreground">
+                    <th className="capitalize text-left p-4 text-sm font-semibold text-foreground">
                       Actions
                     </th>
                   </tr>

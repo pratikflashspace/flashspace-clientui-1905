@@ -167,10 +167,9 @@ const TrackProgress = () => {
           />
         </div>
         <Button
-          variant="outline"
           onClick={() => void fetchData(true)}
           disabled={refreshing}
-          className="h-11 px-6 font-semibold hover:bg-primary hover:text-[#FEF8C5]"
+          className="h-11 px-6 font-semibold bg-primary text-[#FEF8C5] hover:bg-primary/90 hover:text-[#FEF8C5]"
         >
           {refreshing ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -186,31 +185,31 @@ const TrackProgress = () => {
           <table className="w-full min-w-[950px]">
             <thead className="bg-muted/40 border-b border-border text-nowrap">
               <tr>
-                <th className="text-left px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-4 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Booking ID
                 </th>
-                <th className="text-left px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left px-4 py-4 pl-[52px] text-sm font-bold capitalize text-muted-foreground">
                   User Name
                 </th>
-                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Space Booked
                 </th>
-                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-sm font-bold capitalize text-muted-foreground">
                   KYC Admin
                 </th>
-                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-sm font-bold capitalize text-muted-foreground">
                   KYC Partner
                 </th>
-                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Draft Sent
                 </th>
-                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Draft Signed
                 </th>
-                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Agreement
                 </th>
-                <th className="text-center px-4 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-4 py-4 text-sm font-bold capitalize text-muted-foreground">
                   Support Docs
                 </th>
               </tr>

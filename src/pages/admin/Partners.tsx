@@ -197,22 +197,22 @@ const PartnersManagementTab = () => {
           <table className="w-full">
             <thead className="bg-muted/50 border-b border-border">
               <tr>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left p-4 pl-[64px] text-sm font-bold capitalize text-muted-foreground">
                   Partner
                 </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left p-4 text-sm font-bold capitalize text-muted-foreground">
                   Email
                 </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left p-4 text-sm font-bold capitalize text-muted-foreground">
                   Phone
                 </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-left p-4 text-sm font-bold capitalize text-muted-foreground">
                   Spaces
                 </th>
-                <th className="text-left p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center p-4 text-sm font-bold capitalize text-muted-foreground">
                   KYC
                 </th>
-                <th className="text-right p-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center p-4 text-sm font-bold capitalize text-muted-foreground">
                   Action
                 </th>
               </tr>
@@ -263,18 +263,18 @@ const PartnersManagementTab = () => {
                     </td>
                     <td className="p-4">
                       {partner.kycVerified ? (
-                        <div className="flex items-center text-green-600 gap-1 text-sm font-medium">
+                        <div className="flex items-center justify-center text-green-600 gap-1 text-sm font-medium">
                           <CheckCircle className="w-4 h-4" />
                           Verified
                         </div>
                       ) : (
-                        <div className="flex items-center text-amber-600 gap-1 text-sm font-medium">
+                        <div className="flex items-center justify-center text-amber-600 gap-1 text-sm font-medium">
                           <XCircle className="w-4 h-4" />
                           Pending
                         </div>
                       )}
                     </td>
-                    <td className="p-4 text-right">
+                    <td className="p-4 text-center">
                       <Button
                         variant="ghost"
                         className="text-primary"
@@ -796,13 +796,13 @@ const PartnerInvoicesTab = () => {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-border bg-muted/30">
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Invoice #</th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Partner Details</th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Date</th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Amount</th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Status</th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase">Payment Details</th>
-                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase text-center">Action</th>
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">Invoice #</th>
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">Partner Details</th>
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">Date</th>
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">Amount</th>
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">Status</th>
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize">Payment Details</th>
+                        <th className="px-6 py-4 text-sm font-bold text-muted-foreground capitalize text-center">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">

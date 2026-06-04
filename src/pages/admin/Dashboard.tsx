@@ -202,9 +202,9 @@ export default function AdminDashboard() {
               <table className="w-full text-sm">
                 <thead className="bg-muted/50 border-b border-border">
                   <tr>
-                    <th className="text-left p-4 font-semibold text-muted-foreground">User</th>
-                    <th className="text-left p-4 font-semibold text-muted-foreground">Date</th>
-                    <th className="text-left p-4 font-semibold text-muted-foreground">Time</th>
+                    <th className="text-sm capitalize text-left p-4 font-semibold text-muted-foreground">User</th>
+                    <th className="text-sm capitalize text-left p-4 font-semibold text-muted-foreground">Date</th>
+                    <th className="text-sm capitalize text-left p-4 font-semibold text-muted-foreground">Time</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -254,9 +254,9 @@ export default function AdminDashboard() {
               <table className="w-full text-sm">
                 <thead className="bg-muted/50 border-b border-border">
                   <tr>
-                    <th className="text-left p-4 font-semibold text-muted-foreground">Client</th>
-                    <th className="text-left p-4 font-semibold text-muted-foreground">Space</th>
-                    <th className="text-left p-4 font-semibold text-muted-foreground">Amount</th>
+                    <th className="text-sm capitalize text-left p-4 font-semibold text-muted-foreground">Client</th>
+                    <th className="text-sm capitalize text-left p-4 font-semibold text-muted-foreground">Space</th>
+                    <th className="text-sm capitalize text-left p-4 font-semibold text-muted-foreground">Amount</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
