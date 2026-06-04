@@ -414,9 +414,7 @@ export default function TicketSystem() {
               <th className="text-left p-4 text-sm font-semibold text-foreground">
                 Category
               </th>
-              <th className="text-left p-4 text-sm font-semibold text-foreground">
-                Priority
-              </th>
+
               <th className="text-left p-4 text-sm font-semibold text-foreground">
                 Assignee
               </th>
@@ -455,7 +453,7 @@ export default function TicketSystem() {
                     {formatCategory(ticket.category)}
                   </Badge>
                 </td>
-                <td className="p-4">{getPriorityBadge("medium")}</td>
+
                 <td className="p-4">
                   <div className="flex items-center gap-2">
                     <Avatar className="w-6 h-6">
@@ -484,7 +482,7 @@ export default function TicketSystem() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleViewTicket(ticket)}
-                    className="gap-1"
+                    className="gap-1 bg-transparent border-border text-foreground hover:bg-primary hover:text-[#FEF8C5] hover:border-primary"
                   >
                     <Eye className="w-4 h-4" />
                     View
@@ -563,7 +561,7 @@ export default function TicketSystem() {
               variant="outline"
               size="sm"
               onClick={() => handleViewTicket(ticket)}
-              className="w-full gap-2 mt-2 h-9 border-muted-foreground/20"
+              className="w-full gap-2 mt-2 h-9 bg-transparent text-foreground border-border hover:bg-primary hover:text-[#FEF8C5] hover:border-primary"
             >
               <Eye className="w-4 h-4" />
               View Ticket Details
@@ -640,12 +638,12 @@ export default function TicketSystem() {
 
         <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-muted-foreground">Resolved (MTD)</span>
+            <span className="text-sm font-medium text-muted-foreground">Resolved Tickets</span>
             <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center">
               <CheckCircle className="w-4 h-4 text-green-600" />
             </div>
           </div>
-          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-green-600 tracking-tight">{stats.resolvedThisMonth}</h3>
+          <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-[24px] font-extrabold text-green-600 tracking-tight">{stats.resolved}</h3>
         </div>
 
         <div className="bg-background border border-border rounded-xl shadow-[rgba(23,34,38,0.08)_0px_4px_24px_-4px] p-6 transition-all hover:shadow-lg">
@@ -687,7 +685,7 @@ export default function TicketSystem() {
             <TabsTrigger value="escalated" className="px-4 py-2 text-sm">
               Escalated ({stats.escalated})
             </TabsTrigger>
-            <TabsTrigger value="resolved" className="px-4 py-2 text-sm">Resolved</TabsTrigger>
+            <TabsTrigger value="resolved" className="px-4 py-2 text-sm">Resolved ({stats.resolved})</TabsTrigger>
           </TabsList>
         </div>
 

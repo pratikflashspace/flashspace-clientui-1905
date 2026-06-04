@@ -21,7 +21,6 @@ import {
   NotificationType,
 } from "@/services/adminNotification.service";
 
-type FilterType = "all" | "unread" | "read";
 type ActiveView = "recent" | "deleted";
 
 type NotificationVisualMeta = {
@@ -129,7 +128,6 @@ export default function Notifications() {
   const [loading, setLoading] = useState(true);
   const [loadingDeleted, setLoadingDeleted] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterType, setFilterType] = useState<FilterType>("all");
   const [activeView, setActiveView] = useState<ActiveView>("recent");
   const [deletedNotifications, setDeletedNotifications] = useState<
     AdminNotification[]
@@ -186,14 +184,9 @@ export default function Notifications() {
         notification.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         notification.message.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesFilter =
-        filterType === "all" ||
-        (filterType === "unread" && !notification.read) ||
-        (filterType === "read" && notification.read);
-
-      return matchesSearch && matchesFilter;
+      return matchesSearch;
     });
-  }, [activeView, deletedNotifications, filterType, notifications, searchQuery]);
+  }, [activeView, deletedNotifications, notifications, searchQuery]);
 
   const handleMarkAsRead = async (id: string) => {
     try {
@@ -346,7 +339,7 @@ export default function Notifications() {
                 <h1 className="text-[30px] font-extrabold tracking-tight text-black" style={{ fontFamily: "'Inter', sans-serif" }}>
                   My <span className="italic text-primary">Notifications</span>
                 </h1>
-                <p className="text-sm font-medium text-gray-500 md:text-base">
+                <p className="text-sm font-medium text-[#6B7280] md:text-base">
                   Stay updated with system activities, booking alerts, and ticket
                   updates.
                 </p>
@@ -414,28 +407,7 @@ export default function Notifications() {
                     </button>
                   ))}
                 </div>
-                {activeView === "recent" ? (
-                  <div className="inline-flex rounded-2xl border border-gray-200 bg-white p-1 shadow-sm">
-                    {([
-                      { value: "all", label: "All" },
-                      { value: "unread", label: "Unread" },
-                      { value: "read", label: "Read" },
-                    ] as const).map((item) => (
-                      <button
-                        key={item.value}
-                        type="button"
-                        onClick={() => setFilterType(item.value)}
-                        className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                          filterType === item.value
-                            ? "bg-[#35503F] text-white"
-                            : "text-gray-500 hover:bg-gray-50"
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
+
               </div>
               <div className="text-sm font-bold uppercase tracking-wider text-gray-400">
                 {filteredNotifications.length} total

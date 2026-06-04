@@ -71,7 +71,7 @@ interface PaymentDetails {
   markedPaidAt?: string;
 }
 
-const paymentMethods = ["Bank Transfer", "UPI", "NEFT", "RTGS", "IMPS", "Other"];
+const paymentMethods = ["Bank Transfer", "NEFT", "RTGS", "IMPS", "Paytm", "PhonePe", "GooglePay", "UPI", "Other"];
 
 const todayInputValue = () => new Date().toISOString().slice(0, 10);
 
@@ -383,7 +383,7 @@ const AdminPartnerInvoices = () => {
         <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
           Partner Invoices <span className="text-primary italic">Management</span>
         </h1>
-        <p className="text-sm md:text-base text-muted-foreground mt-1">
+        <p className="text-sm md:text-base text-[#6B7280] mt-1">
           Review invoices submitted by Space Partners and manage payouts.
         </p>
       </div>
@@ -494,7 +494,7 @@ const AdminPartnerInvoices = () => {
         </div>
       </div>
 
-      <div className="bg-background border border-border rounded-2xl shadow-sm overflow-hidden min-h-[450px]">
+      <div className="bg-background border border-border rounded-xl shadow-sm overflow-hidden min-h-[450px]">
         {loading ? (
           <div className="p-8">
             <TableSkeleton rows={8} cols={7} />
@@ -744,7 +744,7 @@ const AdminPartnerInvoices = () => {
       )}
 
       {paymentModalOpen && (
-        <div className="fixed inset-0 z-[1500] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[1500] flex items-center justify-center bg-black/60 p-4 backdrop-blur-md">
           <div
             role="dialog"
             aria-modal="true"
@@ -785,11 +785,11 @@ const AdminPartnerInvoices = () => {
                   <div className="space-y-2">
                     <Label>Payment Method</Label>
                     <Select
-                      value={paymentForm.paymentMethod}
+                      value={paymentForm.paymentMethod || "none"}
                       onValueChange={(value) =>
                         setPaymentForm((prev) => ({
                           ...prev,
-                          paymentMethod: value,
+                          paymentMethod: value === "none" ? "" : value,
                         }))
                       }
                     >
@@ -797,6 +797,9 @@ const AdminPartnerInvoices = () => {
                         <SelectValue placeholder="Select method" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="none" className="hidden">
+                          Select method
+                        </SelectItem>
                         {paymentMethods.map((method) => (
                           <SelectItem key={method} value={method}>
                             {method}

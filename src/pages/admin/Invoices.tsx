@@ -650,7 +650,7 @@ const Invoices = () => {
                 <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
                   Payment <span className="text-primary italic">Received</span>
                 </h1>
-                <p className="text-muted-foreground mt-2">
+                <p className="text-[#6B7280] mt-2">
                   Review and manage all client invoices and booking payments.
                 </p>
               </>
@@ -659,7 +659,7 @@ const Invoices = () => {
                 <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
                   Invoice <span className="text-primary italic">Management</span>
                 </h1>
-                <p className="text-muted-foreground mt-2">
+                <p className="text-[#6B7280] mt-2">
                   Upload and issue manual invoices directly to users.
                 </p>
               </>
@@ -844,7 +844,7 @@ const InvoiceTable = ({
     );
 
   return (
-    <div className="bg-background border border-border rounded-2xl overflow-hidden shadow-sm">
+    <div className="bg-background border border-border rounded-xl overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>

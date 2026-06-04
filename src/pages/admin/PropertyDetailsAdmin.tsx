@@ -666,7 +666,7 @@ export default function AdminPropertyDetails() {
           </div>
 
           {/* Bookings Section */}
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
               <h2 className="text-lg font-bold text-slate-900">
                 Property Bookings ({bookings.length})

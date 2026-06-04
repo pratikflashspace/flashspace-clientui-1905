@@ -96,7 +96,7 @@ const RevenueDashboard = () => {
         <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
           Revenue <span className="text-primary italic">Dashboard</span>
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-[#6B7280] mt-2">
           Complete financial overview and analytics
         </p>
       </div>

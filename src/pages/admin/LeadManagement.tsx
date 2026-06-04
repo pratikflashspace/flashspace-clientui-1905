@@ -260,7 +260,7 @@ const LeadManagement = () => {
           <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
             Lead <span className="text-primary italic">Management</span>
           </h1>
-          <p className="text-muted-foreground mt-2">Track and manage your incoming leads</p>
+          <p className="text-[#6B7280] mt-2">Track and manage your incoming leads</p>
         </div>
       </div>
 
@@ -342,10 +342,10 @@ const LeadManagement = () => {
           Total <span className="text-foreground font-bold">{pagination.total}</span> leads
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" disabled={pagination.page <= 1} onClick={() => fetchLeads(pagination.page - 1)} className="gap-1">
+          <Button variant="outline" size="sm" disabled={pagination.page <= 1} onClick={() => fetchLeads(pagination.page - 1)} className="gap-1 hover:bg-primary hover:text-[#FEF8C5]">
             <ChevronLeft className="w-4 h-4" /> Previous
           </Button>
-          <Button variant="outline" size="sm" disabled={pagination.page >= pagination.pages} onClick={() => fetchLeads(pagination.page + 1)} className="gap-1 bg-primary text-white hover:bg-primary/90">
+          <Button variant="outline" size="sm" disabled={pagination.page >= pagination.pages} onClick={() => fetchLeads(pagination.page + 1)} className="gap-1 hover:bg-primary hover:text-[#FEF8C5]">
             Next <ChevronRight className="w-4 h-4" />
           </Button>
         </div>

@@ -233,38 +233,38 @@ export default function UserManagement() {
       case "super_admin":
         return {
           label: "Super Admin",
-          className: "bg-red-50 text-red-700 border-red-200 font-bold",
+          className: "bg-[#35503F] text-[#FEF8C3] border-[#35503F] font-bold hover:bg-[#FEF8C3] hover:text-[#35503F] transition-colors duration-300",
           icon: <Shield className="w-3 h-3" />,
         };
       case "admin":
         return {
           label: "Admin",
-          className: "bg-purple-50 text-purple-700 border-purple-200",
+          className: "bg-[#35503F] text-[#FEF8C3] border-[#35503F] font-bold hover:bg-[#FEF8C3] hover:text-[#35503F] transition-colors duration-300",
           icon: <Shield className="w-3 h-3" />,
         };
       case "partner":
         return {
           label: "Space Partner",
-          className: "bg-orange-50 text-orange-700 border-orange-200",
+          className: "bg-[#35503F] text-[#FEF8C3] border-[#35503F] font-bold hover:bg-[#FEF8C3] hover:text-[#35503F] transition-colors duration-300",
           icon: <Users className="w-3 h-3" />,
         };
       case "affiliate":
         return {
           label: "Affiliate Partner",
-          className: "bg-cyan-50 text-cyan-700 border-cyan-200",
+          className: "bg-[#35503F] text-[#FEF8C3] border-[#35503F] font-bold hover:bg-[#FEF8C3] hover:text-[#35503F] transition-colors duration-300",
           icon: <Users className="w-3 h-3" />,
         };
       case "sales":
         return {
           label: "Sales Team",
-          className: "bg-green-50 text-green-700 border-green-200",
+          className: "bg-[#35503F] text-[#FEF8C3] border-[#35503F] font-bold hover:bg-[#FEF8C3] hover:text-[#35503F] transition-colors duration-300",
           icon: <Users className="w-3 h-3" />,
         };
       case "user":
       default:
         return {
           label: "Client",
-          className: "bg-blue-50 text-blue-700 border-blue-200",
+          className: "bg-[#35503F] text-[#FEF8C3] border-[#35503F] font-bold hover:bg-[#FEF8C3] hover:text-[#35503F] transition-colors duration-300",
           icon: null,
         };
     }
@@ -295,7 +295,7 @@ export default function UserManagement() {
             <h1 className="text-[30px] font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
               User <span className="text-primary italic">Management</span>
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-[#6B7280] mt-2">
               Oversee, manage, and analyze user base.
             </p>
           </div>
@@ -369,7 +369,7 @@ export default function UserManagement() {
         </div>
 
         {/* Main Content Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Toolbar */}
           <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-white">
             <div className="relative flex-1 w-full md:max-w-md">
@@ -429,10 +429,10 @@ export default function UserManagement() {
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="bg-gray-50 border-b border-gray-100">
-                        <th className="px-6 py-4 text-sm font-semibold text-foreground">User Profile</th>
-                        <th className="px-6 py-4 text-sm font-semibold text-foreground">Role</th>
-                        <th className="px-6 py-4 text-sm font-semibold text-foreground">Verification</th>
-                        <th className="px-6 py-4 text-sm font-semibold text-foreground">Joined Date</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-foreground"><div className="ml-[60px]">User Profile</div></th>
+                        <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">Role</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">Verification</th>
+                        <th className="px-6 py-4 text-sm font-semibold text-foreground text-center">Joined Date</th>
                         <th className="px-6 py-4 text-xs font-semibold text-muted-foreground uppercase tracking-widest text-right">Actions</th>
                       </tr>
                     </thead>
@@ -463,52 +463,58 @@ export default function UserManagement() {
                               </div>
                             </td>
                             <td className="px-6 py-5">
-                              {viewMode === "active" ? (
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className="focus:outline-none">
-                                    <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black tracking-wider border uppercase transition-all hover:bg-white hover:shadow-md ${roleBadge.className}`}>
-                                      {roleBadge.icon}
-                                      {roleBadge.label}
-                                      <ChevronDown className="w-3 h-3 opacity-50" />
-                                    </span>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuPortal>
-                                    <DropdownMenuContent align="start" className="w-56 bg-white shadow-2xl border-0 rounded-2xl p-2 z-[100]">
-                                      <DropdownMenuLabel className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 py-3">Assign New Role</DropdownMenuLabel>
-                                      <DropdownMenuSeparator className="bg-gray-50 mx-2" />
-                                      {["user", "partner", "affiliate", "sales", "support", "admin"].map((r) => (
-                                        <DropdownMenuItem 
-                                          key={r}
-                                          onClick={() => handleUpdateRole(user, r)}
-                                          className="flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
-                                        >
-                                          <span className="text-xs font-bold capitalize">{r.replace("_", " ")}</span>
-                                          {user.role === r && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
-                                        </DropdownMenuItem>
-                                      ))}
-                                    </DropdownMenuContent>
-                                  </DropdownMenuPortal>
-                                </DropdownMenu>
-                              ) : (
-                                <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black tracking-wider border uppercase ${roleBadge.className}`}>
-                                  {roleBadge.icon}
-                                  {roleBadge.label}
+                              <div className="flex justify-center">
+                                {viewMode === "active" ? (
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger className="focus:outline-none">
+                                      <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold tracking-wide border capitalize transition-all hover:shadow-md ${roleBadge.className}`}>
+                                        {roleBadge.icon}
+                                        {roleBadge.label}
+                                        <ChevronDown className="w-3 h-3 opacity-50" />
+                                      </span>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuPortal>
+                                      <DropdownMenuContent align="start" className="w-56 bg-white shadow-2xl border-0 rounded-2xl p-2 z-[100]">
+                                        <DropdownMenuLabel className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 py-3">Assign New Role</DropdownMenuLabel>
+                                        <DropdownMenuSeparator className="bg-gray-50 mx-2" />
+                                        {["user", "partner", "affiliate", "sales", "support", "admin"].map((r) => (
+                                          <DropdownMenuItem 
+                                            key={r}
+                                            onClick={() => handleUpdateRole(user, r)}
+                                            className="flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors"
+                                          >
+                                            <span className="text-xs font-bold capitalize">{r.replace("_", " ")}</span>
+                                            {user.role === r && <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                                          </DropdownMenuItem>
+                                        ))}
+                                      </DropdownMenuContent>
+                                    </DropdownMenuPortal>
+                                  </DropdownMenu>
+                                ) : (
+                                  <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold tracking-wide border capitalize ${roleBadge.className}`}>
+                                    {roleBadge.icon}
+                                    {roleBadge.label}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-5">
+                              <div className="flex justify-center">
+                                {viewMode === "deleted" ? (
+                                  <span className="inline-flex items-center gap-2 text-[10px] font-black text-red-600 uppercase tracking-widest bg-red-50 px-2 py-1 rounded-lg">Deleted</span>
+                                ) : user.isEmailVerified ? (
+                                  <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-green-600 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">Verified</span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-amber-600 uppercase tracking-widest bg-amber-50 px-2 py-1 rounded-lg">Pending</span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-6 py-5">
+                              <div className="flex justify-center">
+                                <span className="text-[11px] text-muted-foreground font-black uppercase tracking-widest">
+                                  {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                                 </span>
-                              )}
-                            </td>
-                            <td className="px-6 py-5">
-                              {viewMode === "deleted" ? (
-                                <span className="inline-flex items-center gap-2 text-[10px] font-black text-red-600 uppercase tracking-widest bg-red-50 px-2 py-1 rounded-lg">Deleted</span>
-                              ) : user.isEmailVerified ? (
-                                <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-green-600 uppercase tracking-widest bg-green-50 px-2 py-1 rounded-lg">Verified</span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-amber-600 uppercase tracking-widest bg-amber-50 px-2 py-1 rounded-lg">Pending</span>
-                              )}
-                            </td>
-                            <td className="px-6 py-5">
-                              <span className="text-[11px] text-muted-foreground font-black uppercase tracking-widest">
-                                {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                              </span>
+                              </div>
                             </td>
                             <td className="px-6 py-5 text-right whitespace-nowrap">
                               <DropdownMenu>
@@ -591,7 +597,7 @@ export default function UserManagement() {
                         </div>
 
                         <div className="flex flex-wrap gap-2 pt-2">
-                          <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black tracking-wider border uppercase ${roleBadge.className}`}>
+                          <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-[11px] font-bold tracking-wide border capitalize ${roleBadge.className}`}>
                             {roleBadge.label}
                           </span>
                           {user.isEmailVerified ? (

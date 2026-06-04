@@ -159,7 +159,7 @@ const BalanceSheet = () => {
           <h1 className="text-2xl md:text-3xl font-extrabold text-foreground tracking-tight">
             Balance <span className="text-primary italic">Sheet</span>
           </h1>
-          <p className="text-sm md:text-base text-muted-foreground mt-1">
+          <p className="text-sm md:text-base text-[#6B7280] mt-1">
             Complete financial summary and reports
           </p>
         </div>

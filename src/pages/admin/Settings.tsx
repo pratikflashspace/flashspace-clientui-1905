@@ -384,7 +384,7 @@ export default function AdminSettings() {
           <h1 className="text-[30px] font-extrabold text-foreground tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
             Settings
           </h1>
-          <p className="text-sm md:text-base text-muted-foreground font-medium max-w-2xl">
+          <p className="text-sm md:text-base text-[#6B7280] font-medium max-w-2xl">
             Manage your account and platform preferences.
           </p>
         </div>

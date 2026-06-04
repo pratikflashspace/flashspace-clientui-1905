@@ -65,7 +65,7 @@ export default function BusinessKYCDetails() {
 					<h1 className="text-2xl font-bold text-gray-900 tracking-tight font-[Poppins]">
 						Business KYC Details
 					</h1>
-					<p className="text-gray-500 mt-1 text-sm">
+					<p className="text-[#6B7280] mt-1 text-sm">
 						Review the business information associated with this KYC request.
 					</p>
 				</div>

@@ -306,7 +306,7 @@ export default function BookingManagement() {
         <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
           Booking <span className="text-primary italic">Management</span>
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-[#6B7280] mt-2">
           Centralized booking control for every client, partner, and space.
         </p>
       </div>
@@ -435,16 +435,16 @@ export default function BookingManagement() {
           <table className="w-full min-w-[1100px] border-collapse">
             <thead className="bg-muted/40 border-b border-border text-nowrap">
               <tr>
-                <th className="text-left px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Booking Info
                 </th>
                 <th className="text-left px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Client Details
                 </th>
-                <th className="text-left px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Space & Partner
                 </th>
-                <th className="text-left px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <th className="text-center px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Plan & Type
                 </th>
                 <th className="text-right px-5 py-4 text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -462,12 +462,12 @@ export default function BookingManagement() {
               {paginatedBookings.length > 0 ? (
                 paginatedBookings.map((booking) => (
                   <tr key={booking._id} className="hover:bg-muted/10 transition-colors group">
-                    <td className="px-5 py-4 align-middle">
-                      <div className="flex flex-col gap-1">
-                        <span className="inline-flex w-fit rounded-lg bg-primary/5 px-2.5 py-0.5 font-mono text-xs font-bold text-primary border border-primary/10">
+                    <td className="px-5 py-3 align-middle text-center">
+                      <div className="flex flex-col items-center gap-1 mx-auto text-center">
+                        <span className="inline-flex w-fit rounded-lg bg-primary/5 px-2 py-0.5 font-mono text-[11px] font-bold text-primary border border-primary/10">
                           {booking.bookingNumber || booking._id.slice(-8).toUpperCase()}
                         </span>
-                        <span className="text-xs font-medium text-muted-foreground">
+                        <span className="text-[10px] font-medium text-muted-foreground">
                           {booking.createdAt
                             ? format(new Date(booking.createdAt), "dd MMM yyyy, hh:mm aa")
                             : "No date"}
@@ -475,54 +475,54 @@ export default function BookingManagement() {
                       </div>
                     </td>
                     
-                    <td className="px-5 py-4 align-middle">
+                    <td className="px-5 py-3 align-middle">
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9 border border-border shadow-sm">
+                        <Avatar className="h-8 w-8 border border-border shadow-sm">
                           {booking.user?.profilePicture && (
                             <AvatarImage src={booking.user.profilePicture} alt={booking.user.fullName} className="object-cover" />
                           )}
-                          <AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
+                          <AvatarFallback className="bg-primary/10 text-[11px] font-bold text-primary">
                             {booking.user?.fullName ? getInitial(booking.user.fullName) : <Users className="h-4 w-4" />}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col min-w-0">
-                          <span className="font-bold text-[15px] text-foreground line-clamp-1">
+                          <span className="font-bold text-[13px] text-foreground truncate">
                             {booking.user?.fullName || "Guest User"}
                           </span>
-                          <span className="text-xs text-muted-foreground line-clamp-1" title={booking.user?.email || "No email"}>
+                          <span className="text-[11px] text-muted-foreground truncate" title={booking.user?.email || "No email"}>
                             {booking.user?.email || "No email"}
                           </span>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-5 py-4 align-middle">
-                      <div className="flex flex-col gap-1.5 max-w-[240px]">
-                        <span className="text-[15px] font-bold text-foreground line-clamp-1" title={booking.spaceSnapshot?.name || "Unknown Space"}>
+                    <td className="px-5 py-3 align-middle text-center">
+                      <div className="flex flex-col items-center gap-1 max-w-[240px] mx-auto text-center">
+                        <span className="text-[13px] font-bold text-foreground truncate w-full" title={booking.spaceSnapshot?.name || "Unknown Space"}>
                           {booking.spaceSnapshot?.name || "Unknown Space"}
                         </span>
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <Badge variant="secondary" className="text-xs font-medium px-1.5 py-0">
+                        <div className="flex flex-wrap items-center justify-center gap-1.5">
+                          <Badge variant="secondary" className="text-[10px] font-medium px-1.5 py-0">
                             {booking.spaceSnapshot?.city || "No city"}
                           </Badge>
-                          <span className="inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-xs font-semibold text-emerald-800 border border-emerald-100 max-w-[120px] truncate" title={getPartnerName(booking)}>
+                          <span className="inline-flex items-center rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-800 border border-emerald-100 max-w-[120px] truncate" title={getPartnerName(booking)}>
                             {getPartnerName(booking)}
                           </span>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-5 py-4 align-middle">
-                      <div className="flex flex-col gap-1.5">
-                        <span className="text-[15px] font-bold text-foreground line-clamp-1">
+                    <td className="px-5 py-3 align-middle text-center">
+                      <div className="flex flex-col items-center gap-1 mx-auto text-center">
+                        <span className="text-[13px] font-bold text-foreground truncate w-full">
                           {booking.plan?.name || "Custom Plan"}
                         </span>
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-xs font-medium text-slate-700">
+                        <div className="flex flex-wrap items-center justify-center gap-1.5">
+                          <span className="inline-flex items-center rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-700">
                             {formatBookingType(booking.type)}
                           </span>
                           {booking.plan?.tenure && (
-                            <span className="inline-flex items-center rounded bg-amber-50 px-1.5 py-0.5 text-xs font-semibold text-amber-800 border border-amber-100">
+                            <span className="inline-flex items-center rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 border border-amber-100">
                               {booking.plan.tenure} {booking.plan.tenureUnit || ""}
                             </span>
                           )}
@@ -530,17 +530,17 @@ export default function BookingManagement() {
                       </div>
                     </td>
 
-                    <td className="px-5 py-4 align-middle text-right">
-                      <span className="font-bold text-base text-foreground">
+                    <td className="px-5 py-3 align-middle text-right">
+                      <span className="font-bold text-sm text-foreground">
                         {formatCurrency(getBookingAmount(booking))}
                       </span>
                     </td>
 
-                    <td className="px-5 py-4 align-middle text-center">
+                    <td className="px-5 py-3 align-middle text-center">
                       <Badge
                         variant="outline"
                         className={cn(
-                          "inline-flex justify-center min-w-[110px] py-1 text-xs font-bold shadow-none",
+                          "inline-flex justify-center min-w-[100px] py-1 text-[11px] font-bold shadow-none",
                           statusBadgeClass[booking.status] || "bg-muted text-muted-foreground border-slate-200",
                         )}
                       >
@@ -548,7 +548,7 @@ export default function BookingManagement() {
                       </Badge>
                     </td>
 
-                    <td className="px-5 py-4 align-middle text-center">
+                    <td className="px-5 py-3 align-middle text-center">
                       <div className="flex items-center justify-center gap-2">
                         <Select
                           value={booking.status}
@@ -557,7 +557,7 @@ export default function BookingManagement() {
                           }
                           disabled={updatingBookingId === booking._id}
                         >
-                          <SelectTrigger className="h-9 w-[120px] rounded-lg border-border bg-white text-xs font-semibold focus:ring-1 focus:ring-primary shadow-sm">
+                          <SelectTrigger className="h-8 w-[110px] rounded-lg border-border bg-white text-[11px] font-semibold focus:ring-1 focus:ring-primary shadow-sm">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="rounded-xl border-border">
@@ -565,7 +565,7 @@ export default function BookingManagement() {
                               <SelectItem
                                 key={status.value}
                                 value={status.value}
-                                className="rounded-lg data-[state=checked]:bg-[#FEF8C3] font-medium"
+                                className="rounded-lg data-[state=checked]:bg-[#FEF8C3] font-medium text-[11px]"
                               >
                                 {status.label}
                               </SelectItem>
@@ -573,7 +573,7 @@ export default function BookingManagement() {
                           </SelectContent>
                         </Select>
                         {updatingBookingId === booking._id && (
-                          <Loader2 className="h-4 w-4 animate-spin text-primary shrink-0" />
+                          <Loader2 className="h-3 w-3 animate-spin text-primary shrink-0" />
                         )}
                       </div>
                     </td>
@@ -606,7 +606,7 @@ export default function BookingManagement() {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 rounded-lg px-4 text-xs font-semibold"
+                className="h-9 rounded-lg px-4 text-xs font-semibold hover:bg-primary hover:text-[#FEF8C5]"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
               >
@@ -618,7 +618,7 @@ export default function BookingManagement() {
               <Button
                 variant="outline"
                 size="sm"
-                className="h-9 rounded-lg px-4 text-xs font-semibold"
+                className="h-9 rounded-lg px-4 text-xs font-semibold hover:bg-primary hover:text-[#FEF8C5]"
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
               >

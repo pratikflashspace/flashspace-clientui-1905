@@ -815,7 +815,7 @@ class AdminService {
             open: statsMap.open || 0,
             in_progress: statsMap.in_progress || 0,
 
-            resolved: statsMap.resolved || 0,
+            resolved: (statsMap.resolved || 0) + (statsMap.closed || 0),
             closed: statsMap.closed || 0,
             avgResolution: "4.2 hrs",
             resolvedThisMonth: backendData.resolvedThisMonth?.[0]?.count || 0,

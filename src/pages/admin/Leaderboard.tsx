@@ -73,7 +73,7 @@ const Leaderboard = () => {
         <h1 className="text-3xl font-extrabold text-foreground tracking-tight">
           Team <span className="text-primary italic">Leaderboard</span>
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-[#6B7280] mt-2">
           Track performance and celebrate top performers
         </p>
       </div>
