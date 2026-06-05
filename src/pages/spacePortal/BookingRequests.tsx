@@ -448,8 +448,9 @@ export default function BookingRequests() {
       <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={handleUpload} />
 
       <div>
-        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-          Booking <span className="text-[#4A6D56] italic">Requests</span>
+        <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className="text-gray-900 dark:text-white">Booking</span> <span className="text-[#36503F] italic">Requests</span>
+        
         </h1>
         <p className="mt-2 text-[#557064]">Verify KYC, exchange agreements, and publish final booking documents.</p>
       </div>

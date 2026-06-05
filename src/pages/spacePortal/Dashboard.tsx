@@ -122,21 +122,20 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Header */}
-      <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-            Space Partner <span className="text-[#4A6D56] italic">Dashboard</span>
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your workspace listings, clients, and revenue
-          </p>
+    <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#f7f7f6] font-sans animate-fade-in relative">
+      <div className="w-full space-y-10">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <span className="text-gray-900 dark:text-white">Space Partner</span> <span className="text-[#36503F] italic">Dashboard</span>
+            </h1>
+            <p className="text-[#6B7280] text-[16px] md:text-[16px]">
+              Manage your workspace listings, clients, and revenue
+            </p>
+          </div>
+          <SpacePartnerHeaderActions />
         </div>
-        <div className="flex items-center gap-3">
-          <PartnerNotificationBell />
-        </div>
-      </div>
 
       {/* Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
@@ -252,6 +251,7 @@ export default function Dashboard() {
         </div>
       </div>
 
+      </div>
       <AddSpaceDialog open={addSpaceOpen} onOpenChange={setAddSpaceOpen} />
     </div>
   );

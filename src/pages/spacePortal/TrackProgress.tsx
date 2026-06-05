@@ -134,8 +134,9 @@ const TrackProgress = () => {
   return (
     <div className="flex-1 animate-in fade-in duration-500">
       <div className="mb-7">
-        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-          Track <span className="text-[#4A6D56] italic">Progress</span>
+        <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className="text-gray-900 dark:text-white">Track</span> <span className="text-[#36503F] italic">Progress</span>
+        
         </h1>
         <p className="mt-2 text-sm font-medium text-muted-foreground">
           Monitor the lifecycle progress of all your space bookings.

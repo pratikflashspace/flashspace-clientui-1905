@@ -211,8 +211,8 @@ export default function Tickets() {
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-          Tickets
+        <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className="text-gray-900 dark:text-white">Tickets</span>
         </h1>
         <p className="text-muted-foreground mt-2">
           Manage and track client support tickets and enquiries

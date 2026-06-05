@@ -388,8 +388,9 @@ const MySpaces = () => {
     <div className="flex-1">
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-            My <span className="text-[#4A6D56] italic">Spaces</span>
+          <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className="text-gray-900 dark:text-white">My</span> <span className="text-[#36503F] italic">Spaces</span>
+        
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage all your workspace listings

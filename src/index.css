@@ -206,7 +206,9 @@
   }
 
   .client-dashboard-portal,
-  .client-dashboard-portal * {
+  .client-dashboard-portal *,
+  .space-portal-layout,
+  .space-portal-layout * {
     font-family: "Inter", system-ui, sans-serif !important;
   }
 
