@@ -904,9 +904,9 @@ export default function KYCVerification() {
       <div className="w-full space-y-6">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-              {profileId ? "KYC" : "Space"}{" "}
-              <span className="text-[#4A6D56] italic">Verification</span>
+            <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <span className="text-gray-900 dark:text-white">{profileId ? "KYC" : "Space"}</span>{" "}
+              <span className="text-[#36503F] italic">Verification</span>
             </h1>
             <p className="text-muted-foreground mt-2 text-base">
               {linkBookingId

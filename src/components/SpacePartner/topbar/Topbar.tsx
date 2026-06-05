@@ -306,7 +306,7 @@ export default function Topbar({
 
         {/* Title */}
         <div className="min-w-0 flex-1 overflow-hidden">
-          <h2 className="truncate text-xl font-bold text-[#35503F] dark:text-white sm:text-2xl tracking-tight">
+          <h2 className="truncate text-xl font-extrabold text-gray-900 dark:text-white sm:text-2xl tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
             {title}
           </h2>
 

@@ -194,9 +194,9 @@ export default function ClientDetails() {
       <div className="rounded-2xl border border-[#DDE5DA] bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-              {client.companyName}
-            </h1>
+            <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className="text-gray-900 dark:text-white">{client.companyName}</span>
+        </h1>
 
             <p className="mt-2 text-[#607067]">
               Client ID:{" "}

@@ -362,8 +362,9 @@ export default function TicketsAndTasks() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-            Tickets & <span className="text-[#4A6D56] italic">Tasks</span>
+          <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className="text-gray-900 dark:text-white">Tickets &</span> <span className="text-[#36503F] italic">Tasks</span>
+        
           </h1>
           <p className="text-[#164e4e]/70 dark:text-gray-400 mt-1">
             Manage your support tickets and daily team tasks

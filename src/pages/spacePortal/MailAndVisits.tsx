@@ -183,8 +183,9 @@ const MailAndVisits = () => {
       {/* Header */}
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-            Mail & <span className="text-[#4A6D56] italic">Visits</span>
+          <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className="text-gray-900 dark:text-white">Mail &</span> <span className="text-[#36503F] italic">Visits</span>
+        
           </h1>
           <p className="text-muted-foreground mt-2">
             Track and manage front-desk interactions for your clients

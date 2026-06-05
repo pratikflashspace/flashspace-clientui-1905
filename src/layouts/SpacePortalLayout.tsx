@@ -253,11 +253,11 @@ export default function SpacePortalLayout() {
   const makeTitle = (lead: string, highlight?: string) =>
     highlight ? (
       <>
-        {lead}{" "}
-        <span className="text-[#4A6D56] italic">{highlight}</span>
+        <span className="text-gray-900 dark:text-white">{lead}</span>{" "}
+        <span className="text-[#36503F] italic">{highlight}</span>
       </>
     ) : (
-      lead
+      <span className="text-gray-900 dark:text-white">{lead}</span>
     );
 
   /**
@@ -278,7 +278,7 @@ export default function SpacePortalLayout() {
         subtitle:
           "Complete control over clients, plans, and space performance.",
         hideTopBar: true,
-        pageBg: "#f3f4f3",
+        pageBg: "#f7f7f6",
       },
       "/spaceportal/booking-analytics": {
         title: makeTitle("Booking", "Analytics"),
@@ -746,7 +746,7 @@ export default function SpacePortalLayout() {
   return (
     <SpacePortalNotificationsProvider value={notificationsProviderValue}>
       <SpacePortalSearchProvider value={searchProviderValue}>
-        <div className="min-h-screen bg-slate-50 flex">
+        <div className="min-h-screen bg-slate-50 flex space-portal-layout">
           {/* Desktop Sidebar */}
           <div
             className={`fixed inset-y-0 left-0 z-30 transition-all duration-300 hidden lg:block ${isSidebarCollapsed ? "w-20" : "w-72"}`}
@@ -859,7 +859,7 @@ export default function SpacePortalLayout() {
             )}
 
             {/* Page Content */}
-            <main className="relative mt-4 flex-1 px-3 pb-6 sm:mt-6 sm:px-5 lg:px-8">
+            <main className={`relative flex-1 ${headerKey === '/spaceportal/dashboard' ? '' : 'mt-4 px-3 pb-6 sm:mt-6 sm:px-5 lg:px-8'}`}>
               <ErrorBoundary>
                 <Outlet />
               </ErrorBoundary>

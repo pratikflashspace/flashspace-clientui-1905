@@ -118,8 +118,9 @@ const InvoicesAndPayments = () => {
     <div className="flex-1 space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-[#35503F] tracking-tight">
-            Invoices <span className="text-[#4A6D56] italic">Management</span>
+          <h1 className="text-3xl md:text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <span className="text-gray-900 dark:text-white">Invoices</span> <span className="text-[#36503F] italic">Management</span>
+        
           </h1>
           <p className="text-muted-foreground mt-1">
             Upload and track your invoices sent to FlashSpace admin.
