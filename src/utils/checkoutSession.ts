@@ -7,6 +7,7 @@ const CHECKOUT_RETURN_PATHS = [
   "/space/",
   "/coworking-space/",
   "/meeting-room/",
+  "/oauth/authorize",
 ];
 
 const canUseSessionStorage = () =>

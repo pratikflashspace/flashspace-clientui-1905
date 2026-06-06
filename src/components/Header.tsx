@@ -421,7 +421,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
         </aside>
       </div>
 
-      <LoginModal isOpen={isLoginOpen} onClose={() => navigate("/")} onSignupClick={() => navigate("/signup")} />
+      <LoginModal isOpen={isLoginOpen} onClose={() => navigate("/")} onSignupClick={() => navigate("/signup")} onLoginSuccess={handleLoginSuccess} />
       <SignupModal isOpen={isSignupOpen} onClose={() => navigate("/")} initialRole={signupRole} onLoginClick={() => navigate("/login")} />
       <PartnerChoiceModal isOpen={isPartnerChoiceOpen} onClose={() => setIsPartnerChoiceOpen(false)} onSelect={openPartnerSignup} />
       <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
