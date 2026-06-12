@@ -1124,6 +1124,7 @@ const StartChatting = () => {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          'x-flashspace-csrf': 'true',
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
@@ -1777,7 +1778,7 @@ const StartChatting = () => {
             <button
               onClick={() => {
                 setIsLimitPopupOpen(false);
-                setIsLoginOpen(true);
+                navigate('/login');
               }}
               className="w-full py-3 bg-black dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold hover:opacity-90 transition-all transform active:scale-95 shadow-lg shadow-black/20 dark:shadow-white/10"
             >
