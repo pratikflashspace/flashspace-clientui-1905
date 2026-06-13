@@ -9,6 +9,8 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   isTyping?: boolean;
+  spacesData?: any[];
+  serviceType?: string;
 }
 
 export interface ChatSession {

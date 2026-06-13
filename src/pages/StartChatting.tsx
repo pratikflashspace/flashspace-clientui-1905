@@ -9,7 +9,7 @@ import {
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, MessageCircle, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
   Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
-  LogOut, Lock, Check, Tag, Zap, Map, ChevronRight, ChevronLeft, // [UPDATED] added Map and ChevronRight
+  LogOut, Lock, Check, Tag, Zap, Map, ChevronRight, ChevronLeft, PanelLeftClose, Shield, // [UPDATED] added Map and ChevronRight
   UserIcon, Trash2
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
@@ -34,6 +34,8 @@ import ContactModal from '@/components/ui/ContactModal'; // [NEW]
 import { API_CONFIG } from '@/config/api.config'; // [NEW] Import API Config
 import Header from "@/components/Header";
 import { useLocationMetadata } from '@/hooks/useLocationMetadata';
+import SpacesInlineWidget from '@/components/chat/SpacesInlineWidget';
+import SpaceDetailsModal from '@/components/chat/SpaceDetailsModal';
 
 // [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
 const formatMessage = (text: string) => {
@@ -134,7 +136,7 @@ const formatMessage = (text: string) => {
 // [NEW] Typewriter Effect Component
 const TypewriterEffect = ({ text, onComplete }: { text: string; onComplete?: () => void }) => {
   const [displayedText, setDisplayedText] = useState('');
-  const speed = 5; // ms per char
+  const speed = 15; // ms per char to simulate GPT streaming
 
   useEffect(() => {
     setDisplayedText('');
@@ -391,6 +393,8 @@ const StartChatting = () => {
   const [showUpdates, setShowUpdates] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false); // [NEW] Contact form state
+  const [selectedSpace, setSelectedSpace] = useState<any>(null);
+  const [isSpaceDetailsOpen, setIsSpaceDetailsOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const sidebarScrollRef = useRef<HTMLElement>(null);
   const updatesScrollRef = useRef<HTMLDivElement>(null);
@@ -474,6 +478,11 @@ const StartChatting = () => {
     activeChatIdRef.current = activeChatId;
   }, [activeChatId]);
 
+  const chatSessionsRef = useRef(chatSessions);
+  useEffect(() => {
+    chatSessionsRef.current = chatSessions;
+  }, [chatSessions]);
+
   useEffect(() => {
     // Handle SPA navigation (React unmount)
     return () => {
@@ -518,9 +527,15 @@ const StartChatting = () => {
 
     const timer = setTimeout(() => {
       const firstUserMsg = chatMessages.find(m => m.role === 'user');
-      const title = firstUserMsg
-        ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '')
-        : 'Chat session';
+      
+      const currentSession = chatSessionsRef.current.find(s => (s._id || s.id) === activeChatId);
+      let title = currentSession?.title;
+
+      if (!title || title === 'Chat session') {
+        title = firstUserMsg
+          ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '')
+          : 'Chat session';
+      }
 
       const sessionData = {
         id: activeChatId || Date.now().toString(),
@@ -530,16 +545,18 @@ const StartChatting = () => {
       };
 
       chatService.saveSession(sessionData).then(res => {
-        if (res.success && res.data && !activeChatId) {
+        if (res.success && res.data) {
           // New chat — set activeChatId to the MongoDB _id so future saves update instead of duplicate
           const newId = res.data._id || res.data.id;
-          setActiveChatId(newId);
-          // Also add to sidebar sessions
-          setChatSessions(prev => {
-            // Avoid duplicates
-            if (prev.some(s => (s._id || s.id) === newId)) return prev;
-            return [{ ...sessionData, _id: newId }, ...prev];
-          });
+          if (!activeChatId || activeChatId !== newId) {
+            setActiveChatId(newId);
+            // Also add to sidebar sessions
+            setChatSessions(prev => {
+              // Remove the temporary session or replace it
+              const filtered = prev.filter(s => (s._id || s.id) !== activeChatId);
+              return [{ ...sessionData, _id: newId, id: newId }, ...filtered];
+            });
+          }
         }
         console.log('[Chat] Auto-saved to MongoDB');
       }).catch(err => {
@@ -751,6 +768,7 @@ const StartChatting = () => {
     // Check for service type
     const services = [
       { type: 'virtual', keys: ['virtual', 'address', 'mail', 'gst', 'registration'] },
+      { type: 'business_setup', keys: ['business setup', 'company registration', 'incorporation'] },
       { type: 'coworking', keys: ['coworking', 'desk', 'office', 'space', 'workspace', 'seat', 'cabin', 'on-demand', 'on demand', 'hot desk', 'hot-desk', 'meeting room', 'conference'] },
     ];
 
@@ -765,30 +783,10 @@ const StartChatting = () => {
   };
 
   // Helper: Fetch and Update Map
-  const updateMapForQuery = async (text: string, isAIResponse: boolean = false, forcedServiceType?: 'virtual' | 'coworking') => {
-    const { cityName, areaName, property, serviceType: detectedServiceType } = detectIntents(text);
+  const updateMapForQuery = async (text: string, isAIResponse: boolean = false, forcedServiceType?: 'virtual' | 'coworking' | 'business_setup' | string, forcedCityName?: string) => {
+    const { cityName: detectedCityName, areaName, property, serviceType: detectedServiceType } = detectIntents(text);
     const serviceType = forcedServiceType || detectedServiceType;
-
-    // [PHASE 5] Smart Update Logic:
-    // If this is an AI response suggesting a DIFFERENT city when we already have markers, IGNORE IT.
-    // Also ignore if it's different from what the user just intentionally searched.
-    if (isAIResponse && cityName) {
-      const target = lastTargetCity.current?.toLowerCase();
-      // const currentCity = mapMarkers[0]?.address.toLowerCase();
-
-      if (target && !cityName.toLowerCase().includes(target)) {
-        console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on user-targeted ${lastTargetCity.current}`);
-        return;
-      }
-
-      // [FIX] Removed strict current markers check to allow AI to fetch for the target city if not yet loaded.
-      /*
-      if (mapMarkers.length > 0 && currentCity && !currentCity.includes(cityName.toLowerCase())) {
-        console.log(`[MAP] Ignoring AI suggestion for ${cityName} to stay on current markers.`);
-        return;
-      }
-      */
-    }
+    const cityName = forcedCityName || detectedCityName;
 
     if (cityName) {
       if (!isAIResponse) {
@@ -801,9 +799,9 @@ const StartChatting = () => {
       if (property && !isAIResponse) {
         displayTitle = property.name;
       } else if (areaName && !isAIResponse) {
-        displayTitle = `${type === 'virtual' ? 'Virtual Offices' : 'Coworking Spaces'} in ${areaName}`;
+        displayTitle = `${type === 'virtual' ? 'Virtual Offices' : type === 'business_setup' ? 'Business Setup Packages' : 'Coworking Spaces'} in ${areaName}`;
       } else {
-        displayTitle = `${type === 'virtual' ? 'Virtual Offices' : 'Coworking Spaces'} in ${cityName}`;
+        displayTitle = `${type === 'virtual' ? 'Virtual Offices' : type === 'business_setup' ? 'Business Setup Packages' : 'Coworking Spaces'} in ${cityName}`;
       }
       setMapTitle(displayTitle);
 
@@ -820,7 +818,7 @@ const StartChatting = () => {
         // setShowMap(true); // [MOVE] We now wait for results to avoid showing empty map
 
         // [PHASE 3] Unified Fetching: Fetch both if not specified, or just requested type
-        const fetchVirtual = !serviceType || serviceType === 'virtual';
+        const fetchVirtual = !serviceType || serviceType === 'virtual' || serviceType === 'business_setup';
         const fetchCoworking = !serviceType || serviceType === 'coworking';
 
         const [virtualRes, coworkingRes] = await Promise.all([
@@ -838,7 +836,9 @@ const StartChatting = () => {
           price: item.gstPlanPrice,
           rating: item.rating,
           reviews: item.reviews,
-          features: item.features || []
+          features: item.features || [],
+          serviceType: serviceType === 'business_setup' ? 'Business Setup' : 'Virtual Office',
+          originalData: item
         }));
 
         // Coworking service returns array Directly
@@ -851,10 +851,46 @@ const StartChatting = () => {
           price: item.price,
           rating: item.rating,
           reviews: item.reviews,
-          features: item.features || []
+          features: item.features || [],
+          serviceType: 'Coworking Space',
+          originalData: item
         }));
 
         const results = [...virtualMarkers, ...coworkingMarkers];
+
+        // [NEW] If business setup, replace results with business setup packages
+        if (serviceType === 'business_setup') {
+          try {
+            const businessSetupData = require('@/data/business_setup_data.json');
+            const packages = (businessSetupData.servicesByCity && businessSetupData.servicesByCity[lowerCity]) || businessSetupData.features;
+            results.length = 0; // clear others
+            packages.forEach((pkg: any) => {
+              results.push({
+                position: generateRandomCoordinates(center, 0.01),
+                title: pkg.name || pkg.title,
+                address: `${cityName} (Business Setup)`,
+                image: 'https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=800&q=80',
+                price: pkg.price,
+                rating: 5.0,
+                reviews: 150,
+                features: pkg.features || [],
+                serviceType: 'Business Setup',
+                originalData: pkg
+              });
+            });
+          } catch(e) {
+            console.error("Failed to load business setup data", e);
+          }
+        }
+
+        // [NEW] Prioritize 'Stirring Minds' to always show at the top
+        results.sort((a, b) => {
+          const aIsStirring = a.title.toLowerCase().includes('stirring minds');
+          const bIsStirring = b.title.toLowerCase().includes('stirring minds');
+          if (aIsStirring && !bIsStirring) return -1;
+          if (!aIsStirring && bIsStirring) return 1;
+          return 0;
+        });
 
         // [PHASE 9] Jitter only the results to avoid global mess
         const jitteredResults = results.map((m, idx) => {
@@ -874,12 +910,16 @@ const StartChatting = () => {
           setMapMarkers(jitteredResults);
           const firstResult = jitteredResults[0].position;
           setMapCenter(firstResult);
-          setShowMap(true);
+          // User explicitly requested to NEVER auto-open the map.
+          // It should only open when they manually click "Show Map".
+          return jitteredResults;
         } else {
           console.log(`[MAP] No listings found for ${cityName} in local DB. Keeping map closed.`);
+          return [];
         }
       } catch (error) {
         console.error("Failed to update map for query:", error);
+        return [];
       } finally {
         setIsMapLoading(false);
       }
@@ -903,7 +943,9 @@ const StartChatting = () => {
   const closeBoth = () => {
     setShowUpdates(false);
     setShowHistory(false); // Close history as well
-    setIsSidebarOpen(false); // Also close mobile sidebar if open
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false); // Only close mobile sidebar if open
+    }
   };
 
   // [NEW] Handle history selection
@@ -957,7 +999,7 @@ const StartChatting = () => {
   // Handle Sidebar and Map Sync
   useEffect(() => {
     if (showMap) {
-      setIsSidebarOpen(false); // Auto-collapse sidebar when map opens
+      // setIsSidebarOpen(false); // Removed auto-collapse
       // [NEW] Force a global resize event after transition to ensure map layout is correct
       setTimeout(() => {
         window.dispatchEvent(new Event('resize'));
@@ -1085,6 +1127,41 @@ const StartChatting = () => {
     };
   }, []);
 
+  // [NEW] Async Title Generator
+  const generateChatTitleAsync = async (messageText: string, chatId: string) => {
+    try {
+      const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+      const targetUrl = isAuthenticated ? BACKEND_CHAT_URL : GUEST_CHAT_URL;
+      
+      const prompt = `Summarize this text in 2 to 4 words for a chat title. Do not include quotes or any extra text. Text: "${messageText}"`;
+      
+      const response = await fetch(targetUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-flashspace-csrf': 'true',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({
+          message: prompt,
+          query: prompt,
+          conversation_id: 'default',
+          session_id: getSessionId() + '_title_gen'
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const aiTitle = (data.reply || data.message || '').replace(/["'*]/g, '').trim();
+        if (aiTitle && aiTitle.length < 50) {
+           setChatSessions(prev => prev.map(s => (s.id === chatId || s._id === chatId) ? { ...s, title: aiTitle } : s));
+        }
+      }
+    } catch (e) {
+      console.error('Failed to generate AI title', e);
+    }
+  };
+
   const handleSendMessage = async (text?: string) => {
     const messageContent = text || message;
     if (!messageContent.trim() || isLoading) return;
@@ -1107,9 +1184,26 @@ const StartChatting = () => {
       timestamp: new Date()
     };
 
+    // [NEW] Eagerly create an optimistic session if it's a new chat
+    if (!activeChatId) {
+      const tempId = Date.now().toString();
+      setActiveChatId(tempId);
+      const title = messageContent.trim().slice(0, 50) + (messageContent.length > 50 ? '…' : '');
+      const newSession = {
+        id: tempId,
+        title,
+        messages: [...chatMessages, userMessage],
+        date: 'Today',
+      };
+      setChatSessions(prev => [newSession, ...prev]);
+      
+      // Async generate a smart title
+      generateChatTitleAsync(messageContent.trim(), tempId);
+    }
+
     // Add user message to chat
     setChatMessages(prev => [...prev, userMessage]);
-    if (!text) setMessage('');
+    setMessage('');
     setIsLoading(true);
 
     try {
@@ -1138,8 +1232,7 @@ const StartChatting = () => {
       // [NEW] Detect user intent once to share with AI update
       const { serviceType: userServiceType } = detectIntents(userMessage.content);
 
-      // [NEW] Trigger map update based on user message (optimistic update)
-      await updateMapForQuery(userMessage.content);
+      // (Optimistic map update removed to prevent unwanted spaces on general queries)
 
       if (!response.ok) {
         throw new Error('Failed to get response from chatbot');
@@ -1148,11 +1241,18 @@ const StartChatting = () => {
       const data = await response.json();
 
       // Backend returns reply directly from AI backend
-      const aiResponseText = data.reply || data.message || 'I apologize, but I encountered an error. Please try again.';
+      let aiResponseText = data.reply || data.message || 'I apologize, but I encountered an error. Please try again.';
 
-      // [NEW] Trigger map update based on AI response text (isAIResponse = true)
-      // Pass userServiceType to preserve the user's primary intent (e.g. coworking)
-      await updateMapForQuery(aiResponseText, true, userServiceType as any);
+      // Parse AI response for [SHOW_CARDS: city, type]
+      let fetchedSpaces = undefined;
+      const showCardsMatch = aiResponseText.match(/\[SHOW_CARDS:\s*([^,\]]+)(?:,\s*([^\]]+))?\]/i);
+
+      if (showCardsMatch) {
+        const aiCity = showCardsMatch[1].trim();
+        const aiServiceType = showCardsMatch[2]?.trim() || userServiceType || 'coworking';
+        aiResponseText = aiResponseText.replace(showCardsMatch[0], '').trim();
+        fetchedSpaces = await updateMapForQuery(`${aiCity} ${aiServiceType}`, true, aiServiceType as any, aiCity);
+      }
 
       // Add AI response to chat
       const assistantMessage: ChatMessage = {
@@ -1160,11 +1260,12 @@ const StartChatting = () => {
         role: 'assistant',
         content: aiResponseText || 'I apologize, but I encountered an error. Please try again.',
         timestamp: new Date(),
-        isTyping: true // [NEW] Start typing effect
+        isTyping: true, // [NEW] Start typing effect
+        spacesData: fetchedSpaces && fetchedSpaces.length > 0 ? fetchedSpaces : undefined
       };
 
       setChatMessages(prev => [...prev, assistantMessage]);
-      setShowMap(true); // [FIX] Force map to open for AI response if markers found
+      // setShowMap(true); // User requested not to auto-open map
     } catch (error) {
       console.error('Error sending message to backend:', error);
 
@@ -1249,8 +1350,7 @@ const StartChatting = () => {
     setMessage(actionMessage);
     // Auto-send the message
     setTimeout(() => {
-      const event = new KeyboardEvent('keypress', { key: 'Enter' });
-      handleSendMessage();
+      handleSendMessage(actionMessage);
     }, 100);
   };
 
@@ -1259,14 +1359,8 @@ const StartChatting = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B1120] dark:text-gray-100 flex flex-col overflow-x-hidden font-grotesk">
-      <style>{`
-        @media (max-width: 768px) {
-          chat-widget {
-            display: none !important;
-          }
-        }
-      `}</style>
+    <div className="min-h-screen bg-[#f8f9fa] dark:bg-[#0B1120] dark:text-gray-100 flex flex-col overflow-x-hidden font-grotesk">
+
 
       {showUpdates && (
         <div
@@ -1295,7 +1389,7 @@ const StartChatting = () => {
       {/* Mini Sidebar — visible when full sidebar is collapsed - Hidden on mobile */}
       {!isSidebarOpen && (
         <div
-          className="hidden sm:flex fixed left-0 w-[60px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 z-[60] flex-col items-center pt-4 gap-3 shadow-sm transition-all"
+          className="hidden sm:flex fixed left-0 w-[80px] bg-[#f8f8f8] border-r border-gray-200 dark:border-gray-800 z-[60] flex-col items-center pt-4 gap-3 transition-all"
           style={{
             top: HEADER_OFFSET,
             height: `calc(100vh - ${HEADER_OFFSET})`,
@@ -1322,66 +1416,63 @@ const StartChatting = () => {
 
       <div
         ref={sidebarRef}
-        className={`fixed left-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 shadow-xl lg:shadow-none z-[110] lg:z-10 flex flex-col overflow-hidden transform transition-all duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } ${!isSidebarOpen ? "lg:translate-x-0 lg:w-[60px]" : "lg:w-[320px]"}`}
+        className={`fixed left-0 bg-[#f8f8f8] border-r border-gray-200 dark:border-gray-800 z-[110] lg:z-10 flex flex-col overflow-hidden transform transition-all duration-300 ease-in-out w-[288px] ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
         style={{
-          width: isSidebarOpen ? "320px" : "60px",
           top: HEADER_OFFSET,
           height: `calc(100vh - ${HEADER_OFFSET})`,
+          fontFamily: "'Inter', sans-serif"
         }}
       >
-        {/* Logo - FIXED TOP */}
-        <div className="flex-shrink-0 flex items-center h-16 px-4 mb-2 pt-2 border-b border-gray-100 dark:border-gray-800/60 overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-4 border-b border-gray-200 dark:border-gray-800 lg:hidden">
           <Link to="/" aria-label="FlashSpace home" className="flex items-center min-w-[120px]">
             <img src="/Logo/Flashspace Logo.png" alt="FlashSpace" className="h-[24px] w-auto" />
           </Link>
-        </div>
-        {/* New Chat row - FIXED TOP */}
-        <div className="flex-shrink-0 flex flex-col px-2 bg-white dark:bg-gray-900 z-10 pt-2">
-          <div className="space-y-0.5 pb-2 border-b border-gray-100 dark:border-gray-800/60">
-            <button
-              onClick={handleNewChat}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
-              style={{ color: '#677e73' }}
-            >
-              <MessageSquare className="w-4 h-4 flex-shrink-0" />
-              New Chat
-            </button>
-            <button
-              onClick={() => handleNavigation('/solutions/virtual-office')}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
-              style={{ color: '#677e73' }}
-            >
-              <Briefcase className="w-4 h-4 flex-shrink-0" />
-              Workspaces
-            </button>
-            <button
-              onClick={() => setShowUpdates(prev => !prev)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
-              style={{ color: '#677e73' }}
-            >
-              <Bell className="w-4 h-4 flex-shrink-0" />
-              Notifications
-            </button>
-            <button
-              onClick={() => handleNavigation('/settings')}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
-              style={{ color: '#677e73' }}
-            >
-              <Settings className="w-4 h-4 flex-shrink-0" />
-              Settings
-            </button>
-          </div>
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors text-gray-500"
+            aria-label="Close sidebar"
+          >
+            <PanelLeftClose className="w-5 h-5" />
+          </button>
         </div>
 
+        {/* Logo - Matching Admin Dashboard */}
+        <div className="flex flex-col shrink-0 transition-all duration-300 border-b border-gray-200 dark:border-gray-800 w-full px-3 py-4 justify-center">
+          <div className="flex items-center w-full justify-between">
+            <img
+              src="/Logo/Flashspace Logo.png"
+              alt="FlashSpace Logo"
+              onClick={() => navigate("/")}
+              className={`w-auto object-contain transition-all duration-300 ml-[-4px] cursor-pointer ${!isSidebarOpen ? "h-6" : "h-7"}`}
+            />
+          </div>
+        </div>
         {/* Main Nav - SCROLLABLE CONTENT */}
         <nav
           ref={sidebarScrollRef}
-          className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 space-y-0.5"
+          className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4"
         >
+          {/* Action Buttons */}
+          <div className="flex flex-col space-y-1.5 pb-4">
+            <button
+              onClick={handleNewChat}
+              className={`flex items-center justify-start w-full h-[40px] px-3 gap-3 transition-all duration-300 rounded-lg group ${!activeChatId ? 'bg-[#35503F] text-[#FEF8CF] hover:bg-[#35503F]/90' : 'text-[#677e73] hover:bg-gray-200 hover:text-[#1a2d1d] dark:hover:text-white dark:hover:bg-gray-700'}`}
+            >
+              <MessageSquare size={18} strokeWidth={2} className="shrink-0" />
+              <span className="text-[14px] font-semibold whitespace-nowrap">New Chat</span>
+            </button>
+            <button
+              onClick={() => handleNavigation('/solutions/virtual-office')}
+              className="flex items-center justify-start w-full h-[40px] px-3 gap-3 transition-all duration-300 rounded-lg group text-[#677e73] hover:bg-gray-200 hover:text-[#1a2d1d] dark:hover:text-white dark:hover:bg-gray-700"
+            >
+              <Briefcase size={18} strokeWidth={2} className="shrink-0" />
+              <span className="text-[14px] font-semibold whitespace-nowrap">Workspaces</span>
+            </button>
+          </div>
+
           {/* Recent Section */}
-          <div className="pt-2 pb-1">
-            <p className="text-[10px] font-semibold tracking-widest uppercase px-3 mb-1" style={{ color: '#677e73', opacity: 0.6 }}>RECENT</p>
+          <div className="pt-2">
+            <p className="text-[14px] font-semibold tracking-widest px-2 mb-2 text-[#1a2d1d] opacity-50 font-sans">Recents</p>
             {chatSessions.length === 0 ? (
               <p className="px-3 py-2 text-xs italic" style={{ color: '#677e73', opacity: 0.5 }}>No past chats yet</p>
             ) : (
@@ -1389,7 +1480,7 @@ const StartChatting = () => {
                 const sessionKey = session._id || session.id;
                 const isActive = activeChatId === sessionKey;
                 return (
-                  <div key={sessionKey} className={`relative group w-full flex items-center pr-1 rounded-lg transition-colors ${isActive ? 'bg-[#35503F]' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}>
+                  <div key={sessionKey} className={`relative group w-full h-[40px] flex items-center pr-2 transition-colors ${isActive ? 'bg-[#35503F] rounded-lg' : 'rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
                     <button
                       onClick={() => {
                         // Before switching, save the current chat
@@ -1406,19 +1497,18 @@ const StartChatting = () => {
                               return sKey === activeChatId ? { ...s, messages: chatMessages } : s;
                             }));
                           } else {
-                            // New unsaved chat — save as a new session
+                            // New unsaved chat – save as a new session
                             startNewChat(chatMessages);
                           }
                         }
                         setChatMessages(session.messages);
                         setActiveChatId(sessionKey);
                       }}
-                      className={`flex-1 text-left px-3 py-2 text-sm min-w-0 font-${isActive ? 'semibold' : 'normal'}`}
-                      style={{ color: isActive ? 'white' : '#677e73' }}
+                      className={`flex-1 h-full flex items-center text-left px-3 text-[14px] min-w-0 font-${isActive ? 'semibold' : 'medium'}`}
+                      style={{ color: isActive ? '#FEF8CF' : '#677e73' }}
                       title={session.title}
                     >
-                      <div className="truncate w-full">{session.title}</div>
-                      <div className="text-[10px] mt-0.5 truncate" style={{ opacity: isActive ? 0.7 : 0.55 }}>{session.date}</div>
+                      <div className="truncate w-full first-letter:uppercase">{session.title}</div>
                     </button>
 
                     <button
@@ -1447,7 +1537,7 @@ const StartChatting = () => {
         <div className="border-t border-gray-200 dark:border-gray-700 p-3 space-y-1">
           <button
             onClick={() => handleNavigation('/')}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left"
             style={{ color: '#677e73' }}
           >
             <Home className="w-4 h-4 flex-shrink-0" />
@@ -1455,7 +1545,7 @@ const StartChatting = () => {
           </button>
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-left"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-left"
             style={{ color: '#677e73' }}
           >
             <ChevronLeft className="w-4 h-4 flex-shrink-0" />
@@ -1466,14 +1556,14 @@ const StartChatting = () => {
 
       {/* Main Content - Adjusted for wider sidebar */}
       <div
-        className={`flex-1 pt-0 flex flex-row shadow-2xl z-40 relative transition-all duration-300 ${isSidebarOpen ? "lg:ml-[320px]" : "lg:ml-[60px]"} ml-0`}
+        className={`flex-1 pt-0 flex flex-row z-40 relative transition-all duration-300 ${isSidebarOpen ? "lg:ml-[288px]" : "lg:ml-[80px]"} ml-0`}
         style={{
           marginRight: showMap && window.innerWidth >= 1024 ? `${mapWidth}px` : '0px',
         }}
       >
-        <div className="flex-1 h-[100dvh] bg-slate-50 dark:bg-[#0B1120] overflow-hidden flex flex-col min-w-0 transition-all duration-500">
+        <div className="flex-1 h-[100dvh] bg-[#FAF9F6] dark:bg-[#0B1120] overflow-hidden flex flex-col min-w-0 transition-all duration-500">
           {/* Chat Interface */}
-          <div className="w-full h-full flex flex-col bg-white dark:bg-[#0B1120] relative">
+          <div className="w-full h-full flex flex-col bg-transparent relative">
 
             {/* Chat Header with Map Toggle */}
             <div className="flex items-center justify-between lg:justify-end px-4 pt-2 lg:pt-3 pb-1 flex-shrink-0 gap-2">
@@ -1507,7 +1597,7 @@ const StartChatting = () => {
             {/* Chat Content */}
             <div
               ref={chatContainerRef}
-              className="chat-container custom-scrollbar flex-1 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
+              className="chat-container custom-scrollbar flex-1 min-h-0 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
               style={{ height: '100%' }}
               data-lenis-prevent
               tabIndex={0}
@@ -1516,74 +1606,101 @@ const StartChatting = () => {
             >
               {chatMessages.length === 0 ? (
                 // Clean Welcome State (matching screenshot)
-                <div className="flex flex-col items-center justify-center h-full text-center max-w-3xl mx-auto px-4 sm:px-6">
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-3 lg:mb-4 tracking-tight leading-tight">
+                <div className="flex flex-col items-center justify-center h-full text-center max-w-4xl mx-auto px-4 sm:px-6">
+                  <h2 className="text-[32px] sm:text-[40px] font-bold text-[#1a2d1d] dark:text-white mb-2 tracking-tight font-sans">
                     How can we help your business?
                   </h2>
-                  <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mb-8 lg:mb-12 max-w-md leading-relaxed">
+                  <p className="text-[16px] text-[#677e73] dark:text-gray-400 mb-10 max-w-lg leading-relaxed font-medium font-sans">
                     Ask about coworking spaces, virtual offices, compliance, or
                     compare plans instantly.
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 w-full max-w-2xl lg:max-w-none">
-                    <button
-                      onClick={() => handleQuickAction('Find coworking spaces in Delhi NCR region')}
-                      className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
-                    >
-                      <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Find coworking spaces</div>
-                      <div className="text-xs text-gray-400">in Delhi NCR region</div>
-                    </button>
-                    <button
-                      onClick={() => handleQuickAction('Help me with GST Registration complete registration process')}
-                      className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
-                    >
-                      <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">GST Registration</div>
-                      <div className="text-xs text-gray-400">Complete registration</div>
-                    </button>
-                    <button
-                      onClick={() => handleQuickAction('Compare workspace plans and find the best deal')}
-                      className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
-                    >
-                      <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Compare plans</div>
-                      <div className="text-xs text-gray-400">Find the best deal</div>
-                    </button>
-                    <button
-                      onClick={() => handleQuickAction('Check business compliance requirements')}
-                      className="text-left p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 rounded-2xl transition-all duration-200 shadow-sm hover:shadow-md"
-                    >
-                      <div className="text-sm font-semibold text-gray-800 dark:text-white mb-1">Business compliance</div>
-                      <div className="text-xs text-gray-400">Check requirements</div>
-                    </button>
+                  <div className="w-full max-w-3xl mt-8 mb-4">
+                    {/* Embedded Input Bar for Empty State */}
+                    <div className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-full border border-[#edede6] dark:border-white/5 flex items-center p-1.5 sm:p-2 pr-1.5 sm:pr-2 gap-2 transition-all focus-within:border-[#35503F] focus-within:shadow-[0_0_15px_rgba(53,80,63,0.3)] dark:focus-within:border-[#35503F] dark:focus-within:shadow-[0_0_15px_rgba(53,80,63,0.5)]">
+                      <button className="p-1.5 sm:p-2 text-[#677e73] hover:text-[#1a2d1d] hover:bg-gray-50 dark:hover:bg-white/5 rounded-full transition-colors cursor-default">
+                        <Search className="w-5 h-5 sm:w-5 sm:h-5" strokeWidth={1.5} />
+                      </button>
+                      <input
+                        type="text"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleSendMessage();
+                          }
+                        }}
+                        placeholder="Type your question..."
+                        className="flex-1 bg-transparent !border-0 focus:ring-0 focus:border-transparent !outline-none text-[#1a2d1d] dark:text-gray-100 placeholder-[#677e73] text-[15px] sm:text-[16px] font-normal font-sans h-full py-2 min-w-0"
+                        style={{ outline: 'none', boxShadow: 'none', border: 'none', borderColor: 'transparent' }}
+                      />
+                      <button
+                        onClick={toggleVoiceInput}
+                        className={`p-1.5 sm:p-2 rounded-full transition-all ${isListening
+                          ? "text-red-500 bg-red-50 hover:bg-red-100 animate-pulse"
+                          : "text-[#677e73] dark:text-gray-300 hover:text-[#1a2d1d] hover:bg-gray-50 dark:hover:bg-gray-800"
+                          }`}
+                        title={isListening ? "Stop listening" : "Start voice input"}
+                      >
+                        <Mic
+                          className={`w-5 h-5 sm:w-6 sm:h-6 ${isListening ? "fill-current" : ""}`}
+                          strokeWidth={1.5}
+                        />
+                      </button>
+                      {message.trim() && (
+                        <button
+                          onClick={() => handleSendMessage()}
+                          className="p-2 sm:p-2.5 bg-[#FEF8CF] text-[#1a2d1d] rounded-full shadow-sm hover:bg-[#f6eca1] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center"
+                          disabled={isLoading}
+                        >
+                          <Send className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="w-full max-w-3xl mt-4">
+                    <div className="flex flex-wrap items-center justify-center gap-3">
+                      <button
+                        onClick={() => handleQuickAction('Find professional virtual office spaces')}
+                        className="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-[14px] font-medium font-sans text-[#1a2d1d] dark:text-gray-200 transition-all shadow-sm hover:border-[#35503F] hover:shadow-[0_0_15px_rgba(53,80,63,0.2)] hover:text-[#35503F] dark:hover:border-[#35503F] dark:hover:shadow-[0_0_15px_rgba(53,80,63,0.4)]"
+                      >
+                        Virtual Office
+                      </button>
+                      
+                      <button
+                        onClick={() => handleQuickAction('Explore flexible coworking options')}
+                        className="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-[14px] font-medium font-sans text-[#1a2d1d] dark:text-gray-200 transition-all shadow-sm hover:border-[#35503F] hover:shadow-[0_0_15px_rgba(53,80,63,0.2)] hover:text-[#35503F] dark:hover:border-[#35503F] dark:hover:shadow-[0_0_15px_rgba(53,80,63,0.4)]"
+                      >
+                        Coworking Spaces
+                      </button>
+
+                      <button
+                        onClick={() => handleQuickAction('Get help with company registration & setup')}
+                        className="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-[14px] font-medium font-sans text-[#1a2d1d] dark:text-gray-200 transition-all shadow-sm hover:border-[#35503F] hover:shadow-[0_0_15px_rgba(53,80,63,0.2)] hover:text-[#35503F] dark:hover:border-[#35503F] dark:hover:shadow-[0_0_15px_rgba(53,80,63,0.4)]"
+                      >
+                        Business Setup
+                      </button>
+                    </div>
                   </div>
                 </div>
 
               ) : (
                 // Chat Messages
-                <div className="space-y-6 max-w-5xl mx-auto pb-4 w-full">
+                <div className="space-y-6 max-w-4xl mx-auto pb-32 w-full">
                   {chatMessages.map((msg) => (
                     <div
                       key={msg.id}
-                      className={`flex gap-4 group ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                      className={`flex gap-4 group ${msg.role === 'user' ? 'flex-row-reverse items-center' : 'flex-row items-start'}`}
                     >
-                      {/* Avatar */}
-                      <div
-                        className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm border ${msg.role === "user"
-                          ? "bg-gradient-to-br from-[#35503F] to-[#3d6b4f] border-[#35503F] text-white"
-                          : "bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 text-[#35503F]"
-                          }`}
-                      >
-                        {msg.role === "user" ? (
-                          <User className="w-4 h-4 sm:w-5 sm:h-5" />
-                        ) : (
-                          <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                        )}
-                      </div>
+                      {/* Avatar removed as per user request */}
 
                       {/* Message Bubble */}
                       <div
-                        className={`max-w-[90%] sm:max-w-[85%] px-4 sm:px-6 py-3 sm:py-4 shadow-sm ${msg.role === "user"
-                          ? "bg-gradient-to-br from-[#35503F] to-[#3d6b4f] text-white rounded-2xl rounded-tr-sm"
-                          : "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-2xl rounded-tl-sm"
+                        className={`max-w-[90%] sm:max-w-[85%] px-4 sm:px-5 shadow-sm ${msg.role === "user"
+                          ? "bg-gradient-to-br from-[#35503F] to-[#3d6b4f] text-white rounded-[24px] py-1.5 sm:py-2"
+                          : "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-[24px] py-3 sm:py-4"
                           }`}
                       >
                         {msg.role === 'assistant' && msg.isTyping ? (
@@ -1592,15 +1709,22 @@ const StartChatting = () => {
                             onComplete={() => handleTypingComplete(msg.id)}
                           />
                         ) : (
-                          <div className={`text-[16px] leading-[1.8] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium font-sans ${msg.role === 'user' ? 'text-white' : 'text-gray-800 dark:text-gray-100'
+                          <div className={`text-[16px] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium font-sans ${msg.role === 'user' ? 'text-white leading-[1.5]' : 'text-gray-800 dark:text-gray-100 leading-[1.8]'
                             }`}>
                             {formatMessage(msg.content)}
                           </div>
                         )}
-                        <p className={`text-[10px] mt-2 font-medium tracking-wide opacity-80 ${msg.role === 'user' ? 'text-white' : 'text-gray-400'
-                          }`}>
-                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </p>
+                        {msg.role === 'assistant' && !msg.isTyping && msg.spacesData && msg.spacesData.length > 0 && (
+                          <div className="mt-4">
+                            <SpacesInlineWidget 
+                              spaces={msg.spacesData} 
+                              onSpaceClick={(space) => {
+                                setSelectedSpace(space);
+                                setIsSpaceDetailsOpen(true);
+                              }}
+                            />
+                          </div>
+                        )}
                       </div>
 
                       {msg.role === 'assistant' && !msg.isTyping && (
@@ -1619,13 +1743,16 @@ const StartChatting = () => {
                   {/* Loading Indicator */}
                   {isLoading && (
                     <div className="flex gap-4">
-                      <div className="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-[#35503F] shadow-sm flex-shrink-0">
-                        <Building2 className="w-5 h-5" />
-                      </div>
-                      <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-6 py-4 shadow-sm flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                        <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                        <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce"></span>
+                      {/* Avatar removed as per user request */}
+                      <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-6 py-4 shadow-sm flex items-center gap-3">
+                        {(!chatMessages.length || !/^(hi|hello|hey|kya hal|how are you|good morning|good evening)/i.test(chatMessages[chatMessages.length - 1]?.content.trim())) && (
+                          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Give me a moment, Flash AI is working on it</span>
+                        )}
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce"></span>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -1634,50 +1761,60 @@ const StartChatting = () => {
             </div>
 
             {/* Chat Input */}
-            <div className="p-3 sm:p-4 lg:p-6 bg-transparent relative z-20">
-              <div className="max-w-4xl mx-auto relative group">
-                <div className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-2xl sm:rounded-[1.25rem] border border-gray-200 dark:border-white/5 flex items-center p-1.5 sm:p-2 pr-1.5 sm:pr-2 gap-1 sm:gap-2 transition-all focus-within:border-gray-300 dark:focus-within:border-white/10">
-                  <button className="p-2 sm:p-3 text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-colors">
-                    <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+            {chatMessages.length > 0 && (
+              <div className="p-3 sm:p-4 lg:p-6 bg-transparent relative z-20">
+                <div className="max-w-4xl mx-auto relative group">
+                  <div className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-2xl sm:rounded-full border border-[#edede6] dark:border-white/5 flex items-center p-1.5 sm:p-2 pr-1.5 sm:pr-2 gap-2 transition-all focus-within:border-[#35503F] focus-within:shadow-[0_0_15px_rgba(53,80,63,0.3)] dark:focus-within:border-[#35503F] dark:focus-within:shadow-[0_0_15px_rgba(53,80,63,0.5)]">
+                  <button className="p-1.5 sm:p-2 text-[#677e73] hover:text-[#1a2d1d] hover:bg-gray-50 dark:hover:bg-white/5 rounded-full transition-colors cursor-default">
+                    <Search className="w-5 h-5 sm:w-5 sm:h-5" strokeWidth={1.5} />
                   </button>
                   <input
                     type="text"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     onKeyPress={(e) => {
-                      if (e.key === "Enter") {
+                      if (e.key === 'Enter') {
                         e.preventDefault();
                         handleSendMessage();
                       }
                     }}
-                    placeholder="Type a message..."
-                    className="flex-1 bg-transparent border-none outline-none text-gray-800 dark:text-gray-100 placeholder-gray-400 text-sm sm:text-[16px] font-medium h-full py-2 min-w-0"
+                    placeholder="Type your question..."
+                    className="flex-1 bg-transparent !border-0 focus:ring-0 focus:border-transparent !outline-none text-[#1a2d1d] dark:text-gray-100 placeholder-[#677e73] text-[15px] sm:text-[16px] font-normal font-sans h-full py-2 min-w-0"
+                    style={{ outline: 'none', boxShadow: 'none', border: 'none', borderColor: 'transparent' }}
                   />
                   <button
                     onClick={toggleVoiceInput}
-                    className={`p-2 sm:p-3 rounded-xl transition-all ${isListening
+                    className={`p-1.5 sm:p-2 rounded-full transition-all ${isListening
                       ? "text-red-500 bg-red-50 hover:bg-red-100 animate-pulse"
-                      : "text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      : "text-[#677e73] dark:text-gray-300 hover:text-[#1a2d1d] hover:bg-gray-50 dark:hover:bg-gray-800"
                       }`}
                     title={isListening ? "Stop listening" : "Start voice input"}
                   >
                     <Mic
-                      className={`w-4 h-4 sm:w-5 sm:h-5 ${isListening ? "fill-current" : ""}`}
+                      className={`w-5 h-5 sm:w-6 sm:h-6 ${isListening ? "fill-current" : ""}`}
+                      strokeWidth={1.5}
                     />
                   </button>
-                  <button
-                    onClick={() => handleSendMessage()}
-                    className="p-2 sm:p-3 bg-[#35503F] text-white rounded-xl shadow-sm hover:bg-[#2d4435] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={!message.trim() || isLoading}
-                  >
-                    <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
+                  {message.trim() && (
+                    <button
+                      onClick={() => handleSendMessage()}
+                      className="p-2 sm:p-2.5 bg-[#FEF8CF] text-[#1a2d1d] rounded-full shadow-sm hover:bg-[#f6eca1] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center"
+                      disabled={isLoading}
+                    >
+                      <Send className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
+                    </button>
+                  )}
                 </div>
-                <p className="text-[9px] sm:text-[10px] text-center text-gray-400 mt-2 sm:mt-3 font-medium">
-                  Flashspace AI can make mistakes. Please verify important
-                  details.
-                </p>
               </div>
+            </div>
+            )}
+
+            {/* Always visible Disclaimer at bottom */}
+            <div className="pb-3 pt-2 left-0 w-full z-10 pointer-events-none flex-shrink-0">
+              <p className="text-[10px] sm:text-[11px] text-center text-[#677e73] font-medium flex items-center justify-center gap-1.5 opacity-80">
+                <Shield className="w-3.5 h-3.5" />
+                Flashspace AI can make mistakes. Please verify important details.
+              </p>
             </div>
           </div>
         </div>
@@ -1752,6 +1889,13 @@ const StartChatting = () => {
             </>
           )}
         </div>
+        
+        <SpaceDetailsModal
+          space={selectedSpace}
+          isOpen={isSpaceDetailsOpen}
+          onClose={() => setIsSpaceDetailsOpen(false)}
+          onScheduleVisit={() => handleNavigation('/services/virtual-office')}
+        />
       </div>
 
       {/* Limit Reached Popup */}
@@ -1778,7 +1922,7 @@ const StartChatting = () => {
             <button
               onClick={() => {
                 setIsLimitPopupOpen(false);
-                navigate('/login');
+                setIsLoginOpen(true);
               }}
               className="w-full py-3 bg-black dark:bg-white text-white dark:text-gray-900 rounded-xl font-bold hover:opacity-90 transition-all transform active:scale-95 shadow-lg shadow-black/20 dark:shadow-white/10"
             >
@@ -1787,6 +1931,17 @@ const StartChatting = () => {
           </div>
         </div>
       )}
+
+      {/* Login Modal */}
+      <LoginModal 
+        isOpen={isLoginOpen} 
+        onClose={() => setIsLoginOpen(false)} 
+        onSwitchToSignup={() => {
+          setIsLoginOpen(false);
+          // If there is a SignupModal we can open it, but for now just navigate if needed
+          navigate('/login');
+        }}
+      />
     </div>
   );
 };

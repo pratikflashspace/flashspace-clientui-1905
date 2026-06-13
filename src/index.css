@@ -1293,9 +1293,209 @@ html.lenis body {
 }
 
 .toast-animate-in {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.maplibregl-popup-close-button:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #202124 !important;
+  transform: scale(1.1);
+}
+
+.maplibregl-popup-tip {
+  border-top-color: white !important;
+  border-bottom-color: white !important;
+}
+
+/* Custom marker hover animation */
+.custom-marker {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-marker:hover {
+  z-index: 1000;
+}
+
+/* Background Grid Pattern for Auth Pages */
+.bg-grid-slate-100 {
+  background-image:
+    linear-gradient(to right, rgb(241 245 249 / 0.5) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(241 245 249 / 0.5) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Fix mouse wheel scrolling issues */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure chat container can scroll with mouse wheel */
+.chat-container {
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+}
+
+
+
+/* Force scrollable containers to respond to mouse wheel and touch correctly */
+[data-lenis-prevent],
+.overflow-y-auto,
+.overflow-auto,
+.overflow-y-scroll,
+[style*="overflow-y: auto"],
+[style*="overflow-y: scroll"],
+[style*="overflowY: scroll"] {
+  overscroll-behavior: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: auto !important;
+  pointer-events: auto !important;
+}
+
+/* Explicit fix for Lenis prevent elements */
+[data-lenis-prevent] {
+  scroll-behavior: auto !important;
+}
+
+/* Ensure no parent of a scrollable element blocks pointer events */
+#affiliate-main-content {
+  pointer-events: auto !important;
+}
+
+/* Global Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.3s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out forwards;
+}
+
+/* Lenis Recommended CSS */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+@keyframes toast-enter {
+  0% {
+    transform: translateY(-20px) scale(0.9);
+    opacity: 0;
+  }
+
+  60% {
+    transform: translateY(5px) scale(1.02);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-exit {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+}
+
+.toast-animate-in {
   animation: toast-enter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .toast-animate-out {
   animation: toast-exit 0.3s ease-in forwards;
+}
+
+/* Force GHL chat widget to stay below Flash AI button */
+chat-widget {
+  z-index: 2147483640 !important;
 }

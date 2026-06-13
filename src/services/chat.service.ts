@@ -49,8 +49,14 @@ class ChatService {
     date: string;
   }): Promise<ChatApiResponse<ChatSession>> {
     try {
+      // Create a clean payload without heavy spacesData
+      const cleanSessionData = {
+        ...sessionData,
+        messages: sessionData.messages.map(({ spacesData, ...rest }) => rest)
+      };
+
       // Pass the local 'id' so backend can find it if it exists or create new
-      const response = await axiosInstance.post<ChatApiResponse<ChatSession>>('/api/chat', sessionData);
+      const response = await axiosInstance.post<ChatApiResponse<ChatSession>>('/api/chat', cleanSessionData);
       return response.data;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Failed to save chat session";

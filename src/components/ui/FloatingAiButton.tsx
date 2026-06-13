@@ -140,7 +140,7 @@ export const FloatingAiButton = () => {
       <button
         ref={buttonRef}
         onClick={() => navigate("/start-chatting")}
-        className={`hidden md:flex fixed bottom-6 right-[100px] z-50 items-center gap-2 rounded-full px-4 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ${
+        className={`hidden md:flex fixed bottom-6 right-[100px] z-[2147483647] items-center gap-2 rounded-full px-4 py-3 text-sm font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         } ${
           isOverDark 
@@ -163,7 +163,7 @@ export const FloatingAiButton = () => {
             animate={{ opacity: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, y: 50, x: "-50%" }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="md:hidden fixed bottom-6 left-1/2 z-[100] w-[92%] max-w-[400px] cursor-pointer"
+            className="md:hidden fixed bottom-6 left-1/2 z-[2147483647] w-[92%] max-w-[400px] cursor-pointer"
             onClick={() => navigate("/start-chatting")}
           >
             <div className="bg-white/85 backdrop-blur-xl border border-gray-200/60 rounded-full p-1.5 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
