@@ -35,7 +35,9 @@ import { API_CONFIG } from '@/config/api.config'; // [NEW] Import API Config
 import Header from "@/components/Header";
 import { useLocationMetadata } from '@/hooks/useLocationMetadata';
 import SpacesInlineWidget from '@/components/chat/SpacesInlineWidget';
+import businessSetupData from '@/data/business_setup_data.json';
 import SpaceDetailsModal from '@/components/chat/SpaceDetailsModal';
+import { SpaceDetailsSidebar } from '@/components/Map/SpaceDetailsSidebar';
 
 // [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
 const formatMessage = (text: string) => {
@@ -137,6 +139,11 @@ const formatMessage = (text: string) => {
 const TypewriterEffect = ({ text, onComplete }: { text: string; onComplete?: () => void }) => {
   const [displayedText, setDisplayedText] = useState('');
   const speed = 15; // ms per char to simulate GPT streaming
+  
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     setDisplayedText('');
@@ -145,21 +152,22 @@ const TypewriterEffect = ({ text, onComplete }: { text: string; onComplete?: () 
       // Handle the case where text might be empty or undefined gracefully
       if (!text) {
         clearInterval(timer);
-        if (onComplete) onComplete();
+        if (onCompleteRef.current) onCompleteRef.current();
         return;
       }
 
       if (i < text.length) {
-        setDisplayedText((prev) => prev + text.charAt(i));
+        const charToAppend = text.charAt(i);
+        setDisplayedText((prev) => prev + charToAppend);
         i++;
       } else {
         clearInterval(timer);
-        if (onComplete) onComplete();
+        if (onCompleteRef.current) onCompleteRef.current();
       }
     }, speed);
 
     return () => clearInterval(timer);
-  }, [text]);
+  }, [text]); // Removed onComplete to prevent restart loops
 
   return (
     <div className="text-[16px] leading-[1.8] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium text-gray-800 font-sans">
@@ -737,12 +745,12 @@ const StartChatting = () => {
       }
     }
 
-    // 2. Check for area match (if no property or city found)
-    if (!foundProperty && !foundCityName) {
+    // 2. Check for area match (even if city found, to refine search)
+    if (!foundProperty) {
       for (const area of searchMetadata.areas) {
         if (textLower.includes(area.name.toLowerCase())) {
           foundAreaName = area.name;
-          foundCityName = area.city;
+          foundCityName = area.city; // This will override the generic city with the exact city for the area
           break;
         }
       }
@@ -783,7 +791,7 @@ const StartChatting = () => {
   };
 
   // Helper: Fetch and Update Map
-  const updateMapForQuery = async (text: string, isAIResponse: boolean = false, forcedServiceType?: 'virtual' | 'coworking' | 'business_setup' | string, forcedCityName?: string) => {
+  const updateMapForQuery = async (text: string, isAIResponse: boolean = false, forcedServiceType?: 'virtual' | 'coworking' | 'business_setup' | string, forcedCityName?: string, aiMessageContent?: string) => {
     const { cityName: detectedCityName, areaName, property, serviceType: detectedServiceType } = detectIntents(text);
     const serviceType = forcedServiceType || detectedServiceType;
     const cityName = forcedCityName || detectedCityName;
@@ -818,57 +826,18 @@ const StartChatting = () => {
         // setShowMap(true); // [MOVE] We now wait for results to avoid showing empty map
 
         // [PHASE 3] Unified Fetching: Fetch both if not specified, or just requested type
-        const fetchVirtual = !serviceType || serviceType === 'virtual' || serviceType === 'business_setup';
-        const fetchCoworking = !serviceType || serviceType === 'coworking';
+        // For business_setup, skip API calls entirely — use local JSON data
+        let results: any[] = [];
 
-        const [virtualRes, coworkingRes] = await Promise.all([
-          fetchVirtual ? getVirtualOfficesByCity(cityName) : Promise.resolve({ offices: [] }),
-          fetchCoworking ? getCoworkingSpacesByCity(cityName) : Promise.resolve({ spaces: [] })
-        ]);
-
-        // Virtual office service returns { offices: [...], pagination: ... }
-        const virtualData = (virtualRes as any).offices || (Array.isArray(virtualRes) ? virtualRes : []);
-        const virtualMarkers = virtualData.map((item: any) => ({
-          position: item.coordinates || generateRandomCoordinates(center, 0),
-          title: item.name,
-          address: item.address,
-          image: item.image,
-          price: item.gstPlanPrice,
-          rating: item.rating,
-          reviews: item.reviews,
-          features: item.features || [],
-          serviceType: serviceType === 'business_setup' ? 'Business Setup' : 'Virtual Office',
-          originalData: item
-        }));
-
-        // Coworking service returns array Directly
-        const coworkingData = Array.isArray(coworkingRes) ? coworkingRes : (coworkingRes as any).spaces || [];
-        const coworkingMarkers = coworkingData.map((item: any) => ({
-          position: item.coordinates || generateRandomCoordinates(center, 0),
-          title: item.name,
-          address: item.address,
-          image: item.image,
-          price: item.price,
-          rating: item.rating,
-          reviews: item.reviews,
-          features: item.features || [],
-          serviceType: 'Coworking Space',
-          originalData: item
-        }));
-
-        const results = [...virtualMarkers, ...coworkingMarkers];
-
-        // [NEW] If business setup, replace results with business setup packages
         if (serviceType === 'business_setup') {
+          // Business setup uses local JSON data, NOT API calls
           try {
-            const businessSetupData = require('@/data/business_setup_data.json');
             const packages = (businessSetupData.servicesByCity && businessSetupData.servicesByCity[lowerCity]) || businessSetupData.features;
-            results.length = 0; // clear others
             packages.forEach((pkg: any) => {
               results.push({
                 position: generateRandomCoordinates(center, 0.01),
                 title: pkg.name || pkg.title,
-                address: `${cityName} (Business Setup)`,
+                address: pkg.description || `${cityName} (Business Setup)`,
                 image: 'https://images.unsplash.com/photo-1664575602276-acd073f104c1?w=800&q=80',
                 price: pkg.price,
                 rating: 5.0,
@@ -881,12 +850,92 @@ const StartChatting = () => {
           } catch(e) {
             console.error("Failed to load business setup data", e);
           }
+        } else {
+          // Normal workspace flow — fetch from API
+          const fetchVirtual = !serviceType || serviceType === 'virtual';
+          const fetchCoworking = !serviceType || serviceType === 'coworking';
+
+          const [virtualRes, coworkingRes] = await Promise.all([
+            fetchVirtual ? getVirtualOfficesByCity(cityName) : Promise.resolve({ offices: [] }),
+            fetchCoworking ? getCoworkingSpacesByCity(cityName) : Promise.resolve({ spaces: [] })
+          ]);
+
+          // Virtual office service returns { offices: [...], pagination: ... }
+          const virtualData = (virtualRes as any).offices || (Array.isArray(virtualRes) ? virtualRes : []);
+          const virtualMarkers = virtualData.map((item: any) => ({
+            position: item.coordinates || generateRandomCoordinates(center, 0),
+            title: item.name,
+            address: item.address,
+            image: item.image,
+            price: item.gstPlanPrice,
+            rating: item.rating,
+            reviews: item.reviews,
+            features: item.features || [],
+            serviceType: 'Virtual Office',
+            originalData: item
+          }));
+
+          // Coworking service returns array Directly
+          const coworkingData = Array.isArray(coworkingRes) ? coworkingRes : (coworkingRes as any).spaces || [];
+          let coworkingMarkers = coworkingData.map((item: any) => ({
+            position: item.coordinates || generateRandomCoordinates(center, 0),
+            title: item.name,
+            address: item.address,
+            image: item.image,
+            price: item.price,
+            rating: item.rating,
+            reviews: item.reviews,
+            features: item.features || [],
+            serviceType: 'Coworking Space',
+            originalData: item
+          }));
+
+          results = [...virtualMarkers, ...coworkingMarkers];
+
+          // [SMART CARD FILTER]
+          // The absolute source of truth is the AI's text response.
+          // We want the cards to perfectly mirror whatever the AI just told the user.
+          
+          let aiMatchedResults: any[] = [];
+          
+          if (aiMessageContent) {
+            const lowerAIContent = aiMessageContent.toLowerCase();
+            const isSpaceMentioned = (spaceName: string): boolean => {
+              if (!spaceName) return false;
+              const lowerName = spaceName.toLowerCase().trim();
+              if (lowerAIContent.includes(lowerName)) return true;
+              const words = lowerName.split(/\s+/).filter(w => w.length >= 3 && !['the', 'and', 'for', 'space', 'office', 'coworking'].includes(w));
+              if (words.length > 0) {
+                const matchedWords = words.filter(w => lowerAIContent.includes(w));
+                if (matchedWords.length >= Math.max(1, Math.ceil(words.length * 0.6))) return true;
+              }
+              return false;
+            };
+            
+            aiMatchedResults = results.filter(r => isSpaceMentioned(r.title) || isSpaceMentioned(r.originalData?.name));
+          }
+
+          if (aiMatchedResults.length > 0) {
+            results = aiMatchedResults;
+          } else if (areaName) {
+            const lowerArea = areaName.toLowerCase();
+            const areaFiltered = results.filter(r => 
+              r.address?.toLowerCase().includes(lowerArea) || 
+              r.title?.toLowerCase().includes(lowerArea) ||
+              r.originalData?.area?.toLowerCase().includes(lowerArea)
+            );
+            if (areaFiltered.length > 0) {
+              results = areaFiltered;
+            }
+          }
         }
 
         // [NEW] Prioritize 'Stirring Minds' to always show at the top
         results.sort((a, b) => {
-          const aIsStirring = a.title.toLowerCase().includes('stirring minds');
-          const bIsStirring = b.title.toLowerCase().includes('stirring minds');
+          const titleA = a.title || '';
+          const titleB = b.title || '';
+          const aIsStirring = titleA.toLowerCase().includes('stirring minds');
+          const bIsStirring = titleB.toLowerCase().includes('stirring minds');
           if (aIsStirring && !bIsStirring) return -1;
           if (!aIsStirring && bIsStirring) return 1;
           return 0;
@@ -1251,7 +1300,7 @@ const StartChatting = () => {
         const aiCity = showCardsMatch[1].trim();
         const aiServiceType = showCardsMatch[2]?.trim() || userServiceType || 'coworking';
         aiResponseText = aiResponseText.replace(showCardsMatch[0], '').trim();
-        fetchedSpaces = await updateMapForQuery(`${aiCity} ${aiServiceType}`, true, aiServiceType as any, aiCity);
+        fetchedSpaces = await updateMapForQuery(userMessage.content, true, aiServiceType as any, aiCity, aiResponseText);
       }
 
       // Add AI response to chat
@@ -1480,7 +1529,7 @@ const StartChatting = () => {
                 const sessionKey = session._id || session.id;
                 const isActive = activeChatId === sessionKey;
                 return (
-                  <div key={sessionKey} className={`relative group w-full h-[40px] flex items-center pr-2 transition-colors ${isActive ? 'bg-[#35503F] rounded-lg' : 'rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
+                  <div key={sessionKey} className={`relative group w-full h-[40px] flex items-center pr-2 mb-1 border-b border-gray-300 dark:border-gray-600 transition-colors ${isActive ? 'bg-[#35503F] rounded-lg border-transparent' : 'rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700'}`}>
                     <button
                       onClick={() => {
                         // Before switching, save the current chat
@@ -1744,14 +1793,11 @@ const StartChatting = () => {
                   {isLoading && (
                     <div className="flex gap-4">
                       {/* Avatar removed as per user request */}
-                      <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-sm px-6 py-4 shadow-sm flex items-center gap-3">
-                        {(!chatMessages.length || !/^(hi|hello|hey|kya hal|how are you|good morning|good evening)/i.test(chatMessages[chatMessages.length - 1]?.content.trim())) && (
-                          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Give me a moment, Flash AI is working on it</span>
-                        )}
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                          <span className="w-2 h-2 bg-[#35503F] rounded-full animate-bounce"></span>
+                      <div className="flex items-center gap-3 p-2">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 bg-[#35503F]/80 rounded-full animate-wave" style={{ animationDelay: '0ms' }}></span>
+                          <span className="w-2.5 h-2.5 bg-[#35503F]/80 rounded-full animate-wave" style={{ animationDelay: '150ms' }}></span>
+                          <span className="w-2.5 h-2.5 bg-[#35503F]/80 rounded-full animate-wave" style={{ animationDelay: '300ms' }}></span>
                         </div>
                       </div>
                     </div>

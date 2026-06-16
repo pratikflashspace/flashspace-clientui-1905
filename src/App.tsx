@@ -55,6 +55,8 @@ const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const PaymentFailedPage = lazy(() => import("./pages/PaymentFailedPage"));
 const OAuthConsent = lazy(() => import("./pages/auth/OAuthConsent"));
 const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const Blogs = lazy(() => import("./pages/Blogs"));
+const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 
 // Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -89,6 +91,7 @@ const AdminInvoices = lazy(() => import("./pages/admin/Invoices"));
 const DocumentManagement = lazy(() => import("./pages/admin/DocumentManagement"));
 const TrackProgress = lazy(() => import("./pages/admin/TrackProgress"));
 const AIIntegrations = lazy(() => import("./pages/admin/AIIntegrations"));
+const PostBlog = lazy(() => import("./pages/admin/PostBlog"));
 
 // Space Partner Pages
 const SpacePortalClients = lazy(() => import("@/pages/spacePortal/Clients"));
@@ -322,6 +325,8 @@ const App = () => (
                       <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/terms" element={<TermsConditions />} />
                       <Route path="/refund-policy" element={<RefundPolicy />} />
+                      <Route path="/blogs" element={<Blogs />} />
+                      <Route path="/blogs/:slug" element={<BlogDetail />} />
 
                       {/* Auth Routes */}
                       <Route path="/login" element={<Index openLogin={true} />} />

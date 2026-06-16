@@ -174,13 +174,13 @@ export const PlanLocationsShowcase = () => {
                timeline = "Monthly / Quarterly";
             }
             else if (name === "LLP Compliance") {
-               price = "₹14999 only";
+               price = "Customized";
                description = "Stay compliant with annual LLP filing and legal requirements.";
                features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
                timeline = "Ongoing Annual Compliance";
             }
             else if (name === "MCA Compliance") {
-               price = "₹17999 only";
+               price = "Customized";
                description = "Complete MCA compliance and ROC filing support for companies.";
                features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
                timeline = "Monthly / Annual";

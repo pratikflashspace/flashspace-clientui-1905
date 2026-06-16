@@ -1,6 +1,7 @@
 import React from 'react';
-import { ArrowRight, MapPin } from 'lucide-react';
+import { ArrowRight, MapPin, ShoppingCart } from 'lucide-react';
 import { getSafeImageUrl } from '@/utils/imageUrl';
+import { useNavigate } from 'react-router-dom';
 
 interface SpacesInlineWidgetProps {
   spaces: any[];
@@ -8,6 +9,8 @@ interface SpacesInlineWidgetProps {
 }
 
 const SpacesInlineWidget: React.FC<SpacesInlineWidgetProps> = ({ spaces, onSpaceClick }) => {
+  const navigate = useNavigate();
+
   if (!spaces || spaces.length === 0) return null;
 
   return (
@@ -18,20 +21,23 @@ const SpacesInlineWidget: React.FC<SpacesInlineWidgetProps> = ({ spaces, onSpace
         const address = space.address || "Delhi";
         const price = space.price || "Price on request";
         const serviceType = space.serviceType || "Virtual Office";
+        const isBusinessSetup = space.serviceType === 'Business Setup' || space.serviceType === 'Business Setup Packages' || title.toLowerCase().includes('registration');
 
         return (
           <div 
             key={index}
             className="flex flex-col sm:flex-row bg-white dark:bg-[#1a1a1a] rounded-2xl border border-[#35503F] dark:border-yellow-400/30 shadow-sm hover:shadow-md hover:border-[#35503F] dark:hover:border-yellow-400 transition-all p-4 gap-4"
           >
-            {/* Image Section */}
-            <div className="sm:w-36 h-36 sm:h-auto shrink-0 relative">
-              <img 
-                src={image} 
-                alt={title} 
-                className="w-full h-full object-cover rounded-xl"
-              />
-            </div>
+            {/* Image Section - Hidden for Business Setup */}
+            {!isBusinessSetup && (
+              <div className="sm:w-36 h-36 sm:h-auto shrink-0 relative">
+                <img 
+                  src={image} 
+                  alt={title} 
+                  className="w-full h-full object-cover rounded-xl"
+                />
+              </div>
+            )}
 
             {/* Content Section */}
             <div className="flex flex-col flex-grow">
@@ -55,11 +61,17 @@ const SpacesInlineWidget: React.FC<SpacesInlineWidgetProps> = ({ spaces, onSpace
                 </div>
 
                 <button 
-                  onClick={() => onSpaceClick(space)}
+                  onClick={() => {
+                    if (isBusinessSetup) {
+                      navigate('/services/business-setup');
+                    } else {
+                      onSpaceClick(space);
+                    }
+                  }}
                   className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#35503F] dark:border-yellow-400 bg-white dark:bg-transparent text-[#35503F] dark:text-yellow-400 hover:bg-[#35503F] hover:text-white dark:hover:bg-yellow-400 dark:hover:text-black transition-colors text-sm font-semibold"
                 >
-                  View Details
-                  <ArrowRight className="w-4 h-4" />
+                  {isBusinessSetup ? 'Buy Now' : 'View Details'}
+                  {isBusinessSetup ? <ShoppingCart className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
                 </button>
               </div>
             </div>

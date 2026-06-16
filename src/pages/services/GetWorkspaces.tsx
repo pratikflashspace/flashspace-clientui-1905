@@ -1118,14 +1118,14 @@ const GetWorkspaces = () => {
             }
             else if (heading === "LLP Compliance") {
                imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
-               price = "₹14999 only";
+               price = "Customized";
                description = "Stay compliant with annual LLP filing and legal requirements.";
                features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
                timeline = "Ongoing Annual Compliance";
             }
             else if (heading === "MCA Compliance") {
                imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
-               price = "₹17999 only";
+               price = "Customized";
                description = "Complete MCA compliance and ROC filing support for companies.";
                features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
                timeline = "Monthly / Annual";
