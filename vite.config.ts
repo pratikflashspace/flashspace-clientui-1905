@@ -27,11 +27,11 @@ export default defineConfig({
   optimizeDeps: {
     include: ["maplibre-gl"],
     esbuildOptions: {
-      target: "es2020",
+      target: "es2017",
     },
   },
   build: {
-    target: "es2020",
+    target: ["es2017", "safari13"],
     chunkSizeWarningLimit: 10000,
     commonjsOptions: {
       include: [/maplibre-gl/, /node_modules/],

@@ -42,7 +42,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Bookings = lazy(() => import("./pages/Bookings"));
 const Community = lazy(() => import("./pages/Community"));
 import Settings from "./pages/Settings";
-import ClientDashboard from "./components/ClientDashboard";
+const ClientDashboard = lazy(() => import("./components/ClientDashboard"));
 const CityListing = lazy(() => import("./pages/CityListing"));
 const AboutUs = lazy(() => import("./pages/AboutUs"));
 const HelpCenter = lazy(() => import("./pages/help/HelpCenter"));
