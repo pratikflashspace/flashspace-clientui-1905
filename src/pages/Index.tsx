@@ -10,6 +10,8 @@ import { Stats } from "@/components/sections/Stats";
 import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { CTA } from "@/components/sections/CTA";
+import { PricingSection } from "@/components/sections/PricingSection";
+import { PlanComparison } from "@/components/sections/PlanComparison";
 import Footer from "@/components/Footer";
 import { TrustedByFilmstrip } from "@/components/sections/TrustedByFilmstrip";
 import { motion, AnimatePresence } from "framer-motion";
@@ -84,6 +86,12 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         </FadeInSection>
         <MobileBrowseCities />
         <ScrollNavLayout />
+        {/* <FadeInSection>
+          <PricingSection />
+        </FadeInSection> */}
+        <FadeInSection>
+          <PlanComparison />
+        </FadeInSection>
         <FadeInSection>
           <ScaleSection />
         </FadeInSection>

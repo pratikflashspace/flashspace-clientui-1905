@@ -1,172 +1,206 @@
 import { motion } from "framer-motion";
-import { 
-  User, 
-  ShieldCheck, 
-  Headset, 
-  ChevronRight,
+import {
+  Building2,
+  Building,
+  Rocket,
+  Calculator,
+  HeartHandshake,
   Code,
-  LineChart,
-  Settings,
-  PieChart,
-  Headphones,
-  ShieldAlert,
-  Palette,
-  Lightbulb
+  ArrowRight,
+  Handshake,
+  User,
+  ShieldCheck,
+  Headset
 } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const topBadges = [
-  {
-    icon: <User className="w-4 h-4 text-[#B89B5E]" />,
-    title: "Tailored for Your Success",
-    subtitle: "Solutions customized to your goals.",
-  },
-  {
-    icon: <ShieldCheck className="w-4 h-4 text-[#B89B5E]" />,
-    title: "Quality You Can Trust",
-    subtitle: "Excellence in every deliverable.",
-  },
-  {
-    icon: <Headset className="w-4 h-4 text-[#B89B5E]" />,
-    title: "Support That Cares",
-    subtitle: "We're with you, every step.",
-  },
-];
+import { Link, useNavigate } from "react-router-dom";
 
 const services = [
   {
     id: "01",
-    title: "Strategy & Consulting",
-    description: "Smart strategies tailored to your goals. We plan, you grow.",
-    icon: <Lightbulb className="w-6 h-6 text-[#B89B5E]" />,
+    title: "Virtual Offices",
+    link: "/solutions/virtual-office",
+    description: "Professional business addresses and mail handling services to establish your presence.",
+    icon: <Building2 className="w-6 h-6" />,
+    theme: "dark"
   },
   {
     id: "02",
-    title: "Design & Branding",
-    description: "Eye-catching designs that build your brand identity.",
-    icon: <Palette className="w-6 h-6 text-[#B89B5E]" />,
+    title: "Coworking Spaces",
+    link: "/services/coworking-space",
+    description: "Flexible, fully-equipped shared workspaces designed for collaboration and productivity.",
+    icon: <Building className="w-6 h-6" />,
+    theme: "light"
   },
   {
     id: "03",
-    title: "Development",
-    description: "High-performance solutions built with clean, scalable code.",
-    icon: <Code className="w-6 h-6 text-[#B89B5E]" />,
+    title: "Business Setup",
+    link: "/services/business-setup",
+    description: "End-to-end assistance in company registration, licensing, and legal structuring.",
+    icon: <Rocket className="w-6 h-6" />,
+    theme: "dark"
   },
   {
     id: "04",
-    title: "Marketing & Growth",
-    description: "Data-driven marketing that brings leads and maximizes growth.",
-    icon: <LineChart className="w-6 h-6 text-[#B89B5E]" />,
+    title: "Taxation and Filing",
+    link: "#",
+    description: "Expert guidance on corporate tax, VAT, and seamless regulatory compliance.",
+    icon: <Calculator className="w-6 h-6" />,
+    theme: "light"
   },
   {
     id: "05",
-    title: "Automation",
-    description: "Streamline workflows and save time with smart automation.",
-    icon: <Settings className="w-6 h-6 text-[#B89B5E]" />,
+    title: "One CRM",
+    link: "#",
+    description: "An all-in-one customer relationship management system to streamline your sales pipeline.",
+    icon: <HeartHandshake className="w-6 h-6" />,
+    theme: "dark"
   },
   {
     id: "06",
-    title: "Analytics & Insights",
-    description: "Turn data into insights and make smarter, faster decisions.",
-    icon: <PieChart className="w-6 h-6 text-[#B89B5E]" />,
-  },
-  {
-    id: "07",
-    title: "Support & Maintenance",
-    description: "Reliable support and ongoing maintenance, always.",
-    icon: <Headphones className="w-6 h-6 text-[#B89B5E]" />,
-  },
-  {
-    id: "08",
-    title: "Security & Reliability",
-    description: "Top-notch security to protect your data and your business.",
-    icon: <ShieldAlert className="w-6 h-6 text-[#B89B5E]" />,
+    title: "Website Development",
+    link: "#",
+    description: "Custom, high-performance AI-powered websites and digital solutions tailored for your business.",
+    icon: <Code className="w-6 h-6" />,
+    theme: "light"
   },
 ];
 
 export const PremiumServices = () => {
+  const navigate = useNavigate();
   return (
-    <section className="py-20 bg-[#FAFAF8] overflow-hidden">
+    <section className="py-20 bg-[#F0F4EE] overflow-hidden premium-services-section" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <style dangerouslySetInnerHTML={{__html: `
+        .premium-services-section, 
+        .premium-services-section * {
+          font-family: 'Inter', sans-serif !important;
+        }
+      `}} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         {/* Header Section */}
-        <div className="text-center mb-16">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="h-px w-8 bg-[#B89B5E]"></div>
-            <span className="text-[#B89B5E] text-sm font-bold tracking-[0.2em] uppercase">
+        <div className="text-center mb-24">
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <span className="text-[#36503F] text-xs font-bold tracking-[0.2em] uppercase">
               What We Do Best
             </span>
-            <div className="h-px w-8 bg-[#B89B5E]"></div>
           </div>
-          
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 font-['Inter']">
-            <span className="text-[#2A3B2C]">Premium Services. </span>
-            <span className="text-[#B89B5E]">Real Impact.</span>
-          </h2>
-          
-          <p className="text-gray-600 max-w-3xl mx-auto text-lg mb-12">
-            End-to-end solutions designed to elevate your brand, streamline operations,
-            and accelerate growth.
+
+          {/* Main Title with decorative diamond line */}
+          <div className="relative mb-6">
+
+
+            <h2 className="text-[56px] leading-[1.1] font-bold mt-10 mb-6 tracking-tight">
+              <span className="text-black">Premium Services. </span>
+              <span className="text-[#36503F]">Real Impact.</span>
+            </h2>
+          </div>
+
+          <p className="text-gray-600 max-w-2xl mx-auto text-[1rem] leading-relaxed mb-12">
+            End-to-end solutions designed to elevate your brand, streamline operations, <br className="hidden md:block" /> and accelerate growth.
           </p>
 
-          {/* Badges */}
-          <div className="flex flex-wrap justify-center gap-x-12 gap-y-6">
-            {topBadges.map((badge, index) => (
-              <div key={index} className="flex items-start gap-4 text-left">
-                <div className="w-12 h-12 rounded-full bg-[#1E2A22] flex items-center justify-center shrink-0">
-                  {badge.icon}
-                </div>
-                <div>
-                  <h4 className="font-bold text-[#1a2d1d] text-sm mb-1">{badge.title}</h4>
-                  <p className="text-gray-500 text-xs">{badge.subtitle}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {services.map((service, index) => (
-            <motion.div
-              key={service.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex border border-gray-100 group cursor-pointer"
-            >
-              {/* Left Colored Bar */}
-              <div className="w-20 bg-[#1E2A22] flex flex-col items-center justify-center relative overflow-hidden shrink-0">
-                {/* Decorative shape */}
-                <div className="absolute -top-4 -right-4 w-12 h-12 bg-white/5 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="relative z-10 group-hover:scale-110 transition-transform duration-300">
-                  {service.icon}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
+          {services.map((service, index) => {
+            const isDark = service.theme === "dark";
+            return (
+              <motion.div
+                onClick={() => service.link && service.link !== "#" && navigate(service.link)}
+                key={service.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className={`group cursor-pointer relative rounded-sm overflow-hidden p-8 flex flex-col transition-all duration-300 hover:scale-105 ${isDark
+                  ? "bg-[#36503F] text-white"
+                  : "bg-[#FDFCF9] text-[#36503F] border border-gray-100 shadow-sm"
+                  }`}
+              >
+                {/* Top Row: Number & Icon */}
+                <div className="flex justify-between items-start mb-6">
+                  <span className={`text-2xl font-bold ${isDark ? 'text-[#FEF8CF]' : 'text-[#36503F]'}`}>
+                    {service.id}
+                  </span>
+
+                  {/* Icon centered conceptually, but positioned relative to the card */}
+                  <div className="absolute left-1/2 -translate-x-1/2 top-8">
+                    <div className={`w-12 h-12 rounded-full border flex items-center justify-center ${isDark
+                      ? 'border-[#FEF8CF] text-[#FEF8CF]'
+                      : 'border-[#36503F] text-[#36503F]'
+                      }`}>
+                      {service.icon}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              {/* Right Content */}
-              <div className="p-6 flex-1 flex flex-col relative">
-                <div className="text-[#B89B5E] text-2xl font-serif mb-2">
-                  {service.id}
+
+                {/* Content */}
+                <div className="mt-8 flex flex-col flex-1">
+                  <h3 className={`text-center font-bold text-[1.1rem] mb-4 ${isDark ? 'text-white' : 'text-[#36503F]'}`}>
+                    {service.title}
+                  </h3>
+
+                  <div className={`w-full h-[1px] mb-5 ${isDark ? 'bg-[#FEF8CF]/30' : 'bg-[#36503F]/30'}`}></div>
+
+                  <p className={`text-[0.8rem] leading-relaxed text-center flex-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {service.description}
+                  </p>
                 </div>
-                <h3 className="font-bold text-[#2A3B2C] text-lg mb-3 leading-tight">
-                  {service.title}
-                </h3>
-                <p className="text-gray-500 text-sm mb-6 flex-1">
-                  {service.description}
-                </p>
-                <Link 
-                  to="#" 
-                  className="inline-flex items-center text-[#B89B5E] text-sm font-semibold group-hover:text-[#9e834d] transition-colors"
-                >
-                  Learn More 
-                  <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </motion.div>
-          ))}
+
+                  <div className="flex justify-end mt-4">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 group-hover:translate-x-1 ${isDark ? "bg-[#FEF8CF] text-[#36503F]" : "bg-[#36503F] text-white"}`}>
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </div>
+
+              </motion.div>
+            );
+          })}
         </div>
+
+        {/* CTA Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="bg-[#FDFCF9] border border-gray-200 rounded-sm p-6 lg:p-8 flex flex-col lg:flex-row items-center justify-between gap-8 relative overflow-hidden"
+        >
+          {/* Subtle Background Pattern/Image placeholder for right side */}
+          <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 pointer-events-none bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center" style={{ maskImage: 'linear-gradient(to right, transparent, black)' }}></div>
+
+          <div className="flex flex-col md:flex-row items-center gap-6 lg:gap-10 z-10 w-full lg:w-auto">
+            {/* Left Icon */}
+            <div className="w-16 h-16 rounded-full bg-[#36503F] flex items-center justify-center shrink-0">
+              <Handshake className="w-8 h-8 text-[#FEF8CF]" />
+            </div>
+
+            {/* Divider */}
+            <div className="hidden md:block w-px h-16 bg-[#FEF8CF]/50"></div>
+
+            {/* Title */}
+            <h2 className="text-2xl md:text-3xl text-center md:text-left text-black font-bold leading-snug">
+              Let's Build Something <br className="hidden md:block" />
+              <span className="text-[#36503F]">
+                <span className="italic">Extraordinary</span> Together.
+              </span>
+            </h2>
+          </div>
+
+          <div className="flex flex-col md:flex-row items-center gap-6 z-10">
+            {/* Description */}
+            <p className="text-sm text-gray-600 text-center md:text-left max-w-xs">
+              Partner with us to unlock new opportunities and achieve sustainable growth.
+            </p>
+
+            {/* Button */}
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-contact-modal'))}
+              className="bg-[#36503F] text-[#FEF8CF] text-xs font-semibold tracking-wider uppercase px-8 py-4 rounded-sm flex items-center gap-2 hover:bg-[#1a261e] transition-colors whitespace-nowrap"
+            >
+              GET IN TOUCH <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </motion.div>
 
       </div>
     </section>

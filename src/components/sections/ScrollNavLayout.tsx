@@ -12,10 +12,9 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-    { id: "virtual-office", label: "Virtual Office" },
-    { id: "coworking", label: "Coworking" },
+    { id: "virtual-office", label: "Workspaces" },
     { id: "business-setup", label: "Business Setup" },
-    { id: "global-access", label: "Global Access" },
+    { id: "taxation-filing", label: "Taxation & Filing" },
     { id: "ai-platform", label: "AI Platform" },
 ];
 
@@ -70,7 +69,7 @@ export const ScrollNavLayout = () => {
                                         className="relative flex flex-col w-full text-left py-2 pl-0 bg-transparent transition-all duration-200 ease-in-out"
                                     >
                                         <span
-                                            className={`whitespace-nowrap uppercase tracking-[0.08em] transition-colors duration-200 text-[12px] ${isActive ? "font-semibold" : "font-medium"
+                                            className={`whitespace-nowrap tracking-[0.08em] transition-colors duration-200 text-[12px] ${isActive ? "font-semibold" : "font-medium"
                                                 }`}
                                             style={{
                                                 color: isActive ? '#36503F' : 'rgba(0,0,0,0.55)',
