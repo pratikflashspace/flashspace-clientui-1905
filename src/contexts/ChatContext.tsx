@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { useAuth } from './AuthContext';
 import chatService from '@/services/chat.service';
+import { safeStorageGet, safeStorageRemove, safeStorageSet } from '@/utils/browserStorage';
 
 // Reusing the exact same types from StartChatting.tsx
 export interface ChatMessage {
@@ -50,7 +51,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   // Load from session storage on mount
   useEffect(() => {
     try {
-      const savedMessages = sessionStorage.getItem('flashspace_chatHistory');
+      const savedMessages = safeStorageGet('session', 'flashspace_chatHistory');
       if (savedMessages) {
         setChatMessages(JSON.parse(savedMessages, (key, value) => {
           if (key === 'timestamp') return new Date(value);
@@ -58,7 +59,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         }));
       }
 
-      const savedSessions = sessionStorage.getItem('flashspace_chatSessions');
+      const savedSessions = safeStorageGet('session', 'flashspace_chatSessions');
       if (savedSessions) {
         setChatSessions(JSON.parse(savedSessions, (key, value) => {
           if (key === 'timestamp') return new Date(value);
@@ -99,9 +100,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setChatMessages([]);
       setChatSessions([]);
       setIsFetchedFromServer(false);
-      sessionStorage.removeItem('flashspace_chatHistory');
-      sessionStorage.removeItem('flashspace_chatSessions');
-      sessionStorage.removeItem('flashspace_activeChatId');
+      safeStorageRemove('session', 'flashspace_chatHistory');
+      safeStorageRemove('session', 'flashspace_chatSessions');
+      safeStorageRemove('session', 'flashspace_activeChatId');
     }
   }, [isAuthenticated]);
 
@@ -113,11 +114,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   // Save changes back to session storage
   useEffect(() => {
-    sessionStorage.setItem('flashspace_chatHistory', JSON.stringify(chatMessages));
+    safeStorageSet('session', 'flashspace_chatHistory', JSON.stringify(chatMessages));
   }, [chatMessages]);
 
   useEffect(() => {
-    sessionStorage.setItem('flashspace_chatSessions', JSON.stringify(chatSessions));
+    safeStorageSet('session', 'flashspace_chatSessions', JSON.stringify(chatSessions));
   }, [chatSessions]);
 
   const startNewChat = useCallback((messagesToSave?: ChatMessage[]) => {
@@ -127,7 +128,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     console.log(`[ChatContext] startNewChat called. Clearing current messages.`);
     
     setChatMessages([]);
-    sessionStorage.removeItem('chat_session_id');
+    safeStorageRemove('session', 'chat_session_id');
   }, []); // No deps needed — all values read from refs
 
   const deleteChatSession = useCallback(async (sessionId: string) => {

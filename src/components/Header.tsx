@@ -13,6 +13,7 @@ import {
   getLoginRedirectUrl,
   isCheckoutReturnPath,
 } from "@/utils/checkoutSession";
+import { safeStorageGet, safeStorageSet } from "@/utils/browserStorage";
 
 interface HeaderProps {
   forceWhiteBackground?: boolean;
@@ -108,24 +109,24 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
 
   useEffect(() => {
     // Rule 1: Show after 10 seconds on site (once per session)
-    const hasFilled = localStorage.getItem("hasFilledGetInTouch");
-    const hasShownInitial = sessionStorage.getItem("hasShownInitialGetInTouch");
+    const hasFilled = safeStorageGet("local", "hasFilledGetInTouch");
+    const hasShownInitial = safeStorageGet("session", "hasShownInitialGetInTouch");
     if (!hasShownInitial && !hasFilled) {
-      let sessionStartTime = sessionStorage.getItem("sessionStartTime");
+      let sessionStartTime = safeStorageGet("session", "sessionStartTime");
       if (!sessionStartTime) {
         sessionStartTime = Date.now().toString();
-        sessionStorage.setItem("sessionStartTime", sessionStartTime);
+        safeStorageSet("session", "sessionStartTime", sessionStartTime);
       }
 
       const elapsed = Date.now() - parseInt(sessionStartTime);
       const remaining = Math.max(0, 10000 - elapsed);
 
       const timer = setTimeout(() => {
-        const alreadyShown = sessionStorage.getItem("hasShownInitialGetInTouch");
-        const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
+        const alreadyShown = safeStorageGet("session", "hasShownInitialGetInTouch");
+        const hasFilledLatest = safeStorageGet("local", "hasFilledGetInTouch");
         if (!alreadyShown && !hasFilledLatest) {
           setIsContactOpen(true);
-          sessionStorage.setItem("hasShownInitialGetInTouch", "true");
+          safeStorageSet("session", "hasShownInitialGetInTouch", "true");
         }
       }, remaining);
 
@@ -145,7 +146,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
     let inactivityTimer: NodeJS.Timeout;
 
     const showInactivityModal = () => {
-      const hasFilled = localStorage.getItem("hasFilledGetInTouch");
+      const hasFilled = safeStorageGet("local", "hasFilledGetInTouch");
       if (!isModalOpenRef.current && !hasFilled) {
         setIsContactOpen(true);
       }
@@ -188,15 +189,15 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
     if (!spaceId) return;
 
     const sessionKey = `hasShownSpacePopup_${spaceId}`;
-    const alreadyShown = sessionStorage.getItem(sessionKey);
-    const hasFilled = localStorage.getItem("hasFilledGetInTouch");
+    const alreadyShown = safeStorageGet("session", sessionKey);
+    const hasFilled = safeStorageGet("local", "hasFilledGetInTouch");
     if (alreadyShown || hasFilled) return;
 
     const timer = setTimeout(() => {
-      const hasFilledLatest = localStorage.getItem("hasFilledGetInTouch");
+      const hasFilledLatest = safeStorageGet("local", "hasFilledGetInTouch");
       if (!isModalOpenRef.current && !hasFilledLatest) {
         setIsContactOpen(true);
-        sessionStorage.setItem(sessionKey, "true");
+        safeStorageSet("session", sessionKey, "true");
       }
     }, 10000); // 10 seconds
 

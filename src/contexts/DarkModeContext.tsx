@@ -5,6 +5,7 @@ import React, {
     useState,
     ReactNode,
 } from "react";
+import { safeStorageGet, safeStorageSet } from "@/utils/browserStorage";
 
 /*Context type */
 interface DarkModeContextType {
@@ -27,17 +28,17 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
     children,
 }) => {
     const [darkMode, setDarkMode] = useState<boolean>(() => {
-        return localStorage.getItem("theme") === "dark";
+        return safeStorageGet("local", "theme") === "dark";
     });
 
     /*Apply theme */
     useEffect(() => {
         if (darkMode) {
             document.documentElement.classList.add("dark");
-            localStorage.setItem("theme", "dark");
+            safeStorageSet("local", "theme", "dark");
         } else {
             document.documentElement.classList.remove("dark");
-            localStorage.setItem("theme", "light");
+            safeStorageSet("local", "theme", "light");
         }
     }, [darkMode]);
 

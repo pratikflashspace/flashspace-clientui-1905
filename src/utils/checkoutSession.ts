@@ -1,3 +1,10 @@
+import {
+  canUseBrowserStorage,
+  safeStorageGet,
+  safeStorageRemove,
+  safeStorageSet,
+} from "@/utils/browserStorage";
+
 const CHECKOUT_RETURN_KEY = "flashspace_checkout_return_to";
 const CHECKOUT_STATE_KEY = "flashspace_checkout_state";
 const DEFAULT_LOGIN_RETURN_TO = "/";
@@ -10,8 +17,7 @@ const CHECKOUT_RETURN_PATHS = [
   "/oauth/authorize",
 ];
 
-const canUseSessionStorage = () =>
-  typeof window !== "undefined" && Boolean(window.sessionStorage);
+const canUseSessionStorage = () => canUseBrowserStorage("session");
 
 export const getCurrentCheckoutPath = () => {
   if (typeof window === "undefined") return "/";
@@ -44,13 +50,13 @@ export const persistCheckoutState = (
   returnTo = getCurrentCheckoutPath(),
 ) => {
   if (!canUseSessionStorage()) return;
-  window.sessionStorage.setItem(CHECKOUT_RETURN_KEY, returnTo);
-  window.sessionStorage.setItem(CHECKOUT_STATE_KEY, JSON.stringify(state));
+  safeStorageSet("session", CHECKOUT_RETURN_KEY, returnTo);
+  safeStorageSet("session", CHECKOUT_STATE_KEY, JSON.stringify(state));
 };
 
 export const readCheckoutState = <T>() => {
   if (!canUseSessionStorage()) return null;
-  const rawState = window.sessionStorage.getItem(CHECKOUT_STATE_KEY);
+  const rawState = safeStorageGet("session", CHECKOUT_STATE_KEY);
   if (!rawState) return null;
 
   try {
@@ -62,6 +68,6 @@ export const readCheckoutState = <T>() => {
 
 export const clearCheckoutState = () => {
   if (!canUseSessionStorage()) return;
-  window.sessionStorage.removeItem(CHECKOUT_RETURN_KEY);
-  window.sessionStorage.removeItem(CHECKOUT_STATE_KEY);
+  safeStorageRemove("session", CHECKOUT_RETURN_KEY);
+  safeStorageRemove("session", CHECKOUT_STATE_KEY);
 };
