@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import { HeroWithSearch } from "@/components/sections/HeroWithSearch";
 import { ScrollNavLayout } from "@/components/sections/ScrollNavLayout";
 import { PlanLocationsShowcase } from "@/components/sections/PlanLocationsShowcase";
+import { PremiumServices } from "@/components/sections/PremiumServices";
 
 import { ScaleSection } from "@/components/sections/ScaleSection";
 import { MetricsOverview } from "@/components/sections/MetricsOverview";
@@ -75,8 +76,11 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         <div className="hidden lg:block">
           <TrustedByFilmstrip />
         </div>
-        <FadeInSection>
+        {/* <FadeInSection>
           <PlanLocationsShowcase />
+        </FadeInSection> */}
+        <FadeInSection>
+          <PremiumServices />
         </FadeInSection>
         <MobileBrowseCities />
         <ScrollNavLayout />
