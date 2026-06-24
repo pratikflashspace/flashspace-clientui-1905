@@ -497,7 +497,7 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-1">
             <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
-              Welcome back, <span className="text-[#36503F] italic">{user?.fullName?.split(" ")[0] || "Customer"}</span>
+              Welcome back, <span className="text-[#36503F] italic">{(user?.fullName || "Customer").split(" ")[0]}</span>
             </h1>
             <p className="text-sm md:text-base text-gray-500 font-medium">
               Manage your workspace subscriptions and track your orders
@@ -741,7 +741,7 @@ export default function Dashboard() {
                             <div className="flex items-start gap-2 text-gray-500 text-xs mb-3 h-8">
                               <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-[#35503F]" />
                               <span className="line-clamp-2">
-                                {booking.spaceSnapshot?.city} — {booking.spaceSnapshot?.address?.split(",")[0]}
+                                {booking.spaceSnapshot?.city} — {(booking.spaceSnapshot?.address || "").split(",")[0]}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-gray-500">
