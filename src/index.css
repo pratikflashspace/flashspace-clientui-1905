@@ -335,9 +335,9 @@
     box-shadow: 0 4px 24px rgba(54, 80, 63, 0.08);
   }
 
-  input:focus:not(.focus-visible\:ring-0),
-  textarea:focus:not(.focus-visible\:ring-0),
-  select:focus:not(.focus-visible\:ring-0) {
+  input:focus:not(.focus-visible\:ring-0):not(.focus\:ring-0),
+  textarea:focus:not(.focus-visible\:ring-0):not(.focus\:ring-0),
+  select:focus:not(.focus-visible\:ring-0):not(.focus\:ring-0) {
     border-color: var(--flash-forest);
     box-shadow: 0 0 0 3px rgba(54, 80, 63, 0.10);
   }

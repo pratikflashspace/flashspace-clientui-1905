@@ -483,7 +483,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                         onError={() => setImgError(true)}
                       />
                     ) : (
-                      user?.fullName?.charAt(0).toUpperCase() || "U"
+                      (user?.fullName?.charAt(0) || "U").toUpperCase()
                     )}
                   </span>
                 </button>
@@ -542,7 +542,7 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                       onError={() => setImgError(true)}
                     />
                   ) : (
-                    user?.fullName?.charAt(0).toUpperCase() || "U"
+                    (user?.fullName?.charAt(0) || "U").toUpperCase()
                   )}
                 </span>
                 <div className="flex flex-col overflow-hidden text-left">

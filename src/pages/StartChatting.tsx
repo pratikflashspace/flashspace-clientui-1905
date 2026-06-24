@@ -1489,7 +1489,7 @@ const StartChatting = () => {
         </div>
 
         {/* Logo - Matching Admin Dashboard */}
-        <div className="flex flex-col shrink-0 transition-all duration-300 border-b border-gray-200 dark:border-gray-800 w-full px-3 py-4 justify-center">
+        <div className="hidden lg:flex flex-col shrink-0 transition-all duration-300 border-b border-gray-200 dark:border-gray-800 w-full px-3 py-4 justify-center">
           <div className="flex items-center w-full justify-between">
             <img
               src="/Logo/Flashspace Logo.png"

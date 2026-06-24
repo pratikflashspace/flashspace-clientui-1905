@@ -108,7 +108,7 @@ export const HeroWithSearch = () => {
                       }}
                       onKeyDown={(event) => event.key === "Enter" && submitSearch()}
                       placeholder={isBusinessSetup ? "Search services..." : "Search city..."}
-                      className="w-full bg-transparent text-xs md:text-sm text-[#1A1A1A] outline-none border-none focus:ring-0 focus:outline-none placeholder:text-[#6B8F78]"
+                      className="w-full bg-transparent text-xs md:text-sm text-[#1A1A1A] outline-none border-none border-transparent focus:border-transparent focus:ring-0 focus:outline-none focus:shadow-none shadow-none placeholder:text-[#6B8F78]"
                     />
                   </label>
                   {showLocationDropdown && locationSearch && matches.length > 0 && (
@@ -143,7 +143,7 @@ export const HeroWithSearch = () => {
                     onChange={(event) => setAiQuery(event.target.value)}
                     onKeyDown={(event) => event.key === "Enter" && aiQuery.trim() && navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`)}
                     placeholder="Ask about spaces, plans, GST..."
-                    className="w-full bg-transparent text-xs md:text-sm text-[#1A1A1A] outline-none border-none focus:ring-0 focus:outline-none placeholder:text-[#6B8F78]"
+                    className="w-full bg-transparent text-xs md:text-sm text-[#1A1A1A] outline-none border-none border-transparent focus:border-transparent focus:ring-0 focus:outline-none focus:shadow-none shadow-none placeholder:text-[#6B8F78]"
                     autoFocus
                   />
                 </label>
@@ -197,7 +197,7 @@ export const HeroWithSearch = () => {
                       }}
                       onKeyDown={(event) => event.key === "Enter" && submitSearch()}
                       placeholder={isBusinessSetup ? "Search services..." : "Search city..."}
-                      className="w-full bg-transparent text-sm text-[#1A1A1A] outline-none border-none focus:ring-0 focus:outline-none placeholder:text-[#6B8F78]"
+                      className="w-full bg-transparent text-sm text-[#1A1A1A] outline-none border-none border-transparent focus:border-transparent focus:ring-0 focus:outline-none focus:shadow-none shadow-none placeholder:text-[#6B8F78]"
                     />
                   </label>
                   {showLocationDropdown && locationSearch && matches.length > 0 && (
@@ -232,7 +232,7 @@ export const HeroWithSearch = () => {
                     onChange={(event) => setAiQuery(event.target.value)}
                     onKeyDown={(event) => event.key === "Enter" && aiQuery.trim() && navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`)}
                     placeholder="Ask about spaces, plans, GST..."
-                    className="w-full bg-transparent text-sm text-[#1A1A1A] outline-none border-none focus:ring-0 focus:outline-none placeholder:text-[#6B8F78]"
+                    className="w-full bg-transparent text-sm text-[#1A1A1A] outline-none border-none border-transparent focus:border-transparent focus:ring-0 focus:outline-none focus:shadow-none shadow-none placeholder:text-[#6B8F78]"
                     autoFocus
                   />
                 </label>
