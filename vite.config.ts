@@ -55,8 +55,9 @@ export default defineConfig({
               return "vendor-icons";
             }
 
-            // 4. Everything else (Core & Libs combined to prevent circular deps)
-            return "vendor-core";
+            // Note: DO NOT add a catch-all "vendor-core" here. 
+            // Grouping all other dependencies together breaks Vite's natural chunking 
+            // and causes circular dependency issues (like React's forwardRef being undefined).
           }
         },
       },
