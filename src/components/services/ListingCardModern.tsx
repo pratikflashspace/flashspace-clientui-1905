@@ -274,7 +274,7 @@ const ListingCardModern = memo<ListingCardModernProps>(
           {/* Title Row */}
           <div className="flex items-start justify-between gap-2 mb-2">
             <h4 className="text-base font-bold text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1">
-              {item.spaceId || item.name}
+              {item.spaceId || (item as any).property?.spaceId || `Space-${item._id?.slice(-5).toUpperCase()}`}
               {item.address && ` at ${getShortAddress(item.address)}`}
             </h4>
             <div className="flex items-center gap-1 shrink-0">

@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import { HeroWithSearch } from "@/components/sections/HeroWithSearch";
 import { ScrollNavLayout } from "@/components/sections/ScrollNavLayout";
 import { PlanLocationsShowcase } from "@/components/sections/PlanLocationsShowcase";
+import { PremiumServices } from "@/components/sections/PremiumServices";
 
 import { ScaleSection } from "@/components/sections/ScaleSection";
 import { MetricsOverview } from "@/components/sections/MetricsOverview";
@@ -9,6 +10,8 @@ import { Stats } from "@/components/sections/Stats";
 import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { CTA } from "@/components/sections/CTA";
+import { PricingSection } from "@/components/sections/PricingSection";
+import { PlanComparison } from "@/components/sections/PlanComparison";
 import Footer from "@/components/Footer";
 import { TrustedByFilmstrip } from "@/components/sections/TrustedByFilmstrip";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,6 +47,7 @@ interface IndexProps {
 const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
   const navigate = useNavigate();
   useEffect(() => {
+    document.title = "FlashSpace";
     let hasOpened = false;
     
     // Auto-open chat widget when scrolling past hero section (Only on Home Page)
@@ -75,11 +79,20 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         <div className="hidden lg:block">
           <TrustedByFilmstrip />
         </div>
-        <FadeInSection>
+        {/* <FadeInSection>
           <PlanLocationsShowcase />
+        </FadeInSection> */}
+        <FadeInSection>
+          <PremiumServices />
         </FadeInSection>
         <MobileBrowseCities />
         <ScrollNavLayout />
+        {/* <FadeInSection>
+          <PricingSection />
+        </FadeInSection> */}
+        <FadeInSection>
+          <PlanComparison />
+        </FadeInSection>
         <FadeInSection>
           <ScaleSection />
         </FadeInSection>

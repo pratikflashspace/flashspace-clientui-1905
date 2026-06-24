@@ -230,11 +230,15 @@ const WorkspaceCard = ({
   view,
   type,
   onBusinessSetupBuy,
+  zoomedCardId,
+  onCardZoom,
 }: {
   ws: UnifiedWorkspace;
   view: ViewMode;
   type: string;
   onBusinessSetupBuy?: (workspace: UnifiedWorkspace) => void;
+  zoomedCardId?: string;
+  onCardZoom?: (cardId: string) => void;
 }) => {
   const { toast } = useToast();
   const [liked, setLiked] = useState(false);
@@ -307,8 +311,21 @@ const WorkspaceCard = ({
   };
 
   if (type === "business-setup") {
+    const cardSlug = ws.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    const isZoomed = zoomedCardId === cardSlug;
     return (
-      <div className="group bg-[#F8FAF9] rounded-[24px] overflow-hidden border border-[#E9EFEA] hover:-translate-y-1.5 transition-all duration-200 ease-out shadow-sm hover:shadow-md sm:aspect-square flex flex-col p-6 cursor-default h-full">
+      <div
+        id={`bs-card-${cardSlug}`}
+        onClick={() => onCardZoom?.(isZoomed ? "" : cardSlug)}
+        style={{
+          transform: isZoomed ? 'scale(1.08)' : 'scale(1)',
+          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          boxShadow: isZoomed ? '0 30px 60px rgba(0,0,0,0.25)' : undefined,
+          zIndex: isZoomed ? 50 : undefined,
+          position: isZoomed ? 'relative' as const : undefined,
+        }}
+        className={`group bg-[#F8FAF9] rounded-[24px] overflow-hidden border ${isZoomed ? 'border-[#36503F]' : 'border-[#E9EFEA]'} hover:-translate-y-1.5 transition-all duration-200 ease-out shadow-sm hover:shadow-md flex flex-col p-6 cursor-pointer h-full`}
+      >
         {/* Header */}
         <div className="flex justify-between items-start mb-3">
           <div className="pr-2">
@@ -352,15 +369,17 @@ const WorkspaceCard = ({
           </div>
 
           <div className="flex gap-3">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onBusinessSetupBuy?.(ws);
-              }}
-              className="flex-1 bg-[#36503F] text-[#FEF8C5] text-[14px] font-semibold py-3 px-4 rounded-[12px] hover:bg-[#2A4032] transition-colors flex items-center justify-center shadow-sm"
-            >
-              Buy Now
-            </button>
+            {!(type === "business-setup" && ws.plans[0]?.price?.toLowerCase().includes("custom")) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBusinessSetupBuy?.(ws);
+                }}
+                className="flex-1 bg-[#36503F] text-[#FEF8C5] text-[14px] font-semibold py-3 px-4 rounded-[12px] hover:bg-[#2A4032] transition-colors flex items-center justify-center shadow-sm"
+              >
+                Buy Now
+              </button>
+            )}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -483,41 +502,47 @@ const WorkspaceCard = ({
           </div>
 
           {/* CTAs — always on their own row */}
-          <div className="flex gap-2 mt-1">
+          <div className="flex gap-3 mt-3 w-full">
             {type !== "business-setup" && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleNavigate();
                 }}
-                className="py-2 px-8 text-xs font-bold rounded-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 whitespace-nowrap flex-[1.4]"
+                className="flex-1 py-2.5 px-4 text-xs font-bold rounded-[12px] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 whitespace-nowrap text-center shadow-sm"
               >
                 Get Best Price
               </button>
             )}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (type === "business-setup") {
-                  onBusinessSetupBuy?.(ws);
-                } else {
-                  window.location.href = "tel:+919888687898";
-                }
-              }}
-              className={`py-2 px-4 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center justify-center gap-1 whitespace-nowrap ${type === "business-setup" ? "flex-1" : "flex-1"}`}
-            >
-              {type === "business-setup" ? <ShoppingCart className="w-3 h-3" /> : <Phone className="w-3 h-3" />}
-              {type === "business-setup" ? "Buy Now" : "Contact Sales"}
-            </button>
+            {!(type === "business-setup" && ws.plans[0]?.price?.toLowerCase().includes("custom")) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (type === "business-setup") {
+                    onBusinessSetupBuy?.(ws);
+                  } else {
+                    window.location.href = "tel:+919888687898";
+                  }
+                }}
+                className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${
+                  type === "business-setup" 
+                    ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm" 
+                    : "bg-transparent text-[#36503F] hover:bg-[#36503F]/5"
+                }`}
+              >
+                {type === "business-setup" ? <ShoppingCart className="w-3.5 h-3.5" /> : <Phone className="w-3.5 h-3.5" />}
+                {type === "business-setup" ? "Buy Now" : "Contact Sales"}
+              </button>
+            )}
             {type === "business-setup" && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   window.location.href = "tel:+919888687898";
                 }}
-                className="py-2 px-4 text-xs font-semibold rounded-lg border border-[#36503F] bg-white text-[#36503F] hover:bg-[#36503F]/10 transition-all duration-200 flex flex-1 items-center justify-center gap-1 whitespace-nowrap"
+                className="flex-1 py-2.5 px-4 text-xs font-semibold rounded-[12px] border border-[#36503F] bg-white text-[#36503F] hover:bg-[#36503F]/10 transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap"
               >
-                <Phone className="w-3 h-3" />
+                <Phone className="w-3.5 h-3.5" />
                 Contact
               </button>
             )}
@@ -657,39 +682,45 @@ const WorkspaceCard = ({
         </div>
 
         {/* CTA Buttons — always at bottom */}
-        <div className="flex gap-1.5 mt-4">
+        <div className="flex gap-2 mt-4">
           {type !== "business-setup" && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleNavigate();
               }}
-              className="flex-[1.4] py-2.5 px-4 text-xs font-bold rounded-full bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200"
+              className="flex-1 py-2.5 px-2 text-[12px] font-bold rounded-[12px] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 whitespace-nowrap text-center shadow-sm"
             >
               Get Best Price
             </button>
           )}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (type === "business-setup") {
-                onBusinessSetupBuy?.(ws);
-              } else {
-                window.location.href = "tel:+919888687898";
-              }
-            }}
-            className={`py-2.5 px-3 text-xs font-semibold rounded-lg border border-[#36503F] bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-all duration-200 flex items-center justify-center gap-1.5 ${type === "business-setup" ? "flex-1" : "flex-1"}`}
-          >
-            {type === "business-setup" ? <ShoppingCart className="w-3 h-3" /> : <Phone className="w-3 h-3" />}
-            <span>{type === "business-setup" ? "Buy Now" : "Contact Sales"}</span>
-          </button>
+          {!(type === "business-setup" && ws.plans[0]?.price?.toLowerCase().includes("custom")) && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (type === "business-setup") {
+                  onBusinessSetupBuy?.(ws);
+                } else {
+                  window.location.href = "tel:+919888687898";
+                }
+              }}
+              className={`flex-1 py-2.5 px-2 text-[12px] font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${
+                type === "business-setup" 
+                  ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm" 
+                  : "bg-transparent text-[#36503F] hover:bg-[#36503F]/5"
+              }`}
+            >
+              {type === "business-setup" ? <ShoppingCart className="w-3.5 h-3.5" /> : <Phone className="w-3.5 h-3.5" />}
+              <span>{type === "business-setup" ? "Buy Now" : "Contact Sales"}</span>
+            </button>
+          )}
           {type === "business-setup" && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 window.location.href = "tel:+919888687898";
               }}
-              className="flex-1 py-2.5 px-3 text-xs font-semibold rounded-lg border border-[#36503F] bg-white text-[#36503F] hover:bg-[#36503F]/10 transition-all duration-200 flex items-center justify-center gap-1.5"
+              className="flex-1 py-2.5 px-3 text-xs font-semibold rounded-[12px] border border-[#36503F] bg-white text-[#36503F] hover:bg-[#36503F]/10 transition-all duration-200 flex items-center justify-center gap-1.5"
             >
               <Phone className="w-3 h-3" />
               <span>Contact</span>
@@ -728,6 +759,23 @@ const GetWorkspaces = () => {
   const [selectedBusinessSetup, setSelectedBusinessSetup] = useState<UnifiedWorkspace | null>(null);
   const [businessPaymentLoading, setBusinessPaymentLoading] = useState(false);
   const [businessTestPaymentLoading, setBusinessTestPaymentLoading] = useState(false);
+  const [zoomedCardId, setZoomedCardId] = useState("");
+
+  // Handle hash-based zoom for business setup cards (from header navigation)
+  useEffect(() => {
+    if (workspaceType === "business-setup" && location.hash) {
+      const hashId = location.hash.substring(1);
+      // Wait for cards to render then scroll and zoom
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`bs-card-${hashId}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setZoomedCardId(hashId);
+        }
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [workspaceType, location.hash, location.key]);
 
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
@@ -1063,9 +1111,10 @@ const GetWorkspaces = () => {
             "Startup India Registration",
             "FSSAI Registration",
             "GST Filing",
-            "LLP Compliance",
-            "MCA Compliance",
-            "Section 8 Registration"
+            "LLP Annual Compliance",
+            "MCA Annual Compliance",
+            "Section 8 Registration",
+            "Accounting Services"
           ];
           const demoBusinessSetups = headings.map((heading, i) => {
             let imgPath = `/home${i+1}.jpg`;
@@ -1111,21 +1160,21 @@ const GetWorkspaces = () => {
             }
             else if (heading === "GST Filing") {
                imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
-               price = "₹1999/month";
+               price = "Customized";
                description = "Monthly and annual GST return filing handled by experts.";
                features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"];
                timeline = "Monthly / Quarterly";
             }
-            else if (heading === "LLP Compliance") {
+            else if (heading === "LLP Annual Compliance") {
                imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
-               price = "₹14999 only";
+               price = "Customized";
                description = "Stay compliant with annual LLP filing and legal requirements.";
                features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
                timeline = "Ongoing Annual Compliance";
             }
-            else if (heading === "MCA Compliance") {
+            else if (heading === "MCA Annual Compliance") {
                imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
-               price = "₹17999 only";
+               price = "Customized";
                description = "Complete MCA compliance and ROC filing support for companies.";
                features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
                timeline = "Monthly / Annual";
@@ -1136,6 +1185,13 @@ const GetWorkspaces = () => {
                description = "Register your NGO or non-profit organization as a Section 8 company.";
                features = ["NGO Registration", "80G & 12A Support", "MOA & AOA Filing", "PAN & TAN"];
                timeline = "15-20 days";
+            }
+            else if (heading === "Accounting Services") {
+               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
+               price = "Customized";
+               description = "Professional accounting and bookkeeping services for your business.";
+               features = ["Bookkeeping", "Financial Statements", "Payroll Processing", "Tax Advisory"];
+               timeline = "Monthly / Ongoing";
             }
             
             return {
@@ -1563,10 +1619,10 @@ const GetWorkspaces = () => {
               <div
                 className={
                   workspaceType === "business-setup"
-                    ? "grid gap-6 pb-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                    ? "grid gap-6 pb-8 pt-4 px-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                     : viewMode === "grid"
                       ? `grid gap-4 pb-8 ${mapCollapsed ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
-                      : "flex flex-col gap-4 pb-8"
+                      : "flex flex-col gap-4 pb-8 max-w-5xl"
                 }
               >
                 <SkeletonCardGrid count={8} view={viewMode} />
@@ -1575,10 +1631,10 @@ const GetWorkspaces = () => {
               <div
                 className={
                   workspaceType === "business-setup"
-                    ? "grid gap-6 pb-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                    ? "grid gap-6 pb-8 pt-4 px-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                     : viewMode === "grid"
                       ? `grid gap-4 pb-8 ${mapCollapsed ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
-                      : "flex flex-col gap-4 pb-8"
+                      : "flex flex-col gap-4 pb-8 max-w-5xl"
                 }
               >
                 {sortedWorkspaces.length > 0 ? (
@@ -1589,6 +1645,8 @@ const GetWorkspaces = () => {
                       view={workspaceType === "business-setup" ? "grid" : viewMode}
                       type={workspaceType}
                       onBusinessSetupBuy={setSelectedBusinessSetup}
+                      zoomedCardId={zoomedCardId}
+                      onCardZoom={setZoomedCardId}
                     />
                   ))
                 ) : (

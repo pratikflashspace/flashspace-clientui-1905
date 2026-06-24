@@ -37,7 +37,7 @@ const Footer = () => {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-4 sm:gap-8 lg:gap-12">
           {/* Solutions */}
           <div className="border-l border-[#FEF8C5]/25 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
-            <h4 className="text-[9px] sm:text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em]">
+            <h4 className="text-[9px] sm:text-[10px] font-bold font-sans text-[#FEF8C5] uppercase tracking-[0.2em]">
               Solutions
             </h4>
             <ul className="space-y-4">
@@ -56,7 +56,7 @@ const Footer = () => {
 
           {/* Resources */}
           <div className="border-l border-[#FEF8C5]/25 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
-            <h4 className="text-[9px] sm:text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em]">
+            <h4 className="text-[9px] sm:text-[10px] font-bold font-sans text-[#FEF8C5] uppercase tracking-[0.2em]">
               Resources
             </h4>
             <ul className="space-y-4">
@@ -75,7 +75,7 @@ const Footer = () => {
 
           {/* Company */}
           <div className="border-l border-[#FEF8C5]/25 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
-            <h4 className="text-[9px] sm:text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em]">
+            <h4 className="text-[9px] sm:text-[10px] font-bold font-sans text-[#FEF8C5] uppercase tracking-[0.2em]">
               Company
             </h4>
             <ul className="space-y-4">
@@ -94,7 +94,7 @@ const Footer = () => {
 
           {/* Community */}
           <div className="border-l border-[#FEF8C5]/25 pl-4 sm:pl-6 space-y-4 sm:space-y-6">
-            <h4 className="text-[9px] sm:text-[10px] font-bold text-[#FEF8C5] uppercase tracking-[0.2em]">
+            <h4 className="text-[9px] sm:text-[10px] font-bold font-sans text-[#FEF8C5] uppercase tracking-[0.2em]">
               Community
             </h4>
             <ul className="space-y-4">

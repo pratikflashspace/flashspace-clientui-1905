@@ -47,31 +47,31 @@ export const useLocationMetadata = () => {
         if (!metadata) return cityCenters.delhi;
 
         // 1. Check Property Names (Highest Precision)
-        const property = metadata.propertyNames.find(
+        const property = metadata?.propertyNames?.find(
             p => p.name.toLowerCase() === normalizedSearch
         );
         if (property?.coordinates) return property.coordinates;
 
         // 2. Check Areas
-        const area = metadata.areas.find(
+        const area = metadata?.areas?.find(
             a => a.name.toLowerCase() === normalizedSearch
         );
         if (area?.coordinates) return area.coordinates;
 
         // 3. Check Cities
-        const city = metadata.cities.find(
+        const city = metadata?.cities?.find(
             c => c.name.toLowerCase() === normalizedSearch
         );
         if (city?.coordinates) return city.coordinates;
 
         // 4. Special Hub Handle (Aliases)
         if (normalizedSearch.includes('bengaluru') || normalizedSearch.includes('bangalore')) {
-            const bglr = metadata.cities.find(c => c.name === 'Bangalore');
+            const bglr = metadata?.cities?.find(c => c.name === 'Bangalore');
             if (bglr?.coordinates) return bglr.coordinates;
         }
 
         if (normalizedSearch.includes('gurgaon') || normalizedSearch.includes('gurugram')) {
-            const grg = metadata.cities.find(c => c.name === 'Gurgaon');
+            const grg = metadata?.cities?.find(c => c.name === 'Gurgaon');
             if (grg?.coordinates) return grg.coordinates;
         }
 

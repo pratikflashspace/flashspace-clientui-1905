@@ -58,6 +58,9 @@ const aiCapabilities = [
 ];
 
 const VirtualOffice = () => {
+  useEffect(() => {
+    document.title = "Virtual Office - FlashSpace";
+  }, []);
   const navigate = useNavigate();
   const [active, setActive] = useState("features");
   const [activeSubTab, setActiveSubTab] = useState(0);

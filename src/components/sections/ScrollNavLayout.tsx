@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { AISection } from "@/components/sections/scroll-sections/AISection";
-import { VirtualOfficeSection } from "@/components/sections/scroll-sections/VirtualOfficeSection";
-import { CoworkingSection } from "@/components/sections/scroll-sections/CoworkingSection";
+import { WorkspacesSection } from "@/components/sections/scroll-sections/WorkspacesSection";
 import { BusinessSetupSection } from "@/components/sections/scroll-sections/BusinessSetupSection";
 import { GlobalAccessSection } from "@/components/sections/scroll-sections/GlobalAccessSection";
+import { TaxationFilingSection } from "@/components/sections/scroll-sections/TaxationFilingSection";
+import { OneCRMSection } from "@/components/sections/scroll-sections/OneCRMSection";
+import { WebsiteDevelopmentSection } from "@/components/sections/scroll-sections/WebsiteDevelopmentSection";
 
 type NavItem = {
     id: string;
@@ -12,10 +14,11 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-    { id: "virtual-office", label: "Virtual Office" },
-    { id: "coworking", label: "Coworking" },
+    { id: "virtual-office", label: "Workspaces" },
     { id: "business-setup", label: "Business Setup" },
-    { id: "global-access", label: "Global Access" },
+    { id: "taxation-filing", label: "Taxation & Filing" },
+    { id: "one-crm", label: "One CRM" },
+    { id: "web-development", label: "Website Development" },
     { id: "ai-platform", label: "AI Platform" },
 ];
 
@@ -70,7 +73,7 @@ export const ScrollNavLayout = () => {
                                         className="relative flex flex-col w-full text-left py-2 pl-0 bg-transparent transition-all duration-200 ease-in-out"
                                     >
                                         <span
-                                            className={`whitespace-nowrap uppercase tracking-[0.08em] transition-colors duration-200 text-[12px] ${isActive ? "font-semibold" : "font-medium"
+                                            className={`whitespace-nowrap tracking-[0.08em] transition-colors duration-200 text-[12px] ${isActive ? "font-semibold" : "font-medium"
                                                 }`}
                                             style={{
                                                 color: isActive ? '#36503F' : 'rgba(0,0,0,0.55)',
@@ -99,10 +102,12 @@ export const ScrollNavLayout = () => {
 
                     {/* Sections column */}
                     <div>
-                        <VirtualOfficeSection />
-                        <CoworkingSection />
+                        <WorkspacesSection />
                         <BusinessSetupSection />
-                        <GlobalAccessSection />
+                        <TaxationFilingSection />
+                        <OneCRMSection />
+                        <WebsiteDevelopmentSection />
+                        {/* <GlobalAccessSection /> */}
                         <AISection />
                     </div>
                 </div>

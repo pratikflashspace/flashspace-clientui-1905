@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Building2, ChevronDown, LayoutDashboard, LogOut, Menu, Settings, Users, X, Phone } from "lucide-react";
+import { Building2, ChevronDown, LayoutDashboard, LogOut, Menu, Settings, Users, X, Phone, Briefcase, FileText, Wrench, Code, ChevronRight, PieChart, Calculator } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginModal } from "@/components/auth/LoginModal";
@@ -23,19 +23,143 @@ interface HeaderProps {
   openSignup?: boolean;
 }
 
-const navItems = [
-  { label: "Virtual Office", href: "/services/virtual-office" },
-  { label: "Coworking Space", href: "/services/coworking-space" },
-  { label: "Business Setup", href: "/services/business-setup" },
-  { label: "Partners", href: "/partner" },
+
+const navData = [
+  {
+    label: "Solutions",
+    isMegaMenu: true,
+    sections: [
+      {
+        title: "Workspaces",
+        items: [
+          { label: "Virtual Office", href: "/services/virtual-office" },
+          { label: "Coworking Spaces", href: "/services/coworking-space" }
+        ]
+      },
+      {
+        title: "Business Setup",
+        items: [
+          { label: "GST Registration", href: "/services/business-setup#gst-registration" },
+          { label: "LLP Registration", href: "/services/business-setup#llp-compliance" },
+          { label: "OPC Registration", href: "/services/business-setup#company-registration-llp-opc-pvt-ltd" },
+          { label: "MSME Registration", href: "/services/business-setup#msme-udyam-registration" },
+          { label: "Startup India Registration", href: "/services/business-setup#startup-india-registration" },
+          { label: "FSSAI Registration", href: "/services/business-setup#fssai-registration" },
+          { label: "Section 8 Registration", href: "/services/business-setup#section-8-registration" }
+        ]
+      },
+      {
+        title: "Filing & Taxation",
+        items: [
+          { label: "GST Filing", href: "/services/business-setup#gst-filing" },
+          { label: "MCA Annual Compliance", href: "/services/business-setup#mca-annual-compliance" },
+          { label: "LLP Annual Compliance", href: "/services/business-setup#llp-annual-compliance" },
+          { label: "Accounting Services", href: "/services/business-setup#accounting-services" }
+        ]
+      },
+      {
+        title: "Business Tools",
+        items: [
+          { label: "One CRM", href: "/solutions/one-crm" }
+        ]
+      },
+      {
+        title: "Services",
+        items: [
+          { label: "Website Development", href: "/solutions/website-development" }
+        ]
+      }
+    ]
+  },
+  { label: "Packages", href: "/packages/basic" },
+  { label: "Partner with us", href: "/partner" },
+  {
+    label: "More",
+    isDropdown: true,
+    items: [
+      { label: "Calculator", href: "/calculators" },
+      { label: "Careers", href: "/career" },
+      // { label: "FlashSphere", href: "/blogs" }
+    ]
+  }
 ];
 
+
+
+const MegaMenuDropdown = ({ sections, closeMenu }: { sections: any[], closeMenu?: () => void }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const getIcon = (title: string, isActive: boolean) => {
+    const color = isActive ? "text-[#36503F]" : "text-gray-400";
+    switch (title) {
+      case "Workspaces": return <Building2 className={`w-5 h-5 ${color}`} />;
+      case "Business Setup": return <Briefcase className={`w-5 h-5 ${color}`} />;
+      case "Filing & Taxation": return <FileText className={`w-5 h-5 ${color}`} />;
+      case "Business Tools": return <Wrench className={`w-5 h-5 ${color}`} />;
+      case "Services": return <Code className={`w-5 h-5 ${color}`} />;
+      case "Pricing Plans": return <PieChart className={`w-5 h-5 ${color}`} />;
+      case "Company": return <Building2 className={`w-5 h-5 ${color}`} />;
+      case "Resources": return <Calculator className={`w-5 h-5 ${color}`} />;
+      default: return <ChevronRight className={`w-5 h-5 ${color}`} />;
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-2xl border border-[#FEF8C5] flex overflow-hidden min-h-[400px]">
+      {/* Left Sidebar Pane */}
+      <div className="w-[35%] bg-[#FAF9F6] flex flex-col py-4 border-r border-[#FEF8C5]/50">
+        {sections.map((section, idx) => {
+          const isActive = activeIndex === idx;
+          return (
+              <div
+                key={idx}
+                onMouseEnter={() => setActiveIndex(idx)}
+                className={`flex items-center justify-between px-6 py-6 cursor-pointer transition-all duration-300 ${isActive ? 'bg-[#FEF8C5]/40 shadow-[0_4px_12px_rgba(54,80,63,0.05)] border-l-[3px] border-[#36503F]' : 'hover:bg-[#FEF8C5]/40 border-l-[3px] border-transparent'}`}
+              >
+              <div className="flex items-center gap-3">
+                {getIcon(section.title, isActive)}
+                <span className={`text-[15px] ${isActive ? 'text-[#36503F] font-bold' : 'text-gray-600 font-medium'}`}>
+                  {section.title}
+                </span>
+              </div>
+              <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${isActive ? 'text-[#36503F] translate-x-1' : 'text-gray-300'}`} />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Right Content Pane */}
+      <div className="w-[65%] bg-white p-8">
+        <h3 className="text-lg font-bold text-[#36503F] mb-6 pb-4 border-b border-[#FEF8C5] inline-block min-w-[200px]">
+          {sections[activeIndex]?.title}
+        </h3>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-2">
+          {sections[activeIndex]?.items.map((sub: any, subIdx: number) => (
+            <Link 
+              key={subIdx} 
+              to={sub.href} 
+              onClick={closeMenu}
+              className="text-[15px] text-gray-600 hover:text-[#36503F] hover:bg-[#FEF8C5]/40 hover:font-bold transition-all duration-200 block px-4 py-2.5 border-l-[3px] border-transparent hover:border-l-[#36503F]"
+            >
+              {sub.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hideDropdowns, setHideDropdowns] = useState(false);
+  const closeDesktopDropdowns = () => {
+    setHideDropdowns(true);
+    setTimeout(() => setHideDropdowns(false), 150);
+  };
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
@@ -277,15 +401,43 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
             </Link>
           </div>
 
-          <nav className="hidden items-center gap-8 lg:flex">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                className="text-sm font-medium text-[#36503F] transition-colors hover:text-[#1F2E26]"
-              >
-                {item.label}
-              </Link>
+          <nav className="hidden items-center gap-8 lg:flex h-full">
+            {navData.map((item, idx) => (
+              <div key={idx} className="relative group h-full flex items-center">
+                {item.isMegaMenu || item.isDropdown ? (
+                  <button className="flex items-center gap-1 text-sm font-medium text-[#36503F] transition-colors hover:text-[#1F2E26]">
+                    {item.label}
+                    <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                  </button>
+                ) : (
+                  <Link to={item.href || "#"} className="flex items-center text-sm font-medium text-[#36503F] transition-colors hover:text-[#1F2E26]">
+                    {item.label}
+                  </Link>
+                )}
+
+                {item.isMegaMenu && (
+                  <div className={`absolute top-[100%] left-[-20px] pt-2 mt-0 w-[850px] max-w-[90vw] transition-all duration-300 z-50 ${hideDropdowns ? 'opacity-0 invisible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'}`}>
+                    <MegaMenuDropdown sections={item.sections} closeMenu={closeDesktopDropdowns} />
+                  </div>
+                )}
+
+                {item.isDropdown && (
+                  <div className={`absolute top-[100%] left-0 pt-2 mt-0 w-48 transition-all duration-300 z-50 ${hideDropdowns ? 'opacity-0 invisible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'}`}>
+                    <div className="bg-white rounded-xl shadow-lg border border-[#FEF8C5]/50 py-2 text-left flex flex-col">
+                      {item.items?.map((sub, subIdx) => (
+                        <Link 
+                          key={subIdx} 
+                          to={sub.href} 
+                          onClick={closeDesktopDropdowns}
+                          className="text-[15px] text-gray-600 hover:text-[#36503F] hover:bg-[#FEF8C5]/40 hover:font-bold transition-all duration-200 block px-5 py-2.5 border-l-[3px] border-transparent hover:border-l-[#36503F]"
+                        >
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
 
@@ -390,16 +542,48 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
             </div>
           )}
 
-          <nav className="flex flex-col gap-1 flex-1 overflow-y-auto">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.href}
-                onClick={closeDrawer}
-                className={cn("rounded-lg px-2 py-3 text-base font-medium text-white transition-colors hover:bg-white/5", location.pathname === item.href && "text-[#FEF8C5]")}
-              >
-                {item.label}
-              </Link>
+          <nav className="flex flex-col gap-1 flex-1 overflow-y-auto pr-2 pb-4">
+            {navData.map((item, idx) => (
+              item.isMegaMenu ? (
+                <details key={idx} className="group">
+                  <summary className="flex items-center justify-between rounded-lg px-2 py-3 text-base font-medium text-white transition-colors hover:bg-white/5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    {item.label}
+                    <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div className="pl-4 pb-2 space-y-4">
+                    {item.sections?.map((section, sIdx) => (
+                      <div key={sIdx}>
+                        <h4 className="text-[#FEF8C5] text-xs font-bold uppercase tracking-wider mb-2">{section.title}</h4>
+                        <div className="space-y-2 pl-2 border-l border-white/10">
+                          {section.items.map((sub, subIdx) => (
+                            <Link key={subIdx} to={sub.href} onClick={closeDrawer} className="block text-sm text-white/70 hover:text-white py-1">
+                              {sub.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              ) : item.isDropdown ? (
+                <details key={idx} className="group">
+                  <summary className="flex items-center justify-between rounded-lg px-2 py-3 text-base font-medium text-white transition-colors hover:bg-white/5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    {item.label}
+                    <ChevronDown className="w-4 h-4 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div className="pl-4 pb-2 space-y-2 border-l border-white/10 ml-2">
+                    {item.items?.map((sub, subIdx) => (
+                      <Link key={subIdx} to={sub.href} onClick={closeDrawer} className="block text-sm text-white/70 hover:text-white py-1.5 pl-2">
+                        {sub.label}
+                      </Link>
+                    ))}
+                  </div>
+                </details>
+              ) : (
+                <Link key={idx} to={item.href || "#"} onClick={closeDrawer} className="block rounded-lg px-2 py-3 text-base font-medium text-white transition-colors hover:bg-white/5">
+                  {item.label}
+                </Link>
+              )
             ))}
           </nav>
           

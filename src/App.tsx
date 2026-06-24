@@ -32,6 +32,8 @@ const PartnerWithUs = lazy(() => import("./pages/PatnerWithUs"));
 const MeetingsRoom = lazy(() => import("./pages/Solutions/meetingsroom"));
 const Dayoffice = lazy(() => import("./pages/Solutions/Dayoffice"));
 const EventSpacePage = lazy(() => import("./pages/Solutions/Eventspace"));
+const OneCRMPage = lazy(() => import("./pages/Solutions/OneCRMPage"));
+const WebsiteDevelopmentSolution = lazy(() => import("./pages/Solutions/website-development"));
 const SpacePortalLayout = lazy(() => import("./layouts/SpacePortalLayout"));
 const Career = lazy(() => import("./pages/Career"));
 const Login = lazy(() => import("./pages/Login"));
@@ -55,6 +57,12 @@ const PaymentSuccessPage = lazy(() => import("./pages/PaymentSuccessPage"));
 const PaymentFailedPage = lazy(() => import("./pages/PaymentFailedPage"));
 const OAuthConsent = lazy(() => import("./pages/auth/OAuthConsent"));
 const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const Blogs = lazy(() => import("./pages/Blogs"));
+const BlogDetail = lazy(() => import("./pages/BlogDetail"));
+const PackageDetail = lazy(() => import("./pages/PackageDetail"));
+const PackageCheckout = lazy(() => import("./pages/PackageCheckout"));
+const CalculatorsHub = lazy(() => import("./pages/CalculatorsHub"));
+const CalculatorDetail = lazy(() => import("./pages/CalculatorDetail"));
 
 // Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -89,6 +97,7 @@ const AdminInvoices = lazy(() => import("./pages/admin/Invoices"));
 const DocumentManagement = lazy(() => import("./pages/admin/DocumentManagement"));
 const TrackProgress = lazy(() => import("./pages/admin/TrackProgress"));
 const AIIntegrations = lazy(() => import("./pages/admin/AIIntegrations"));
+const PostBlog = lazy(() => import("./pages/admin/PostBlog"));
 
 // Space Partner Pages
 const SpacePortalClients = lazy(() => import("@/pages/spacePortal/Clients"));
@@ -285,6 +294,18 @@ const App = () => (
                         path="/solutions/eventspace"
                         element={<EventSpacePage />}
                       />
+                      <Route
+                        path="/solutions/one-crm"
+                        element={<OneCRMPage />}
+                      />
+                      <Route
+                        path="/Solutions/website-development"
+                        element={<WebsiteDevelopmentSolution />}
+                      />
+                      <Route
+                        path="/solutions/website-development"
+                        element={<WebsiteDevelopmentSolution />}
+                      />
 
                       {/* Spaces*/}
                       <Route
@@ -306,6 +327,12 @@ const App = () => (
                       />
 
                       {/* Payment Routes */}
+                      <Route element={<ProtectedRoute />}>
+                        <Route
+                          path="/package-checkout"
+                          element={<PackageCheckout />}
+                        />
+                      </Route>
                       <Route
                         path="/payment/success"
                         element={<PaymentSuccessPage />}
@@ -322,6 +349,11 @@ const App = () => (
                       <Route path="/privacy" element={<PrivacyPolicy />} />
                       <Route path="/terms" element={<TermsConditions />} />
                       <Route path="/refund-policy" element={<RefundPolicy />} />
+                      <Route path="/blogs" element={<Blogs />} />
+                      <Route path="/blogs/:slug" element={<BlogDetail />} />
+                      <Route path="/packages/:planId" element={<PackageDetail />} />
+                      <Route path="/calculators" element={<CalculatorsHub />} />
+                      <Route path="/calculators/:calculatorId" element={<CalculatorDetail />} />
 
                       {/* Auth Routes */}
                       <Route path="/login" element={<Index openLogin={true} />} />
