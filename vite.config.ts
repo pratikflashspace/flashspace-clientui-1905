@@ -39,27 +39,8 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            // 1. Heavy Data/3D
-            if (id.includes("country-state-city")) return "vendor-geo-data";
-            if (id.includes("three")) return "vendor-3d";
-            
-            // 2. Heavy UI Components
-            if (id.includes("maplibre-gl") || id.includes("recharts") || id.includes("gsap") || id.includes("sheryjs")) {
-              return "vendor-heavy-ui";
-            }
-            
-            // 3. Icons (Keep separate as they are numerous)
-            if (id.includes("lucide-react") || id.includes("react-icons") || id.includes("@tabler/icons-react")) {
-              return "vendor-icons";
-            }
-
-            // Note: DO NOT add a catch-all "vendor-core" here. 
-            // Grouping all other dependencies together breaks Vite's natural chunking 
-            // and causes circular dependency issues (like React's forwardRef being undefined).
-          }
-        },
+        // Let Vite naturally handle chunks to avoid circular dependency and forwardRef bugs.
+        // Memory limits are now handled by NODE_OPTIONS in package.json
       },
     },
   },

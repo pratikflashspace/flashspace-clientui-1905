@@ -637,10 +637,12 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                         {kycData?.businessInfo?.companyName || "No company added"}
                       </p>
                     )}
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2 flex items-center gap-2">
-                       <ShieldCheck className="w-3 h-3 text-[#35503F]" />
-                       Client ID: {(user?._id || user?.id)?.slice(-8).toUpperCase() || "N/A"}
-                    </p>
+                   <div className="flex flex-col">
+                     <span className="font-semibold text-gray-900 break-words line-clamp-1">{user?.fullName || "Not Provided"}</span>
+                     <span className="text-sm font-medium text-[#36503F]/70">
+                       Client ID: {(user?._id || user?.id)?.slice(-8)?.toUpperCase() || "N/A"}
+                     </span>
+                   </div>
                   </div>
                 </div>
               </div>
