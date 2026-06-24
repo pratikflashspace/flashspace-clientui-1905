@@ -271,7 +271,7 @@ const Careers = () => {
                 We're always looking for talented people. Send us your resume
                 and we'll keep you in mind.
               </p>
-              <a href="mailto:careers@flashspace.in" className="bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] h-12 px-8 rounded-xl font-medium inline-flex items-center justify-center transition-colors">
+              <a href="mailto:team@flashspace.ai" className="bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] h-12 px-8 rounded-xl font-medium inline-flex items-center justify-center transition-colors">
                 Send Your Resume <ArrowRight className="w-4 h-4 ml-2" />
               </a>
             </motion.div>

@@ -126,6 +126,14 @@ export default function GSTCalculator() {
                 ₹ {results.totalAmount.toLocaleString("en-IN", { maximumFractionDigits: 2 })}
               </span>
             </div>
+
+            <div className="pt-6 mt-auto">
+              <div className="bg-[#E4EDE6] rounded-lg p-3 border border-[#D4E0D0]">
+                <p className="text-[11px] leading-relaxed text-[#36503F]/80 text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <span className="font-bold">Disclaimer:</span> This calculator provides a basic estimate. Please do not trust these figures blindly for official GST filings or invoicing, as actual tax may vary based on HSN/SAC codes and business specifics.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -104,6 +104,14 @@ export default function IncomeTaxCalculator() {
                     : "Both regimes result in the same tax."}
               </span>
             </div>
+
+            <div className="pt-6 mt-auto">
+              <div className="bg-[#E4EDE6] rounded-lg p-3 border border-[#D4E0D0]">
+                <p className="text-[11px] leading-relaxed text-[#36503F]/80 text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <span className="font-bold">Disclaimer:</span> This calculator provides an estimate based on standard inputs. Please do not trust these figures blindly for official tax filings, as actual tax liabilities may vary based on individual deductions and exemptions.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
