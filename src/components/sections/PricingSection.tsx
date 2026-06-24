@@ -53,7 +53,7 @@ export const PricingSection = ({ highlightPlan, compact }: { highlightPlan?: str
             CHOOSE YOUR PLAN
           </h3>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-black" style={{ fontFamily: "'Inter', sans-serif" }}>
-            Four Plans. <span className="text-[#36503F]">Unlimited Potential.</span>
+            Four Plans <span className="text-[#36503F] block mt-1">Unlimited Potential</span>
           </h2>
           <p className="text-gray-600 text-sm max-w-lg mx-auto" style={{ fontFamily: "'Inter', sans-serif" }}>
             Pick the perfect plan and let's build<br />something extraordinary together.

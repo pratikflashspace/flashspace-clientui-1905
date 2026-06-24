@@ -80,7 +80,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-[300px] sm:max-w-full mx-auto">
       <GoogleLogin
         onSuccess={handleGoogleSuccess}
         onError={handleGoogleError}

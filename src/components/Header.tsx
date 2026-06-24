@@ -194,6 +194,17 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
   const closeDrawer = () => setIsMenuOpen(false);
 
   useEffect(() => {
+    if (isMenuOpen) {
+      document.body.classList.add("mobile-menu-open");
+    } else {
+      document.body.classList.remove("mobile-menu-open");
+    }
+    return () => {
+      document.body.classList.remove("mobile-menu-open");
+    };
+  }, [isMenuOpen]);
+
+  useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();

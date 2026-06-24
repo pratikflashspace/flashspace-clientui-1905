@@ -163,22 +163,46 @@ export const FloatingAiButton = () => {
             animate={{ opacity: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, y: 50, x: "-50%" }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="md:hidden fixed bottom-6 left-1/2 z-[2147483647] w-[92%] max-w-[400px] cursor-pointer"
+            className="md:hidden fixed bottom-6 left-1/2 z-[2147483647] cursor-pointer ai-mobile-btn-container transition-all duration-300"
             onClick={() => navigate("/start-chatting")}
           >
-            <div className="bg-white/85 backdrop-blur-xl border border-gray-200/60 rounded-full p-1.5 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.12)]">
-              <div className="flex items-center gap-3 pl-3">
-                <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#36503F]">
+            <div className="bg-white/85 backdrop-blur-xl border border-gray-200/60 rounded-full p-1.5 flex items-center justify-between shadow-[0_8px_32px_rgba(0,0,0,0.12)] h-[52px]">
+              <div className="flex items-center gap-3 pl-2">
+                <div className="flex items-center justify-center w-8 h-8 shrink-0 rounded-full bg-[#36503F]">
                   <Sparkles className="w-4 h-4 text-[#fef6c5]" />
                 </div>
-                <span className="font-semibold text-sm text-[#1A1A1A]">Ask Flash AI</span>
+                <span className="font-semibold text-sm text-[#1A1A1A] ai-mobile-text whitespace-nowrap">Ask Flash AI</span>
               </div>
               <button 
-                className="flex items-center gap-1.5 bg-[#0F172A] hover:bg-[#1e293b] transition-colors text-white px-4 py-2 rounded-full text-sm font-medium"
+                className="flex items-center gap-1.5 bg-[#0F172A] hover:bg-[#1e293b] transition-colors text-white px-4 py-2 rounded-full text-sm font-medium ai-mobile-cta"
               >
                 Try it <span className="text-base leading-none">&rarr;</span>
               </button>
             </div>
+            
+            <style>{`
+              .ai-mobile-btn-container {
+                width: 92%;
+                max-width: 400px;
+              }
+              body.mobile-menu-open .ai-mobile-btn-container {
+                width: 52px !important;
+                left: auto !important;
+                right: 16px !important;
+                transform: none !important;
+              }
+              body.mobile-menu-open .ai-mobile-text,
+              body.mobile-menu-open .ai-mobile-cta {
+                display: none !important;
+              }
+              body.mobile-menu-open .ai-mobile-btn-container > div {
+                justify-content: center !important;
+                padding: 0 !important;
+              }
+              body.mobile-menu-open .ai-mobile-btn-container .pl-2 {
+                padding-left: 0 !important;
+              }
+            `}</style>
           </motion.div>
         )}
       </AnimatePresence>
