@@ -79,15 +79,17 @@ const BusinessSetupHomeCard = ({ item, onClick }: { item: any; onClick: () => vo
                 </div>
                 
                 <div className="flex gap-2 sm:gap-3 pt-2">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onClick();
-                        }}
-                        className="flex-[1.2] bg-[#36503F] text-[#FEF8C5] text-[12px] sm:text-[14px] font-semibold py-2 sm:py-3 px-2 sm:px-4 rounded-[10px] sm:rounded-[12px] hover:bg-[#2A4032] transition-colors flex items-center justify-center shadow-sm whitespace-nowrap"
-                    >
-                        Buy Now
-                    </button>
+                    {!(item.price?.toLowerCase().includes("custom")) && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onClick();
+                            }}
+                            className="flex-[1.2] bg-[#36503F] text-[#FEF8C5] text-[12px] sm:text-[14px] font-semibold py-2 sm:py-3 px-2 sm:px-4 rounded-[10px] sm:rounded-[12px] hover:bg-[#2A4032] transition-colors flex items-center justify-center shadow-sm whitespace-nowrap"
+                        >
+                            Buy Now
+                        </button>
+                    )}
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
@@ -168,7 +170,7 @@ export const PlanLocationsShowcase = () => {
                timeline = "20-30 days";
             }
             else if (name === "GST Filing") {
-               price = "₹1999/month";
+               price = "Customized";
                description = "Monthly and annual GST return filing handled by experts.";
                features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"];
                timeline = "Monthly / Quarterly";

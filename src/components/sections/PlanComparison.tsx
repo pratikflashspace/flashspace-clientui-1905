@@ -2,10 +2,29 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Leaf, Star, Gem, Crown, Check, Minus, Tag, Zap, IndianRupee } from "lucide-react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 export const PlanComparison = () => {
-  const [hoveredColumn, setHoveredColumn] = useState<number | null>(null);
-  const [hoveredRow, setHoveredRow] = useState<string | null>(null);
+  const [hoveredColumnState, setHoveredColumnState] = useState<number | null>(null);
+  const [hoveredRowState, setHoveredRowState] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const setHoveredColumn = (val: number | null) => {
+    if (!isMobile) setHoveredColumnState(val);
+  };
+
+  const setHoveredRow = (val: string | null) => {
+    if (!isMobile) setHoveredRowState(val);
+  };
+
+  const hoveredColumn = isMobile ? null : hoveredColumnState;
+  const hoveredRow = isMobile ? null : hoveredRowState;
   const plans = [
     {
       name: "BASIC",
@@ -107,17 +126,18 @@ export const PlanComparison = () => {
         </div>
 
         {/* Comparison Table Wrapper */}
-        <div className="relative mt-8">
-          {/* Badge outside to prevent overflow hidden clipping */}
-          <div 
-            className="absolute top-0 bg-[#36503F] text-[#FEF8CF] text-[10px] font-bold px-4 py-1.5 rounded-full tracking-wider uppercase shadow-md whitespace-nowrap z-40 border border-[#36503F]"
-            style={{ left: '72.22%', transform: 'translate(-50%, -50%)' }}
-          >
-            Most Popular
-          </div>
+        <div className="relative mt-8 overflow-x-auto pb-6 pt-5 -mx-4 px-4 lg:mx-0 lg:px-0 lg:overflow-visible custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className="min-w-[900px] relative">
+            {/* Badge outside to prevent overflow hidden clipping */}
+            <div 
+              className="absolute top-0 bg-[#36503F] text-[#FEF8CF] text-[10px] font-bold px-4 py-1.5 rounded-full tracking-wider uppercase shadow-md whitespace-nowrap z-40 border border-[#36503F]"
+              style={{ left: '72.22%', transform: 'translate(-50%, -50%)' }}
+            >
+              Most Popular
+            </div>
 
-          {/* Comparison Table Container */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 relative">
+            {/* Comparison Table Container */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 relative">
             
             {/* Full-Height Column Border overlay for PRO */}
             <div className="absolute top-[-2px] bottom-[-2px] w-[18.52%] border-[2px] border-[#FDE047] rounded-xl shadow-[0_0_20px_rgba(253,224,71,0.4)] pointer-events-none z-30 transition-all duration-300" style={{ left: '62.96%' }}></div>
@@ -247,6 +267,7 @@ export const PlanComparison = () => {
             {plans.map((plan, i) => (
               <div key={i} className={`p-6 flex items-center justify-center border-r border-gray-100 last:border-r-0 transition-colors duration-300 ${plans[i].highlight ? (hoveredColumn === i ? "bg-gray-300" : "bg-gray-100") : (hoveredColumn === i ? "bg-gray-100" : "")}`} onMouseEnter={() => setHoveredColumn(i)} onMouseLeave={() => setHoveredColumn(null)}>
                 <button 
+                  onClick={() => window.location.href = `/packages/${plan.name.toLowerCase()}`}
                   className={`w-full py-3 px-4 rounded-sm text-xs font-bold tracking-wider transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
                   plans[i].highlight
                     ? "bg-[#36503F] text-[#FEF8CF] hover:opacity-90 shadow-md"
@@ -257,11 +278,12 @@ export const PlanComparison = () => {
               </div>
             ))}
           </div>
-
+          </div>
+            {/* End Comparison Table Container */}
+          </div>
+          {/* End Min-Width Wrapper */}
         </div>
         {/* End Comparison Table Wrapper */}
-        </div>
-
         {/* Footer Banner */}
         <div className="mt-6 bg-[#36503F] rounded-xl text-white p-6 lg:p-8 flex flex-col md:flex-row items-center justify-between shadow-xl">
           <div className="flex items-center gap-6 mb-6 md:mb-0">

@@ -1,21 +1,20 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, FileText, Calculator, Landmark, ShieldCheck } from "lucide-react";
-
+import { ArrowUpRight, MonitorSmartphone, Bot, Rocket, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const featureImage = "https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=2071&auto=format&fit=crop";
+const featureImage = "/homewebsite.png";
 
 const services = [
-    { icon: Landmark, title: "GST & Tax Returns", desc: "Expert filing of GST, income tax, and TDS returns on time." },
-    { icon: ShieldCheck, title: "Annual Compliance", desc: "Keep your ROC and MCA compliances updated effortlessly." },
-    { icon: Calculator, title: "Bookkeeping Services", desc: "Maintain clear and accurate books of accounts all year round." },
-    { icon: FileText, title: "Financial Audits", desc: "Prepare for audits with meticulous financial statement reporting." },
+    { icon: MonitorSmartphone, title: "Responsive Design", desc: "Websites that look perfect on desktops, tablets, and smartphones alike." },
+    { icon: Bot, title: "AI Chatbot Integration", desc: "Engage visitors 24/7 with a smart AI chatbot that drives leads and support." },
+    { icon: Rocket, title: "SEO & Performance", desc: "Optimized for lightning-fast speeds and high search engine rankings." },
+    { icon: ShieldCheck, title: "Secure & Reliable", desc: "Protected with advanced security protocols and reliable hosting solutions." },
 ];
 
-export const TaxationFilingSection = () => {
+export const WebsiteDevelopmentSection = () => {
     return (
-        <section id="taxation-filing" className="py-12 lg:py-16 border-t border-border/50" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <section id="web-development" className="py-12 lg:py-16 border-t border-border/50" style={{ fontFamily: "'Inter', sans-serif" }}>
             <div className="space-y-12" style={{ fontFamily: "'Inter', sans-serif" }}>
                 {/* Banner */}
                 <motion.div
@@ -26,16 +25,16 @@ export const TaxationFilingSection = () => {
                 >
                     <img
                         src={featureImage}
-                        alt="Taxation and Filing services"
-                        className="w-full h-[350px] lg:h-[420px] object-cover"
+                        alt="Website Development"
+                        className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" style={{ fontFamily: "'Inter', sans-serif" }} />
                     <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 lg:p-12" style={{ fontFamily: "'Inter', sans-serif" }}>
-                        <span className="text-[#FEF8C5] text-xs sm:text-sm font-bold uppercase tracking-widest mb-1 sm:mb-2 block" style={{ fontFamily: "'Inter', sans-serif" }}>Taxation & Filing</span>
+                        <span className="text-[#FEF8C5] text-xs sm:text-sm font-bold uppercase tracking-widest mb-1 sm:mb-2 block" style={{ fontFamily: "'Inter', sans-serif" }}>Services</span>
                         <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-[#FEF8C5] leading-tight tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
-                            Simplify your compliance
+                            Build your digital presence
                             <br />
-                            <span className="text-[#FEF8C5]/70 font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>and stay ahead always.</span>
+                            <span className="text-[#FEF8C5]/70 font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>with modern web experiences.</span>
                         </h2>
                     </div>
                 </motion.div>
@@ -44,11 +43,11 @@ export const TaxationFilingSection = () => {
                 <div className="grid lg:grid-cols-[1fr_1.5fr] gap-12 items-start px-5 sm:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>
                     <div className="text-justify sm:text-left" style={{ fontFamily: "'Inter', sans-serif" }}>
                         <p className="text-[15px] sm:text-lg text-muted-foreground mb-6 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
-                            Navigate complex tax regulations with ease. We provide comprehensive taxation and filing services to ensure your business remains compliant, efficient, and penalty-free. Let us handle the numbers while you focus on growth.
+                            Your website is your ultimate digital storefront. We design and develop high-performance, visually stunning websites that captivate audiences and drive conversions. Let us bring your vision to the web.
                         </p>
-                        <Link to="/services/business-setup" onClick={() => window.scrollTo(0, 0)}>
+                        <Link to="/solutions/website-development" onClick={() => window.scrollTo(0, 0)}>
                             <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold w-full sm:w-auto">
-                                Explore Services
+                                Explore Web Services
                                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                             </Button>
                         </Link>

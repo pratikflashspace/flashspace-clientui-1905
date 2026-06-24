@@ -47,6 +47,7 @@ interface IndexProps {
 const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
   const navigate = useNavigate();
   useEffect(() => {
+    document.title = "FlashSpace";
     let hasOpened = false;
     
     // Auto-open chat widget when scrolling past hero section (Only on Home Page)

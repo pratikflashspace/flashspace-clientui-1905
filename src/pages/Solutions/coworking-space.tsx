@@ -92,6 +92,9 @@ const aiCapabilities = [
 ];
 
 const CoworkingSpace = () => {
+  useEffect(() => {
+    document.title = "Coworking Space - FlashSpace";
+  }, []);
   const navigate = useNavigate();
   const [active, setActive] = useState("features");
   const [cityQuery, setCityQuery] = useState("");

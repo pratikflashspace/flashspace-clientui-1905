@@ -57,6 +57,84 @@ export default function BookingDetailsModal({
     );
   })();
 
+  const isPackage = (() => {
+    const values = [
+      booking.type,
+      (booking as any).bookingType,
+      (booking as any).paymentType,
+      booking.plan?.name,
+      booking.spaceSnapshot?.name,
+    ]
+      .filter(Boolean)
+      .map((value) => String(value).toLowerCase());
+
+    return values.some(
+      (value) => value.includes("package") || 
+                 value.includes("package_purchase") ||
+                 value.includes("elite") ||
+                 value.includes("premium") ||
+                 value.includes("pro") ||
+                 value.includes("basic")
+    );
+  })();
+
+  if (isPackage) {
+    const rawName = booking.plan?.name || booking.spaceSnapshot?.name || "Package";
+    const packageName = rawName.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    const purchasedDate = booking.startDate || booking.createdAt || "";
+    
+    return (
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 animate-in fade-in zoom-in-95 duration-200">
+        <div className="bg-white rounded-[24px] max-w-md w-full shadow-2xl overflow-hidden flex flex-col relative">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 bg-black/10 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/30 transition-colors z-20"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          
+          <div className="bg-[#36503F] p-8 text-center relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-[#FEF8C5] rounded-bl-full -z-0 opacity-10"></div>
+             <h2 style={{ fontFamily: "'Inter', sans-serif" }} className="text-2xl font-black text-[#FEF8C5] relative z-10">
+               {packageName}
+             </h2>
+             <span className="inline-flex items-center gap-1.5 px-3 py-1 mt-3 rounded-full text-[10px] font-bold bg-green-500/20 text-green-200 border border-green-400/30 relative z-10">
+                <CheckCircle className="w-3.5 h-3.5" />
+                Active Package
+              </span>
+          </div>
+
+          <div className="p-6 space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Amount Paid</p>
+                 <p className="text-xl font-black text-gray-900 mt-1">{formatCurrency(booking.plan.price)}</p>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Purchased On</p>
+                 <p className="text-sm font-bold text-gray-900 mt-1.5 flex items-center gap-1.5">
+                   <Calendar className="w-4 h-4 text-gray-400" />
+                   {formatDate(purchasedDate as string)}
+                 </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                onClose();
+                navigate(`/packages/${packageName.split(' ')[0].toLowerCase()}#whats-included`);
+              }}
+              className="w-full py-4 rounded-xl font-bold bg-[#FEF8C5] text-[#36503F] hover:bg-[#F2EBAF] transition-all flex items-center justify-center gap-2 shadow-sm"
+            >
+              <Ticket className="w-5 h-5" />
+              View Package Details
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     const fetchKyc = async () => {
       try {

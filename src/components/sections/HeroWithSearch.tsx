@@ -60,7 +60,10 @@ export const HeroWithSearch = () => {
         {/* Text Content */}
         <div className="mx-auto max-w-[800px] lg:max-w-[680px] w-full text-center lg:mx-0 lg:text-left">
           
-          <h1 className="mt-2 md:mt-6 text-[38px] md:text-[40px] font-extrabold leading-[1.1] md:leading-[1.15] tracking-[-0.03em] text-white lg:text-[#1A1A1A] sm:text-5xl lg:text-[56px]">
+          <h1 
+            className="mt-2 md:mt-6 text-[38px] md:text-[40px] font-extrabold leading-[1.1] md:leading-[1.15] tracking-[-0.03em] text-white lg:text-[#1A1A1A] sm:text-5xl lg:text-[56px]"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
            India's Smartest <br /><span className="text-[#FEF8C5] lg:text-[#36503F]">Business Solutions Platform.</span>
           </h1>
           <p className="mt-4 mx-auto md:mt-6 lg:mt-5 max-w-[600px] lg:max-w-[480px] text-[15px] md:text-lg lg:text-base font-normal leading-[1.6] md:leading-[1.7] text-white/90 lg:text-[#6B8F78] lg:mx-0">

@@ -38,56 +38,47 @@ const navData = [
       {
         title: "Business Setup",
         items: [
-          { label: "GST Registration", href: "#" },
-          { label: "LLP Registration", href: "#" },
-          { label: "OPC Registration", href: "#" },
-          { label: "MSME Registration", href: "#" },
-          { label: "Startup India Registration", href: "#" },
-          { label: "FSSAI Registration", href: "#" },
-          { label: "Section 8 Registration", href: "#" }
+          { label: "GST Registration", href: "/services/business-setup#gst-registration" },
+          { label: "LLP Registration", href: "/services/business-setup#llp-compliance" },
+          { label: "OPC Registration", href: "/services/business-setup#company-registration-llp-opc-pvt-ltd" },
+          { label: "MSME Registration", href: "/services/business-setup#msme-udyam-registration" },
+          { label: "Startup India Registration", href: "/services/business-setup#startup-india-registration" },
+          { label: "FSSAI Registration", href: "/services/business-setup#fssai-registration" },
+          { label: "Section 8 Registration", href: "/services/business-setup#section-8-registration" }
         ]
       },
       {
         title: "Filing & Taxation",
         items: [
-          { label: "GST Filing", href: "#" },
-          { label: "MCA Annual Compliance", href: "#" },
-          { label: "LLP Annual Compliance", href: "#" },
-          { label: "Accounting Services", href: "#" }
+          { label: "GST Filing", href: "/services/business-setup#gst-filing" },
+          { label: "MCA Annual Compliance", href: "/services/business-setup#mca-annual-compliance" },
+          { label: "LLP Annual Compliance", href: "/services/business-setup#llp-annual-compliance" },
+          { label: "Accounting Services", href: "/services/business-setup#accounting-services" }
         ]
       },
       {
         title: "Business Tools",
         items: [
-          { label: "One CRM", href: "#" }
+          { label: "One CRM", href: "/solutions/one-crm" }
         ]
       },
       {
         title: "Services",
         items: [
-          { label: "Web Development", href: "#" }
+          { label: "Website Development", href: "/solutions/website-development" }
         ]
       }
     ]
   },
-  {
-    label: "Packages",
-    isDropdown: true,
-    items: [
-      { label: "Basic", href: "#" },
-      { label: "Pro", href: "#" },
-      { label: "Premium", href: "#" },
-      { label: "Elite", href: "#" }
-    ]
-  },
+  { label: "Packages", href: "/packages/basic" },
   { label: "Partner with us", href: "/partner" },
   {
     label: "More",
     isDropdown: true,
     items: [
-      { label: "About", href: "/about" },
-      { label: "Calculator", href: "#" },
-      { label: "Careers", href: "#" }
+      { label: "Calculator", href: "/calculators" },
+      { label: "Careers", href: "/career" },
+      // { label: "FlashSphere", href: "/blogs" }
     ]
   }
 ];
@@ -105,22 +96,25 @@ const MegaMenuDropdown = ({ sections, closeMenu }: { sections: any[], closeMenu?
       case "Filing & Taxation": return <FileText className={`w-5 h-5 ${color}`} />;
       case "Business Tools": return <Wrench className={`w-5 h-5 ${color}`} />;
       case "Services": return <Code className={`w-5 h-5 ${color}`} />;
+      case "Pricing Plans": return <PieChart className={`w-5 h-5 ${color}`} />;
+      case "Company": return <Building2 className={`w-5 h-5 ${color}`} />;
+      case "Resources": return <Calculator className={`w-5 h-5 ${color}`} />;
       default: return <ChevronRight className={`w-5 h-5 ${color}`} />;
     }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-2xl border border-[#FEF8CF] flex overflow-hidden min-h-[400px]">
+    <div className="bg-white rounded-xl shadow-2xl border border-[#FEF8C5] flex overflow-hidden min-h-[400px]">
       {/* Left Sidebar Pane */}
-      <div className="w-[35%] bg-[#FAF9F6] flex flex-col py-4 border-r border-[#FEF8CF]/50">
+      <div className="w-[35%] bg-[#FAF9F6] flex flex-col py-4 border-r border-[#FEF8C5]/50">
         {sections.map((section, idx) => {
           const isActive = activeIndex === idx;
           return (
-            <div
-              key={idx}
-              onMouseEnter={() => setActiveIndex(idx)}
-              className={`flex items-center justify-between px-6 py-4 cursor-pointer transition-all duration-300 ${isActive ? 'bg-[#FEF8CF] shadow-[0_4px_12px_rgba(54,80,63,0.05)] border-l-4 border-[#36503F]' : 'hover:bg-[#FEF8CF]/40 border-l-4 border-transparent'}`}
-            >
+              <div
+                key={idx}
+                onMouseEnter={() => setActiveIndex(idx)}
+                className={`flex items-center justify-between px-6 py-6 cursor-pointer transition-all duration-300 ${isActive ? 'bg-[#FEF8C5]/40 shadow-[0_4px_12px_rgba(54,80,63,0.05)] border-l-[3px] border-[#36503F]' : 'hover:bg-[#FEF8C5]/40 border-l-[3px] border-transparent'}`}
+              >
               <div className="flex items-center gap-3">
                 {getIcon(section.title, isActive)}
                 <span className={`text-[15px] ${isActive ? 'text-[#36503F] font-bold' : 'text-gray-600 font-medium'}`}>
@@ -135,7 +129,7 @@ const MegaMenuDropdown = ({ sections, closeMenu }: { sections: any[], closeMenu?
 
       {/* Right Content Pane */}
       <div className="w-[65%] bg-white p-8">
-        <h3 className="text-lg font-bold text-[#36503F] mb-6 pb-4 border-b border-[#FEF8CF] inline-block min-w-[200px]">
+        <h3 className="text-lg font-bold text-[#36503F] mb-6 pb-4 border-b border-[#FEF8C5] inline-block min-w-[200px]">
           {sections[activeIndex]?.title}
         </h3>
         <div className="grid grid-cols-2 gap-x-8 gap-y-2">
@@ -144,9 +138,8 @@ const MegaMenuDropdown = ({ sections, closeMenu }: { sections: any[], closeMenu?
               key={subIdx} 
               to={sub.href} 
               onClick={closeMenu}
-              className="text-[15px] text-gray-600 hover:text-[#36503F] hover:bg-[#FEF8CF]/30 hover:font-medium transition-all duration-200 flex items-center gap-2 px-3 py-2.5 rounded-lg border border-transparent hover:border-[#FEF8CF]"
+              className="text-[15px] text-gray-600 hover:text-[#36503F] hover:bg-[#FEF8C5]/40 hover:font-bold transition-all duration-200 block px-4 py-2.5 border-l-[3px] border-transparent hover:border-l-[#36503F]"
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-[#36503F] opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
               {sub.label}
             </Link>
           ))}
@@ -161,6 +154,11 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
   const { isAuthenticated, user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hideDropdowns, setHideDropdowns] = useState(false);
+  const closeDesktopDropdowns = () => {
+    setHideDropdowns(true);
+    setTimeout(() => setHideDropdowns(false), 150);
+  };
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(openLogin);
@@ -417,16 +415,21 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
                 )}
 
                 {item.isMegaMenu && (
-                  <div className="absolute top-[100%] left-[-20px] pt-2 mt-0 w-[850px] max-w-[90vw] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                    <MegaMenuDropdown sections={item.sections} />
+                  <div className={`absolute top-[100%] left-[-20px] pt-2 mt-0 w-[850px] max-w-[90vw] transition-all duration-300 z-50 ${hideDropdowns ? 'opacity-0 invisible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'}`}>
+                    <MegaMenuDropdown sections={item.sections} closeMenu={closeDesktopDropdowns} />
                   </div>
                 )}
 
                 {item.isDropdown && (
-                  <div className="absolute top-[100%] left-0 pt-2 mt-0 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-                    <div className="bg-white rounded-xl shadow-lg border border-gray-100 py-2 text-left">
+                  <div className={`absolute top-[100%] left-0 pt-2 mt-0 w-48 transition-all duration-300 z-50 ${hideDropdowns ? 'opacity-0 invisible' : 'opacity-0 invisible group-hover:opacity-100 group-hover:visible'}`}>
+                    <div className="bg-white rounded-xl shadow-lg border border-[#FEF8C5]/50 py-2 text-left flex flex-col">
                       {item.items?.map((sub, subIdx) => (
-                        <Link key={subIdx} to={sub.href} className="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-[#36503F] transition-colors">
+                        <Link 
+                          key={subIdx} 
+                          to={sub.href} 
+                          onClick={closeDesktopDropdowns}
+                          className="text-[15px] text-gray-600 hover:text-[#36503F] hover:bg-[#FEF8C5]/40 hover:font-bold transition-all duration-200 block px-5 py-2.5 border-l-[3px] border-transparent hover:border-l-[#36503F]"
+                        >
                           {sub.label}
                         </Link>
                       ))}

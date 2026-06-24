@@ -25,6 +25,7 @@ import {
   MessageSquare,
   MoreVertical,
   Star,
+  Package,
 } from "lucide-react";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
@@ -52,7 +53,7 @@ const MyBookings: React.FC = () => {
 
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState<"all" | BookingType>("all");
+  const [activeTab, setActiveTab] = useState<"all" | BookingType | "package">("all");
   const [statusFilter, setStatusFilter] = useState<"all" | BookingStatus>(
     "all",
   );
@@ -98,7 +99,7 @@ const MyBookings: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 12;
 
   const fetchBookings = async (isSilent = false) => {
     if (!isSilent) setLoading(true);
@@ -111,10 +112,10 @@ const MyBookings: React.FC = () => {
       };
 
       const response = await userDashboardService.getBookings({
-        type: activeTab === "all" ? undefined : (typeMap[activeTab] as any),
+        type: activeTab === "all" || activeTab === "package" ? undefined : (typeMap[activeTab] as any),
         status: statusFilter === "all" ? undefined : statusFilter,
-        page: currentPage,
-        limit: itemsPerPage,
+        page: activeTab === "package" ? 1 : currentPage,
+        limit: activeTab === "package" ? 100 : itemsPerPage,
       });
       if (response.success && response.data) {
         setBookings(response.data);
@@ -406,6 +407,9 @@ const MyBookings: React.FC = () => {
         (!date.to ||
           new Date(b.startDate || "").getTime() <= date.to.getTime()));
 
+    if (activeTab === "package" && !isPackageBooking(b)) return false;
+    if (activeTab !== "all" && activeTab !== "package" && isPackageBooking(b)) return false; // Hide packages from specific space tabs
+
     return matchSearch && matchDate;
   });
 
@@ -540,7 +544,7 @@ const MyBookings: React.FC = () => {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const isBusinessSetupBooking = (booking?: Booking | null) => {
+  function isBusinessSetupBooking(booking?: Booking | null) {
     if (!booking) return false;
     const values = [
       booking.type,
@@ -554,6 +558,28 @@ const MyBookings: React.FC = () => {
 
     return values.some(
       (value) => value.includes("business_setup") || value.includes("businesssetup") || value.includes("meeting_room") || value.includes("meetingroom"),
+    );
+  };
+
+  function isPackageBooking(booking?: Booking | null) {
+    if (!booking) return false;
+    const values = [
+      booking.type,
+      (booking as any).bookingType,
+      (booking as any).paymentType,
+      booking.plan?.name,
+      booking.spaceSnapshot?.name,
+    ]
+      .filter(Boolean)
+      .map((value) => String(value).toLowerCase());
+
+    return values.some(
+      (value) => value.includes("package") || 
+                 value.includes("package_purchase") ||
+                 value.includes("elite") ||
+                 value.includes("premium") ||
+                 value.includes("pro") ||
+                 value.includes("basic")
     );
   };
 
@@ -676,6 +702,7 @@ const MyBookings: React.FC = () => {
               },
               { id: "coworking_space", label: "Coworking", icon: Briefcase },
               { id: "meeting_room", label: "Business Setup", icon: CalendarIcon },
+              { id: "package", label: "Packages", icon: Package },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -813,6 +840,80 @@ const MyBookings: React.FC = () => {
               );
               
               const isBusinessSetup = isBusinessSetupBooking(booking);
+              const isPackage = isPackageBooking(booking);
+
+              if (isPackage) {
+                const purchasedDate = booking.startDate || booking.createdAt || "";
+                const rawName = booking.plan?.name || booking.spaceSnapshot?.name || "Package";
+                const packageName = rawName.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+                
+                const allFeatures = [
+                  { name: "Virtual office", plans: ["Basic Package", "Pro Package", "Premium Package", "Elite Package"] },
+                  { name: "One CRM", plans: ["Basic Package", "Pro Package", "Premium Package", "Elite Package"] },
+                  { name: "GST", plans: ["Pro Package", "Premium Package", "Elite Package"] },
+                  { name: "MSME/ Trade License", plans: ["Pro Package", "Premium Package", "Elite Package"] },
+                  { name: "ESIC/PF", plans: ["Pro Package", "Premium Package", "Elite Package"] },
+                  { name: "Website Development", plans: ["Premium Package", "Elite Package"] },
+                  { name: "Registration", plans: ["Elite Package"] },
+                ];
+
+                return (
+                  <button
+                    key={booking._id}
+                    type="button"
+                    onClick={() => setSelectedBooking(booking)}
+                    className="text-left bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative flex flex-col"
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-5">
+                      <div className="min-w-0">
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#FEF8C5] text-[#36503F] px-4 py-1.5 text-xs font-bold tracking-wider uppercase" style={{ fontFamily: "'Inter', sans-serif" }}>
+                          <Package className="w-3.5 h-3.5" />
+                          Package
+                        </span>
+                      </div>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Active
+                      </span>
+                    </div>
+
+                    <div className="flex-1 space-y-4">
+                      <h3
+                        style={{ fontFamily: "'Inter', sans-serif" }}
+                        className="text-2xl font-black text-[#36503F] transition-colors"
+                      >
+                        {packageName}
+                      </h3>
+                      
+                      <ul className="space-y-2 mt-4 text-xs font-medium text-[#677E73]" style={{ fontFamily: "'Inter', sans-serif" }}>
+                        {allFeatures.filter(f => f.plans.includes(packageName)).slice(0, 3).map((feature, idx) => (
+                          <li key={idx} className="flex items-center gap-2">
+                             <CheckCircle2 className="w-3.5 h-3.5 text-[#36503F]" />
+                             {feature.name}
+                          </li>
+                        ))}
+                        {allFeatures.filter(f => f.plans.includes(packageName)).length > 3 && (
+                          <li className="text-gray-400 italic pl-5">+ more features</li>
+                        )}
+                      </ul>
+                    </div>
+
+                    <div className="h-px bg-[#36503F]/10 my-5" />
+
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <p className="text-2xl font-black text-[#1A1A1A]">
+                          {formatCurrency(booking.plan.price)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] text-gray-400 font-bold">
+                        <CalendarIcon className="w-3.5 h-3.5" />
+                        {formatDate(purchasedDate as string)}
+                      </div>
+                    </div>
+                  </button>
+                );
+              }
 
               if (isBusinessSetup) {
                 const purchasedDate = booking.startDate || booking.createdAt || "";

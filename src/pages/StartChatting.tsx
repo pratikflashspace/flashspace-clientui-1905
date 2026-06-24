@@ -389,6 +389,9 @@ const UpdatesPopup = ({
 
 
 const StartChatting = () => {
+  useEffect(() => {
+    document.title = "Flash AI - FlashSpace";
+  }, []);
   const { resolveCoordinates } = useLocationMetadata();
   const navigate = useNavigate();
   const location = useLocation();

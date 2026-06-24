@@ -41,12 +41,11 @@ const PaymentSuccessPage = () => {
     try {
       const data = await getPaymentStatus(orderId!);
       setPaymentDetails(data);
+      setLoading(false); // Show details immediately
       
       // If bookingId is missing, retry after 1 second (up to 5 times)
       if (!data.bookingId && retryCount < 5) {
         setTimeout(() => fetchPaymentDetails(retryCount + 1), 1000);
-      } else {
-        setLoading(false);
       }
     } catch (error) {
       console.error("Error fetching payment details:", error);
@@ -113,10 +112,12 @@ const PaymentSuccessPage = () => {
               </div>
             ) : paymentDetails ? (
               <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Space</span>
-                  <span className="font-medium text-foreground">{paymentDetails.spaceName}</span>
-                </div>
+                {!paymentDetails.spaceName.toLowerCase().includes('package') && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Space</span>
+                    <span className="font-medium text-foreground">{paymentDetails.spaceName}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Plan</span>
                   <span className="font-medium text-foreground">{paymentDetails.planName}</span>

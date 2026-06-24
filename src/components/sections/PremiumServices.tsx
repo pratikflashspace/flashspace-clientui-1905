@@ -180,9 +180,7 @@ export const PremiumServices = () => {
             {/* Title */}
             <h2 className="text-2xl md:text-3xl text-center md:text-left text-black font-bold leading-snug">
               Let's Build Something <br className="hidden md:block" />
-              <span className="text-[#36503F]">
-                <span className="italic">Extraordinary</span> Together.
-              </span>
+              <span className="text-[#36503F] italic">Extraordinary</span> Together.
             </h2>
           </div>
 
@@ -195,9 +193,9 @@ export const PremiumServices = () => {
             {/* Button */}
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('open-contact-modal'))}
-              className="bg-[#36503F] text-[#FEF8CF] text-xs font-semibold tracking-wider uppercase px-8 py-4 rounded-sm flex items-center gap-2 hover:bg-[#1a261e] transition-colors whitespace-nowrap"
+              className="bg-[#36503F] text-[#FEF8CF] text-[14px] font-semibold tracking-wider px-8 py-4 rounded-sm flex items-center gap-2 hover:bg-[#1a261e] transition-colors whitespace-nowrap"
             >
-              GET IN TOUCH <ArrowRight className="w-4 h-4" />
+              Get In Touch <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </motion.div>

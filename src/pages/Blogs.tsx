@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import { Flame } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -10,7 +11,11 @@ const Blogs = () => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
 
-  const categories = ["All", "Coworking", "Coliving", "Virtual Office", "Office Space"];
+  const categories = ["All", "Coworking", "Virtual Office", "Artificial Intelligence"];
+
+  useEffect(() => {
+    document.title = "Flashsphere - FlashSpace";
+  }, []);
 
   useEffect(() => {
     fetchBlogs();
@@ -20,7 +25,7 @@ const Blogs = () => {
     setLoading(true);
     try {
       const categoryQuery = activeCategory !== "All" ? `?category=${activeCategory}` : "";
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/blogs${categoryQuery}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/blogs${categoryQuery}`);
       const data = await response.json();
       if (data.success) {
         setBlogs(data.data);
@@ -142,6 +147,61 @@ const Blogs = () => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        )}
+
+        {/* Trending Blogs Section */}
+        {!loading && blogs.length > 0 && (
+          <div className="mt-24 mb-10">
+            <div className="flex items-center gap-3 mb-8">
+              {/* <div className="bg-red-50 p-2.5 rounded-xl border border-red-100">
+                <Flame className="text-red-500 w-6 h-6" />
+              </div> */}
+              <h2 className="text-2xl md:text-3xl font-extrabold text-[#1a2d1d] font-['Inter']">
+                Trending Blogs
+              </h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {blogs.slice(0, 3).map((blog, index) => (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  key={`trending-${blog._id}`}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 flex flex-col h-full group"
+                >
+                  <Link to={`/blogs/${blog.slug}`} className="block relative overflow-hidden h-48">
+                    <img
+                      src={blog.coverImage || "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"}
+                      alt={blog.title}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {/* Trending Tag */}
+                    <div className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1 shadow-md uppercase tracking-wider">
+                      <Flame size={12} fill="currentColor" /> Trending
+                    </div>
+                  </Link>
+                  
+                  <div className="p-5 flex flex-col flex-grow">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-semibold text-[#334d3d] uppercase tracking-wider">
+                        {blog.category}
+                      </span>
+                      <span className="text-xs text-gray-400 font-medium">
+                        {format(new Date(blog.createdAt), "MMM dd")}
+                      </span>
+                    </div>
+                    
+                    <Link to={`/blogs/${blog.slug}`}>
+                      <h3 className="text-lg font-bold text-[#1a2d1d] mb-2 line-clamp-2 hover:text-[#334d3d] transition-colors leading-tight">
+                        {blog.title}
+                      </h3>
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         )}
       </div>
