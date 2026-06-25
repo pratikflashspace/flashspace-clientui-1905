@@ -24,7 +24,6 @@ import {
   Eye,
   Trash2,
 } from "lucide-react";
-import { Country, State, City } from "country-state-city";
 import { toast } from "sonner";
 import { authService } from "@/services/auth.service";
 import { cn } from "@/lib/utils";
@@ -896,23 +895,16 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                           Country
                         </label>
                         {isEditing ? (
-                          <select
+                          <input
+                            type="text"
                             value={profileData.country}
-                            onChange={(e) => {
-                              handleInputChange("country", e.target.value);
-                              handleInputChange("state", "");
-                              handleInputChange("city", "");
-                            }}
+                            onChange={(e) => handleInputChange("country", e.target.value)}
+                            placeholder="Enter Country"
                             className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all bg-white"
-                          >
-                            <option value="">Select Country</option>
-                            {Country.getAllCountries().map((c) => (
-                              <option key={c.isoCode} value={c.isoCode}>{c.name}</option>
-                            ))}
-                          </select>
+                          />
                         ) : (
                           <p className="text-gray-900">
-                            {Country.getCountryByCode(profileData.country || "IN")?.name || profileData.country || "N/A"}
+                            {profileData.country || "IN"}
                           </p>
                         )}
                       </div>
@@ -923,23 +915,13 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                           State
                         </label>
                         {isEditing ? (
-                          <select
+                          <input
+                            type="text"
                             value={profileData.state}
-                            onChange={(e) => {
-                              handleInputChange("state", e.target.value);
-                              handleInputChange("city", ""); // Reset city when state changes
-                            }}
-                            disabled={!profileData.country}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all bg-white disabled:opacity-50"
-                          >
-                            <option value="">Select State</option>
-                            {profileData.country && State.getStatesOfCountry(profileData.country).map((s) => (
-                              <option key={s.isoCode} value={s.name}>{s.name}</option>
-                            ))}
-                            {profileData.state && profileData.country && !State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state) && (
-                              <option value={profileData.state}>{profileData.state}</option>
-                            )}
-                          </select>
+                            onChange={(e) => handleInputChange("state", e.target.value)}
+                            placeholder="Enter State"
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all bg-white"
+                          />
                         ) : (
                           <p className="text-gray-900">{profileData.state || "N/A"}</p>
                         )}
@@ -951,25 +933,13 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
                           City
                         </label>
                         {isEditing ? (
-                          <select
+                          <input
+                            type="text"
                             value={profileData.city}
                             onChange={(e) => handleInputChange("city", e.target.value)}
-                            disabled={!profileData.state || !profileData.country}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all bg-white disabled:opacity-50"
-                          >
-                            <option value="">Select City</option>
-                            {profileData.state && profileData.country && State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state)?.isoCode && (
-                              City.getCitiesOfState(profileData.country, State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state)!.isoCode).map((c) => (
-                                <option key={c.name} value={c.name}>{c.name}</option>
-                              ))
-                            )}
-                            {profileData.city && profileData.state && profileData.country && State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state)?.isoCode && !City.getCitiesOfState(profileData.country, State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state)!.isoCode).find(c => c.name === profileData.city) && (
-                              <option value={profileData.city}>{profileData.city}</option>
-                            )}
-                            {profileData.city && profileData.state && profileData.country && !State.getStatesOfCountry(profileData.country).find(s => s.name === profileData.state) && (
-                              <option value={profileData.city}>{profileData.city}</option>
-                            )}
-                          </select>
+                            placeholder="Enter City"
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#35503F]/20 focus:border-[#35503F] transition-all bg-white"
+                          />
                         ) : (
                           <p className="text-gray-900">{profileData.city || "N/A"}</p>
                         )}
