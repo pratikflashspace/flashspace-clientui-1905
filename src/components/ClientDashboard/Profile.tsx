@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { KYCData, Booking } from "@/types/services";
 import userDashboardService from "@/services/userDashboard.service";
@@ -98,36 +98,47 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
     );
   };
 
-  // Fetch user profile and KYC data
+  // Track whether we've done the initial data fetch to prevent infinite loops.
+  // refreshProfile() updates `user` in AuthContext, which would re-trigger useEffect([user]),
+  // creating an infinite loop that crashes iOS Safari with "Maximum call stack size exceeded".
+  const hasFetchedRef = useRef(false);
+
+  // Sync local form state from user object (lightweight, no API calls)
+  const syncProfileFromUser = (currentUser: typeof user) => {
+    if (!currentUser) return;
+    setProfileData((prev) => ({
+      ...prev,
+      fullName: currentUser.fullName || "",
+      email: currentUser.email || "",
+      phone: currentUser.phoneNumber || (currentUser as any).phone || "",
+      alternatePhone: (currentUser as any).alternatePhone || prev.alternatePhone || "",
+      city: (currentUser as any).city || prev.city || "",
+      state: (currentUser as any).state || prev.state || "",
+      country: (currentUser as any).country || prev.country || "IN",
+      pincode: (currentUser as any).pincode || prev.pincode || "",
+      registeredAddress:
+        (currentUser as any).address ||
+        (currentUser as any).registeredAddress ||
+        prev.registeredAddress ||
+        "",
+    }));
+    if (currentUser.profilePicture) {
+      setProfileImage(currentUser.profilePicture);
+    }
+  };
+
+  // Fetch KYC + bookings data only once on mount
   useEffect(() => {
+    if (hasFetchedRef.current) return;
+    hasFetchedRef.current = true;
+
     const fetchProfileData = async () => {
       try {
         setLoading(true);
         setError(null);
 
         // Set profile data from auth context
-        if (user) {
-          setProfileData((prev) => ({
-            ...prev,
-            fullName: user.fullName || "",
-            email: user.email || "",
-            phone: user.phoneNumber || (user as any).phone || "",
-            alternatePhone: (user as any).alternatePhone || prev.alternatePhone || "",
-            city: (user as any).city || prev.city || "",
-            state: (user as any).state || prev.state || "",
-            country: (user as any).country || prev.country || "IN",
-            pincode: (user as any).pincode || prev.pincode || "",
-            registeredAddress:
-              (user as any).address ||
-              (user as any).registeredAddress ||
-              prev.registeredAddress ||
-              "",
-          }));
-          
-          if (user.profilePicture) {
-            setProfileImage(user.profilePicture);
-          }
-        }
+        syncProfileFromUser(user);
 
         // Fetch KYC data for business info
         const kycResponse = await userDashboardService.getKYC();
@@ -206,24 +217,32 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
     };
 
     fetchProfileData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // When user object changes (e.g. after refreshProfile), only sync local form state — no API calls
+  useEffect(() => {
+    if (user) {
+      syncProfileFromUser(user);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  // Double polling on mount to fetch and sync latest user profile details (cover image, profile picture)
+  // Refresh profile picture/cover image on mount (staggered to avoid race)
   useEffect(() => {
-    refreshProfile();
-
     const t1 = setTimeout(() => {
       refreshProfile();
-    }, 800);
+    }, 500);
 
     const t2 = setTimeout(() => {
       refreshProfile();
-    }, 2000);
+    }, 2500);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSave = async () => {

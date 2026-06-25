@@ -15,31 +15,35 @@ import {
   Home,
   Menu,
   X,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, Suspense } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-// Remove this type definition if useAuth already provides the correct user type
-// type User = {
-//   name?: string;
-//   email?: string;
-//   // add other properties as needed
-// };
 import { useLocation, useNavigate } from "react-router-dom";
-import Dashboard from "./Dashboard";
-import MyBookings from "./MyBookings";
-import Billing from "./Billing";
-import Support from "./Support";
-import Logout from "./Logout";
-import Profile from "./Profile";
-import Viewdetails from "./Viewdetails";
-import Notifications from "./Notifications"; // Import the new Notifications component
-import ChatSupport from "./ChatSupport"; // Import ChatSupport
-import Documents from "./Documents";
-import MailRecords from "./MailRecords";
-import VisitRecords from "./VisitRecords";
+
+// Lazy load all page components to prevent iOS WebKit from exceeding
+// the call stack during synchronous module evaluation.
+const Dashboard = React.lazy(() => import("./Dashboard"));
+const MyBookings = React.lazy(() => import("./MyBookings"));
+const Billing = React.lazy(() => import("./Billing"));
+const Support = React.lazy(() => import("./Support"));
+const Logout = React.lazy(() => import("./Logout"));
+const Profile = React.lazy(() => import("./Profile"));
+const Viewdetails = React.lazy(() => import("./Viewdetails"));
+const Notifications = React.lazy(() => import("./Notifications"));
+const ChatSupport = React.lazy(() => import("./ChatSupport"));
+const Documents = React.lazy(() => import("./Documents"));
+const MailRecords = React.lazy(() => import("./MailRecords"));
+const VisitRecords = React.lazy(() => import("./VisitRecords"));
+
+const LazyFallback = () => (
+  <div className="min-h-[400px] flex items-center justify-center">
+    <Loader2 className="w-8 h-8 text-[#35503F] animate-spin" />
+  </div>
+);
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, section: "main", path: "/dashboard" },
@@ -131,8 +135,8 @@ export default function ClientDashboard() {
 
         {/* Sidebar */}
                 <aside
-          className={cn(
-            "fixed top-0 left-0 z-50 h-screen bg-[#f8f8f8] shadow-xl border-r border-[#edede6] flex flex-col transition-all duration-300 ease-in-out",
+                  className={cn(
+            "fixed top-0 left-0 z-50 h-[100dvh] bg-[#f8f8f8] shadow-xl border-r border-[#edede6] flex flex-col transition-all duration-300 ease-in-out",
             "w-72",
             isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
             "xl:relative xl:translate-x-0 xl:shadow-none xl:h-full overflow-hidden",
@@ -202,7 +206,7 @@ export default function ClientDashboard() {
           </div>
 
           {/* Footer and Bottom Actions */}
-          <div className="px-5 py-3 border-t border-gray-100 space-y-2 bg-[#f8f9fa]/30 shrink-0">
+          <div className="px-5 py-3 pb-8 xl:pb-3 border-t border-gray-100 space-y-2 bg-[#f8f9fa]/30 shrink-0">
               <button
                   onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                   className={`
@@ -288,20 +292,15 @@ export default function ClientDashboard() {
           {/* Mobile Top Bar (Only visible when sidebar needs toggle) */}
           <header className="xl:hidden h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-30 flex items-center justify-between px-4 shrink-0">
             <div className="flex flex-col">
-              <div className="flex items-baseline gap-0.5">
-                <span className={cn(
-                  "font-extrabold tracking-tight text-gray-900 transition-all uppercase",
-                  isSidebarCollapsed ? "text-xl" : "text-2xl"
-                )}>
-                  {isSidebarCollapsed ? "F" : "FLASH"}
-                </span>
-                {!isSidebarCollapsed && (
-                  <span className="text-xl font-extrabold tracking-tight text-primary italic lowercase">
-                    space
-                  </span>
-                )}
+              <div className="flex items-baseline gap-0.5 ml-[-6px]">
+                <img
+                    src="https://cdn.prod.website-files.com/664330484432dcdd6519a8fd/665dd8e0007de68a44f3750b_Black%20and%20White%20Bold%20Typography%20Clothing%20Brand%20Logo%20(940%20x%20400%20px)%20(940%20x%20200%20px)%20(940%20x%20150%20px).png"
+                    alt="FlashSpace Logo"
+                    className="h-8 w-auto object-contain cursor-pointer"
+                    onClick={() => navigate("/")}
+                />
               </div>
-              <p className="text-[10px] text-gray-400 mt-0.5 font-bold uppercase tracking-widest leading-none">
+              <p className="ml-2 text-[10px] text-gray-400 mt-0.5 font-bold uppercase tracking-widest leading-none">
                 {menuItems[activeIndex]?.name || "Dashboard"}
               </p>
             </div>
@@ -318,7 +317,9 @@ export default function ClientDashboard() {
 
           <div className="flex-1 p-0">
             <ErrorBoundary>
-              {mainContent}
+              <Suspense fallback={<LazyFallback />}>
+                {mainContent}
+              </Suspense>
             </ErrorBoundary>
           </div>
         </main>
@@ -351,7 +352,9 @@ export default function ClientDashboard() {
                 </button>
               </div>
               <div className="h-full overflow-y-auto pt-[130px]">
-                <Profile isCompact drawerMode />
+                <Suspense fallback={<LazyFallback />}>
+                  <Profile isCompact drawerMode />
+                </Suspense>
               </div>
             </aside>
           </div>

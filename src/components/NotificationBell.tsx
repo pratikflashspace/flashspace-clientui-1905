@@ -54,7 +54,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
 
             {/* Dropdown */}
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden">
+                <div className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-80 md:w-96 bg-white rounded-lg shadow-xl border border-gray-100 z-50 overflow-hidden">
                     {/* Header */}
                     <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center bg-[#fcfcfc]">
                         <h3 className="text-sm font-semibold text-[#36503F]">Notifications</h3>

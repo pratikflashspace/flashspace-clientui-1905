@@ -1038,13 +1038,19 @@ const MyBookings: React.FC = () => {
                           if (!address) return city;
                           
                           const parts = address.split(",").map(p => p.trim());
-                          // Filter out generic parts (floors, plot numbers, pincodes, country)
-                          const skipPattern = /^([0-9]*\s*(floor|level|plot|off|unit|cabin|shop|room|flat|apartment|h\.no|no\.|block|pocket|phase|st|nd|rd|th|india))\b/i;
+                          const skipWords = ["floor", "level", "plot", "off", "unit", "cabin", "shop", "room", "flat", "apartment", "h.no", "no.", "block", "pocket", "phase", "st", "nd", "rd", "th", "india"];
                           const numericPattern = /^[0-9\-\s\+/]+$/;
                           
                           const filtered = parts.filter(p => {
                             const clean = p.toLowerCase();
-                            if (skipPattern.test(clean)) return false;
+                            
+                            let textOnly = clean.replace(/^[0-9\-\s\+/]+/, "").trim();
+                            for (const word of skipWords) {
+                              if (textOnly.startsWith(word)) {
+                                return false;
+                              }
+                            }
+                            
                             if (numericPattern.test(clean)) return false;
                             if (clean === city.toLowerCase()) return false;
                             if (clean === "india") return false;

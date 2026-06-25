@@ -66,6 +66,17 @@ class ErrorBoundary extends Component<Props, State> {
               </button>
             </div>
 
+            {this.state.error && (
+              <div className="mt-6 text-left">
+                <details className="bg-gray-100 p-4 rounded-xl text-sm overflow-auto">
+                  <summary className="font-semibold text-gray-800 cursor-pointer">View Error Details</summary>
+                  <pre className="mt-2 text-red-600 whitespace-pre-wrap break-words">
+                    {this.state.error.toString()}
+                  </pre>
+                </details>
+              </div>
+            )}
+
           </div>
         </div>
       );

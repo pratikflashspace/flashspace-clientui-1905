@@ -45,7 +45,7 @@ export function PartnerNotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute left-0 sm:left-auto sm:right-0 mt-2 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
             <h3 className="font-bold text-[#35503F]">Notifications</h3>
             <Link 
