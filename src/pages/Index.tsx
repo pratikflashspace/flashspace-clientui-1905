@@ -8,6 +8,7 @@ import { ScaleSection } from "@/components/sections/ScaleSection";
 import { MetricsOverview } from "@/components/sections/MetricsOverview";
 import { Stats } from "@/components/sections/Stats";
 import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
+import { ExpertsSection } from "@/components/sections/TestimonialAndExperts";
 import { FAQSection } from "@/components/sections/FAQSection";
 import { CTA } from "@/components/sections/CTA";
 import { PricingSection } from "@/components/sections/PricingSection";
@@ -103,6 +104,9 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         <div className="block lg:hidden">
           <TrustedByFilmstripMobile />
         </div>
+        <FadeInSection>
+          <ExpertsSection />
+        </FadeInSection>
         <FadeInSection>
           <FounderTestimonial />
         </FadeInSection>

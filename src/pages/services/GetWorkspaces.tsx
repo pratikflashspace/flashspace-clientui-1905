@@ -1832,7 +1832,7 @@ const GetWorkspaces = () => {
                     
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 shrink-0">
-                        <img src="/newLogo/premjeet.png" alt="Premjeet" className="w-full h-full object-cover object-top" />
+                        <img src="/to_cloudinary/premjeet.png" alt="Premjeet" className="w-full h-full object-cover object-top" />
                       </div>
                       <div className="flex-1">
                         <h4 className="font-bold text-gray-900 text-[15px] leading-tight mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>Premjeet</h4>

@@ -65,9 +65,9 @@ const additionalServices = [
 ];
 
 const experts = [
-  { name: "Rishi", role: "VO Expert", image: "/newLogo/rishi.png" },
-  { name: "Premjeet", role: "VO Expert", image: "/newLogo/premjeet.png" },
-  { name: "Shubham", role: "VO Expert", image: "/newLogo/shubham.png" },
+  { name: "Rishi", role: "VO Expert", image: "/to_cloudinary/rishi.png" },
+  { name: "Premjeet", role: "VO Expert", image: "/to_cloudinary/premjeet.png" },
+  { name: "Shubham", role: "VO Expert", image: "/to_cloudinary/shubham.png" },
 ];
 
 export const TestimonialSection = () => {
