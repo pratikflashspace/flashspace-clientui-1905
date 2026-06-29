@@ -493,7 +493,7 @@ const VirtualOfficeAds = () => {
                 <div className="mt-0.5 shrink-0 bg-[#E5F0E8] p-1 rounded-full text-[#36503F]">
                   <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={3} />
                 </div>
-                <span className="text-[#1F1F1F] font-semibold text-[13px] sm:text-[15px] leading-tight">{feature}</span>
+                <span className="text-[#1F1F1F]  font-semibold text-[13px] sm:text-[15px] leading-tight">{feature}</span>
               </div>
             ))}
           </div>
