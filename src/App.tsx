@@ -21,6 +21,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const VirtualOffice = lazy(() => import("./pages/services/VirtualOffice"));
 const OnDemand = lazy(() => import("./pages/services/OnDemand"));
 const GetWorkspaces = lazy(() => import("./pages/services/GetWorkspaces"));
+const GetWorkspacesV2 = lazy(() => import("./pages/services/GetWorkspacesV2"));
 const EventSpaces = lazy(() => import("./pages/services/EventSpaces"));
 const BusinessSetup = lazy(() => import("./pages/services/BusinessSetup"));
 const StartChatting = lazy(() => import("./pages/StartChatting"));
@@ -222,8 +223,16 @@ const App = () => (
                         element={<GetWorkspaces />}
                       />
                       <Route
+                        path="/services/virtual-office/1"
+                        element={<GetWorkspacesV2 />}
+                      />
+                      <Route
                         path="/services/coworking-space"
                         element={<GetWorkspaces />}
+                      />
+                      <Route
+                        path="/services/coworking-space/1"
+                        element={<GetWorkspacesV2 />}
                       />
                       <Route
                         path="/services/on-demand"

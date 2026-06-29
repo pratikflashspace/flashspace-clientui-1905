@@ -32,6 +32,8 @@ import {
   BadgePercent,
   Sparkles
 } from "lucide-react";
+import WorkspacesFAQData from "../../data/faq_data.json";
+import { FounderTestimonial } from "../../components/sections/FounderTestimonial";
 import hotToast from "react-hot-toast";
 import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
 import MapLibreMap from "@/components/Map/MapLibreMap";
@@ -459,7 +461,7 @@ const WorkspaceCard = ({
       return (
         <div
           onClick={type !== "business-setup" ? handleNavigate : undefined}
-          className={`flex gap-6 sm:gap-8 group bg-card rounded-2xl border border-border/60 p-4 shadow-soft transition-all duration-200 ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
+          className={`flex gap-6 sm:gap-8 group bg-card rounded-2xl border border-border/60 p-4 shadow-soft transition-all duration-200 w-full ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
         >
         {/* Image — fixed size, never shrinks */}
         <div className="relative w-1/3 h-36 sm:h-44 flex-shrink-0 rounded-xl overflow-hidden">
@@ -792,7 +794,7 @@ const WorkspaceCard = ({
   );
 };
 
-const GetWorkspaces = () => {
+const GetWorkspacesV2 = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -1521,138 +1523,138 @@ const GetWorkspaces = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
-      {/* Full-width top section: Breadcrumb + Filters */}
-      <div className="mt-20 bg-background border-b border-border/60">
-        <div className="fs-container py-4">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
-            <a href="/" className="hover:text-foreground transition-colors">
-              Home
-            </a>
-            <ChevronRight className="w-3 h-3" />
-            <span className="hover:text-foreground transition-colors cursor-pointer">
-              {typeLabel[workspaceType] || "Workspace"}
-            </span>
-            {workspaceType !== "business-setup" && (
-              <>
-                <ChevronRight className="w-3 h-3" />
-                <span className="text-foreground font-medium">{activeCity}</span>
-              </>
-            )}
-          </nav>
-
-          {/* Filter bar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 bg-muted/40 border border-border/60 rounded-2xl p-2.5 sm:p-3 relative z-[40]">
-            {/* Product */}
-            <div className="sm:w-[180px]">
-              <Select
-                value={workspaceType}
-                onValueChange={handleWorkspaceTypeChange}
-              >
-                <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${workspaceType !== "virtual-office"
-                    ? "bg-muted/50 border-border text-foreground"
-                    : "border-border/60 hover:border-border hover:shadow-sm"
-                    }`}
-                >
-                  <SelectValue placeholder="Product" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="virtual-office">Virtual Office</SelectItem>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="coworking">Coworking Space</SelectItem>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="business-setup">Business Setup</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Divider */}
-            <div className="hidden sm:block w-px h-8 bg-border/60 flex-shrink-0" />
-
-            {/* City — custom dropdown with always-visible chevrons */}
-            <CityDropdown
-              activeCity={activeCity}
-              cities={availableCities}
-              loading={citiesLoading}
-              onSelect={handleCityChange}
-              disabled={workspaceType === "business-setup"}
-            />
-
-            {/* Search Location */}
-            <div className="relative flex-1 min-w-[140px]">
-              <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-hidden transition-all duration-200 focus-within:ring-[3px] focus-within:ring-[#36503F]/20 focus-within:border-[#36503F]">
-                <MapPin className="w-4 h-4 text-muted-foreground ml-3 flex-shrink-0" />
-                <Input
-                  value={searchLocation}
-                  onChange={(e) => setSearchLocation(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearch();
-                    }
-                  }}
-                  className="border-0 shadow-none h-full text-sm font-medium text-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none bg-transparent px-3 placeholder:text-muted-foreground/40 min-w-0 flex-1"
-                  placeholder="Search location..."
-                />
-                <button
-                  onClick={handleSearch}
-                  className="px-3 h-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted transition-colors border-l border-border/60"
-                  title="Search"
-                >
-                  <Search className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Pricing */}
-            <div className="sm:w-[160px]">
-              <Select value={pricingFilter} onValueChange={setPricingFilter} disabled={workspaceType === "business-setup"}>
-                <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${pricingFilter !== "all"
-                    ? "bg-muted/50 border-border text-foreground"
-                    : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                    }`}
-                >
-                  <SelectValue placeholder="Pricing" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="all">All Pricing</SelectItem>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="low">Under ₹5,000</SelectItem>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="mid">₹5,000 – ₹15,000</SelectItem>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="high">Above ₹15,000</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Sort by */}
-            <div className="sm:w-[180px]">
-              <Select value={sortBy} onValueChange={setSortBy} disabled={workspaceType === "business-setup"}>
-                <SelectTrigger
-                  className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${sortBy !== "rating"
-                    ? "bg-muted/50 border-border text-foreground"
-                    : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                    }`}
-                >
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="rating">Highest Rated</SelectItem>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="popular">Most Popular</SelectItem>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="price-high">Price: High to Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Desktop: split view — listings left, map right */}
-      <div className="hidden lg:flex flex-1 relative fs-container">
+      <div className="hidden lg:flex flex-1 relative fs-container mt-20">
         {/* Left: Listings */}
         <div
           className={`bg-muted/20 transition-all duration-300 ease-in-out relative ${workspaceType === "business-setup" ? "w-full" : "w-[65%] border-r border-border/40"}`}
         >
-          <div className="py-5 pr-5 sm:pr-8">
-            {/* Results text + view toggle */}
+          {/* Breadcrumb + Filters */}
+          <div className="border-b border-border/60 mb-5 bg-background rounded-bl-3xl">
+            <div className="py-4 pr-5 sm:pr-8 pl-0">
+              {/* Breadcrumb */}
+              <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
+                <a href="/" className="hover:text-foreground transition-colors">
+                  Home
+                </a>
+                <ChevronRight className="w-3 h-3" />
+                <span className="hover:text-foreground transition-colors cursor-pointer">
+                  {typeLabel[workspaceType] || "Workspace"}
+                </span>
+                {workspaceType !== "business-setup" && (
+                  <>
+                    <ChevronRight className="w-3 h-3" />
+                    <span className="text-foreground font-medium">{activeCity}</span>
+                  </>
+                )}
+              </nav>
+
+              {/* Filter bar */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 bg-muted/40 border border-border/60 rounded-2xl p-2.5 sm:p-3 relative z-[40]">
+                {/* Product */}
+                <div className="sm:w-[180px]">
+                  <Select
+                    value={workspaceType}
+                    onValueChange={handleWorkspaceTypeChange}
+                  >
+                    <SelectTrigger
+                      className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${workspaceType !== "virtual-office"
+                        ? "bg-muted/50 border-border text-foreground"
+                        : "border-border/60 hover:border-border hover:shadow-sm"
+                        }`}
+                    >
+                      <SelectValue placeholder="Product" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="virtual-office">Virtual Office</SelectItem>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="coworking">Coworking Space</SelectItem>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="business-setup">Business Setup</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden sm:block w-px h-8 bg-border/60 flex-shrink-0" />
+
+                {/* City — custom dropdown with always-visible chevrons */}
+                <CityDropdown
+                  activeCity={activeCity}
+                  cities={availableCities}
+                  loading={citiesLoading}
+                  onSelect={handleCityChange}
+                  disabled={workspaceType === "business-setup"}
+                />
+
+                {/* Search Location */}
+                <div className="relative flex-1 min-w-[140px]">
+                  <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-hidden transition-all duration-200 focus-within:ring-[3px] focus-within:ring-[#36503F]/20 focus-within:border-[#36503F]">
+                    <MapPin className="w-4 h-4 text-muted-foreground ml-3 flex-shrink-0" />
+                    <Input
+                      value={searchLocation}
+                      onChange={(e) => setSearchLocation(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleSearch();
+                        }
+                      }}
+                      className="border-0 shadow-none h-full text-sm font-medium text-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none bg-transparent px-3 placeholder:text-muted-foreground/40 min-w-0 flex-1"
+                      placeholder="Search location..."
+                    />
+                    <button
+                      onClick={handleSearch}
+                      className="px-3 h-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted transition-colors border-l border-border/60"
+                      title="Search"
+                    >
+                      <Search className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Pricing */}
+                <div className="sm:w-[160px]">
+                  <Select value={pricingFilter} onValueChange={setPricingFilter} disabled={workspaceType === "business-setup"}>
+                    <SelectTrigger
+                      className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${pricingFilter !== "all"
+                        ? "bg-muted/50 border-border text-foreground"
+                        : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
+                        }`}
+                    >
+                      <SelectValue placeholder="Pricing" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="all">All Pricing</SelectItem>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="low">Under ₹5,000</SelectItem>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="mid">₹5,000 – ₹15,000</SelectItem>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="high">Above ₹15,000</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Sort by */}
+                <div className="sm:w-[180px]">
+                  <Select value={sortBy} onValueChange={setSortBy} disabled={workspaceType === "business-setup"}>
+                    <SelectTrigger
+                      className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${sortBy !== "rating"
+                        ? "bg-muted/50 border-border text-foreground"
+                        : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
+                        }`}
+                    >
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="rating">Highest Rated</SelectItem>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="popular">Most Popular</SelectItem>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="price-low">Price: Low to High</SelectItem>
+                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="price-high">Price: High to Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="py-5 pr-5 sm:pr-8 pl-0">
+            {/* Results text */}
             {workspaceType !== "business-setup" && (
               <div className="flex items-center justify-between mb-4">
                 <p className="text-sm text-muted-foreground">
@@ -1665,28 +1667,6 @@ const GetWorkspaces = () => {
                     {activeCity}
                   </span>
                 </p>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
-                    <button
-                      onClick={() => setViewMode("list")}
-                      className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "list"
-                        ? "bg-card text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                        }`}
-                    >
-                      <List className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode("grid")}
-                      className={`flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200 ${viewMode === "grid"
-                        ? "bg-card text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                        }`}
-                    >
-                      <LayoutGrid className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
               </div>
             )}
             {loading ? (
@@ -1696,7 +1676,7 @@ const GetWorkspaces = () => {
                     ? "grid gap-6 pb-8 pt-4 px-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                     : viewMode === "grid"
                       ? "grid gap-4 pb-8 grid-cols-1 min-[700px]:grid-cols-2"
-                      : "flex flex-col gap-4 pb-8 max-w-5xl"
+                      : "flex flex-col gap-4 pb-8 w-full max-w-5xl"
                 }
               >
                 <SkeletonCardGrid count={8} view={viewMode} />
@@ -1708,13 +1688,13 @@ const GetWorkspaces = () => {
                     ? "grid gap-6 pb-8 pt-4 px-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                     : viewMode === "grid"
                       ? "grid gap-4 pb-8 grid-cols-1 min-[700px]:grid-cols-2"
-                      : "flex flex-col gap-4 pb-8 max-w-5xl"
+                      : "flex flex-col gap-4 pb-8 w-full max-w-5xl"
                 }
               >
                 {sortedWorkspaces.length > 0 ? (
                   sortedWorkspaces.map((ws, index) => (
                     <div key={ws.id} className="contents">
-                      {index === 4 && workspaceType !== "business-setup" && (
+                      {index === 1 && workspaceType !== "business-setup" && (
                         <div className="col-span-full py-4 my-2 flex flex-col items-center">
                           <h3 className="text-[17px] font-semibold text-gray-900 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
                             5,000+ {workspaceType === "virtual-office" ? "Virtual Office" : "Coworking Space"} clients served
@@ -1731,13 +1711,13 @@ const GetWorkspaces = () => {
                       )}
                       <WorkspaceCard
                         ws={ws}
-                        view={workspaceType === "business-setup" ? "grid" : viewMode}
+                        view="list"
                         type={workspaceType}
                         onBusinessSetupBuy={setSelectedBusinessSetup}
                         zoomedCardId={zoomedCardId}
                         onCardZoom={setZoomedCardId}
                       />
-                      {index === 5 && workspaceType !== "business-setup" && (
+                      {index === 3 && workspaceType !== "business-setup" && (
                         <ReviewsCarousel />
                       )}
                     </div>
@@ -1898,22 +1878,12 @@ const GetWorkspaces = () => {
                         <h3 className="text-[15px] font-semibold text-gray-900 mb-4 text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
                           5,000+ {workspaceType === "virtual-office" ? "Virtual Office" : "Coworking Space"} clients served
                         </h3>
-                        <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-8 opacity-90 border border-border/60 rounded-xl bg-white shadow-sm px-4 py-8 w-full">
-                          <div className="w-[28%] flex justify-center">
-                            <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-8 object-contain" />
-                          </div>
-                          <div className="w-[28%] flex justify-center">
-                            <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-12 object-contain" />
-                          </div>
-                          <div className="w-[28%] flex justify-center">
-                            <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-6 object-contain" />
-                          </div>
-                          <div className="w-[40%] flex justify-center">
-                            <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-10 object-contain" />
-                          </div>
-                          <div className="w-[40%] flex justify-center">
-                            <img src="/newLogo/Adda247.png" alt="Adda247" className="h-10 object-contain" />
-                          </div>
+                        <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-4 opacity-90 border border-border/60 rounded-xl bg-white shadow-sm px-4 py-4 w-full overflow-hidden">
+                          <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-6 object-contain shrink-0" />
+                          <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-10 object-contain shrink-0" />
+                          <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-5 object-contain shrink-0" />
+                          <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 object-contain shrink-0" />
+                          <img src="/newLogo/Adda247.png" alt="Adda247" className="h-8 object-contain shrink-0" />
                         </div>
                       </div>
                     )}
@@ -1940,6 +1910,7 @@ const GetWorkspaces = () => {
               )}
             </div>
           )}
+          <DiscountBanner onClick={() => setIsContactOpen(true)} />
            <div className="flex items-center justify-center gap-1.5 border-t border-border/40 py-6 pb-10 bg-background">
             <button
                 onClick={goPrevPage}
@@ -1983,15 +1954,7 @@ const GetWorkspaces = () => {
                 }
               `}
             </style>
-            {!showMap && (
-              <button
-                onClick={() => setShowMap(true)}
-                className="fixed bottom-[80px] left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 bg-gray-900 text-white px-5 py-2.5 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.3)] font-semibold text-sm transition-transform active:scale-95 border border-gray-700"
-              >
-                <MapIcon className="w-4 h-4" />
-                Show Map
-              </button>
-            )}
+            {/* Expand map button removed as requested */}
 
             {showMap && (
               <div className="fixed inset-0 z-30 mt-16 bg-background">
@@ -2194,6 +2157,16 @@ const GetWorkspaces = () => {
         </DialogContent>
       </Dialog>
       
+      {/* Footer Extras: Testimonials and FAQs */}
+      {workspaceType !== "business-setup" && (
+        <div className="fs-container mb-16 mt-8">
+          <FounderTestimonial />
+          <div className="mt-12">
+            <WorkspacesFAQ city={activeCity} type={workspaceType} />
+          </div>
+        </div>
+      )}
+
       {/* Footer / Contact Modal */}
       <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
     </div>
@@ -2282,5 +2255,5 @@ const ReviewsCarousel = () => {
   );
 };
 
-export default GetWorkspaces;
+export default GetWorkspacesV2;
 
