@@ -3,9 +3,6 @@ import {
   Building2,
   Building,
   Rocket,
-  Calculator,
-  HeartHandshake,
-  Code,
   ArrowRight,
   Handshake,
   User,
@@ -38,31 +35,7 @@ const services = [
     description: "End-to-end assistance in company registration, licensing, and legal structuring.",
     icon: <Rocket className="w-6 h-6" />,
     theme: "dark"
-  },
-  {
-    id: "04",
-    title: "Taxation and Filing",
-    link: "#",
-    description: "Expert guidance on corporate tax, VAT, and seamless regulatory compliance.",
-    icon: <Calculator className="w-6 h-6" />,
-    theme: "light"
-  },
-  {
-    id: "05",
-    title: "One CRM",
-    link: "#",
-    description: "An all-in-one customer relationship management system to streamline your sales pipeline.",
-    icon: <HeartHandshake className="w-6 h-6" />,
-    theme: "dark"
-  },
-  {
-    id: "06",
-    title: "Website Development",
-    link: "#",
-    description: "Custom, high-performance AI-powered websites and digital solutions tailored for your business.",
-    icon: <Code className="w-6 h-6" />,
-    theme: "light"
-  },
+  }
 ];
 
 export const PremiumServices = () => {

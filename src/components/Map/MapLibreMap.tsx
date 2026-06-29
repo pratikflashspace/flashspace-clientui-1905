@@ -238,6 +238,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
         scrollZoom: true,
         dragRotate: false,
         touchZoomRotate: true,
+        attributionControl: false,
       });
 
       // Add navigation controls
@@ -399,46 +400,46 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       let popup: maplibregl.Popup | undefined;
       const popupHTML = `
         <div style="
-          width: 280px;
+          width: 220px;
           font-family: 'Inter', system-ui, -apple-system, sans-serif;
-          border-radius: 24px;
+          border-radius: 16px;
           overflow: hidden;
           background: white;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         ">
-          <div style="position: relative; width: 100%; height: 180px;">
+          <div style="position: relative; width: 100%; height: 120px;">
             <img 
               src="${markerData.image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop'}" 
               alt="${markerData.title || 'Office'}"
               style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"
-              onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80'; this.onerror=null;"
+              onerror="this.src='https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&q=80'; this.onerror=null;"
             />
-            <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 8px;">
+            <div style="position: absolute; top: 8px; right: 8px; display: flex; gap: 6px;">
                <div style="
-                 width: 32px; height: 32px;
+                 width: 24px; height: 24px;
                  background: rgba(255,255,255,0.9);
                  backdrop-filter: blur(4px);
                  border-radius: 50%;
                  display: flex; align-items: center; justify-content: center;
                  cursor: pointer;
-                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
                  transition: transform 0.2s;
                " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                  </svg>
                </div>
                <div style="
-                 width: 32px; height: 32px;
+                 width: 24px; height: 24px;
                  background: rgba(255,255,255,0.9);
                  backdrop-filter: blur(4px);
                  border-radius: 50%;
                  display: flex; align-items: center; justify-content: center;
                  cursor: pointer;
-                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
                  transition: transform 0.2s;
                " onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                    <line x1="12" y1="5" x2="12" y2="19"></line>
                    <line x1="5" y1="12" x2="19" y2="12"></line>
                  </svg>
@@ -446,42 +447,42 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
             </div>
             ${markerData.rating ? `
               <div style="
-                position: absolute; bottom: 12px; left: 12px;
+                position: absolute; bottom: 8px; left: 8px;
                 background: rgba(255,255,255,0.95);
-                padding: 4px 8px; border-radius: 12px;
-                display: flex; align-items: center; gap: 4px;
-                font-size: 12px; font-weight: 500;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                padding: 2px 6px; border-radius: 10px;
+                display: flex; align-items: center; gap: 2px;
+                font-size: 10px; font-weight: 600;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.15);
               ">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="#F1B922" stroke="#F1B922" stroke-width="1">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="#F1B922" stroke="#F1B922" stroke-width="1">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                 </svg>
                 ${markerData.rating}
               </div>
             ` : ''}
           </div>
-          <div style="padding: 16px;">
-            <h3 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 700; color: #1a1a1a; line-height: 1.3;">
+          <div style="padding: 12px;">
+            <h3 style="margin: 0 0 4px 0; font-size: 13px; font-weight: 700; color: #1a1a1a; line-height: 1.2;">
               ${markerData.title || 'Space'}
             </h3>
             ${markerData.address ? `
-              <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 12px; color: #666; font-size: 13px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 10px; color: #666; font-size: 11px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
-                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px;">
                   ${markerData.address}
                 </span>
               </div>
             ` : ''}
             <div style="
               display: flex; align-items: center; justify-content: space-between;
-              padding-top: 12px; border-top: 1px solid #f0f0f0;
+              padding-top: 10px; border-top: 1px solid #f0f0f0;
             ">
               <div>
-                <span style="font-size: 11px; color: #888; display: block;">Starting from</span>
-                <span style="font-size: 16px; font-weight: 700; color: #1a1a1a;">
+                <span style="font-size: 9px; color: #888; display: block;">Starting from</span>
+                <span style="font-size: 13px; font-weight: 700; color: #1a1a1a;">
                   ${markerData.price ? markerData.price.replace(/\/month.*/, '') : 'Ask for Price'}
                 </span>
               </div>
@@ -686,10 +687,6 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
         </div>
       )}
 
-      {/* Attribution badge */}
-      <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-md shadow-sm text-xs text-gray-600 font-medium z-10">
-        🗺️ {MAP_STYLES[currentStyle].name}
-      </div>
     </div>
   );
 };

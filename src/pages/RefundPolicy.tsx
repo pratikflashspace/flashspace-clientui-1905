@@ -5,10 +5,30 @@ import Footer from '@/components/Footer';
 const RefundPolicy = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
+    document.title = "Refund Policy | FlashSpace";
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div id="refund-policy-page" className="min-h-screen bg-white" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <style>{`
+        #refund-policy-page,
+        #refund-policy-page h1, 
+        #refund-policy-page h2, 
+        #refund-policy-page h3, 
+        #refund-policy-page h4, 
+        #refund-policy-page h5, 
+        #refund-policy-page h6,
+        #refund-policy-page p,
+        #refund-policy-page span,
+        #refund-policy-page button,
+        #refund-policy-page input,
+        #refund-policy-page label,
+        #refund-policy-page a,
+        #refund-policy-page li,
+        #refund-policy-page strong {
+          font-family: 'Inter', sans-serif !important;
+        }
+      `}</style>
       <Header />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
         <div className="space-y-12">

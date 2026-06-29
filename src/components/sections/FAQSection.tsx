@@ -13,6 +13,11 @@ interface FaqItem {
 
 const faqs: FaqItem[] = [
     {
+        question: "What is a virtual office and who needs it?",
+        answer: "A virtual office provides a premium business address without the high costs of physical office space. It is perfect for startups, freelancers, remote teams, and businesses expanding to new cities, offering benefits like GST registration, mail handling, and a professional image.",
+        category: "registration",
+    },
+    {
         question: "Are there any hidden charges?",
         answer: "No, FlashSpace believes in transparent pricing. All costs are clearly mentioned upfront — what you see is what you pay. No surprises.",
         category: "pricing",

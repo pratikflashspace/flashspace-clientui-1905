@@ -40,7 +40,7 @@ const TestimonialsSection = () => {
     { name: "Study IQ", logo: "/Logo/StudyIQ.png", needsInvert: false },
     {
       name: "Flipkart",
-      logo: "https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Logo.png",
+      logo: "/newLogo/flipkart-logo-png_seeklogo-284422.png",
       needsInvert: false,
     },
     {
@@ -187,7 +187,7 @@ const TestimonialsSection = () => {
                   <img
                     src={company.logo}
                     alt={company.name}
-                    className="max-w-full max-h-full object-contain"
+                    className={`max-w-full max-h-full object-contain ${company.name === 'Flipkart' ? 'scale-[2]' : ''}`}
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
                       const parent = e.currentTarget.parentElement;

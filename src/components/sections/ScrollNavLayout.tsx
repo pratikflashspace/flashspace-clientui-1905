@@ -5,8 +5,7 @@ import { WorkspacesSection } from "@/components/sections/scroll-sections/Workspa
 import { BusinessSetupSection } from "@/components/sections/scroll-sections/BusinessSetupSection";
 import { GlobalAccessSection } from "@/components/sections/scroll-sections/GlobalAccessSection";
 import { TaxationFilingSection } from "@/components/sections/scroll-sections/TaxationFilingSection";
-import { OneCRMSection } from "@/components/sections/scroll-sections/OneCRMSection";
-import { WebsiteDevelopmentSection } from "@/components/sections/scroll-sections/WebsiteDevelopmentSection";
+import { AddOnSection } from "@/components/sections/scroll-sections/AddOnSection";
 
 type NavItem = {
     id: string;
@@ -17,8 +16,7 @@ const navItems: NavItem[] = [
     { id: "virtual-office", label: "Workspaces" },
     { id: "business-setup", label: "Business Setup" },
     { id: "taxation-filing", label: "Taxation & Filing" },
-    { id: "one-crm", label: "One CRM" },
-    { id: "web-development", label: "Website Development" },
+    { id: "add-on", label: "Add On" },
     { id: "ai-platform", label: "AI Platform" },
 ];
 
@@ -105,8 +103,7 @@ export const ScrollNavLayout = () => {
                         <WorkspacesSection />
                         <BusinessSetupSection />
                         <TaxationFilingSection />
-                        <OneCRMSection />
-                        <WebsiteDevelopmentSection />
+                        <AddOnSection />
                         {/* <GlobalAccessSection /> */}
                         <AISection />
                     </div>

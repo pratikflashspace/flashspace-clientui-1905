@@ -29,7 +29,7 @@ export const FounderTestimonial = () => {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % testimonials.length);
-    }, 5200);
+    }, 4000);
 
     return () => window.clearInterval(timer);
   }, []);

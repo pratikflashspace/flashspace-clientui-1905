@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { GetInTouchModal } from "@/components/modals/GetInTouchModal";
 import {
   Search,
   Star,
@@ -25,8 +26,11 @@ import {
   Phone,
   Flame,
   Map as MapIcon,
-  Loader2,
   CheckCircle,
+  CheckCircle2,
+  BadgeCheck,
+  BadgePercent,
+  Sparkles
 } from "lucide-react";
 import hotToast from "react-hot-toast";
 import { SkeletonCardGrid } from "@/components/ui/skeleton-loaders";
@@ -200,7 +204,7 @@ const CityDropdown = ({
                 <button
                   key={city}
                   onClick={() => { onSelect(city); setOpen(false); }}
-                  className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-accent ${city === activeCity ? "bg-accent/50 font-medium text-primary" : "text-popover-foreground"
+                  className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-[#FEF8CF] hover:text-[#1a2b21] ${city === activeCity ? "bg-[#FEF8CF]/60 font-medium text-primary" : "text-popover-foreground"
                     }`}
                 >
                   {city}
@@ -221,6 +225,61 @@ const CityDropdown = ({
           </button>
         </div>
       )}
+    </div>
+  );
+};
+
+const DiscountBanner = ({ onClick }: { onClick: () => void }) => (
+  <div className="w-full bg-[#F0F5F2] rounded-xl flex items-center justify-between p-4 sm:p-5 mt-4 mb-2 shadow-sm border border-[#E9EFEA]">
+    <div className="flex items-center gap-3 sm:gap-4">
+      <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-white border border-[#E9EFEA] shadow-[0_2px_10px_rgba(0,0,0,0.03)] shrink-0">
+        <BadgePercent className="w-6 h-6 text-[#10B981]" />
+        <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-[#F59E0B] fill-[#F59E0B] animate-pulse" />
+      </div>
+      <div className="flex flex-col">
+        <h4 className="text-[15px] sm:text-[17px] font-bold text-[#1a2b21] mb-0.5" style={{ fontFamily: "'Inter', sans-serif" }}>Looking for the Best Deal?</h4>
+        <p className="text-[12px] sm:text-[14px] text-[#425e4c] font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>Connect with our experts to unlock exclusive pricing.</p>
+      </div>
+    </div>
+    <button onClick={onClick} className="bg-[#36503F] text-[#FEF8C5] px-4 sm:px-6 py-2.5 rounded-[12px] text-[13px] sm:text-[14px] font-semibold hover:bg-[#2A4032] transition-colors whitespace-nowrap shadow-sm">
+      Get Best Price
+    </button>
+  </div>
+);
+
+const WorkspacesFAQ = ({ city, type }: { city: string, type: string }) => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  
+  const typeName = type === "virtual-office" ? "Virtual Office" : type === "coworking" ? "Coworking Space" : "Business Setup";
+  
+  const faqs = [
+    { question: `What is included in the ${typeName} amenities in ${city}?`, answer: `Our ${typeName.toLowerCase()} workspaces in ${city} typically include high-speed Wi-Fi, ergonomic furniture, access to meeting rooms, printing facilities, and complimentary tea/coffee.` },
+    { question: `Can I book a workspace in ${city} for just a few hours?`, answer: `Yes, many of our partner locations in ${city} offer hourly, daily, and weekly passes depending on your requirement.` },
+    { question: `Is parking available at the ${city} locations?`, answer: `Most locations in ${city} offer dedicated or shared parking spaces. Please check the specific workspace details for exact parking availability.` },
+    { question: "How does the pricing and discount work?", answer: "You can lock in the best price directly through FlashSpace. For bulk bookings or long-term commitments, our experts can negotiate additional discounts." },
+  ];
+
+  return (
+    <div className="w-full bg-[#F4F7F5] border-t border-border/40 mt-12 py-16">
+      <div className="fs-container max-w-4xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#1a2b21] mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>Frequently Asked Questions about {typeName} in {city}</h2>
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <div key={index} className="border border-border/60 rounded-xl overflow-hidden bg-white shadow-sm transition-all">
+              <button 
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full px-6 py-4 flex items-center justify-between text-left focus:outline-none hover:bg-muted/30 transition-colors"
+              >
+                <span className="font-semibold text-[#1a2b21] text-[15px]">{faq.question}</span>
+                <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform duration-300 ${openIndex === index ? "rotate-180" : ""}`} />
+              </button>
+              <div className={`px-6 overflow-hidden transition-all duration-300 ease-in-out ${openIndex === index ? "max-h-40 pb-4 opacity-100" : "max-h-0 opacity-0"}`}>
+                <p className="text-muted-foreground text-sm leading-relaxed">{faq.answer}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
@@ -400,10 +459,10 @@ const WorkspaceCard = ({
       return (
         <div
           onClick={type !== "business-setup" ? handleNavigate : undefined}
-          className={`flex gap-4 group bg-card rounded-2xl border border-border/60 p-4 shadow-soft transition-all duration-200 ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
+          className={`flex gap-6 sm:gap-8 group bg-card rounded-2xl border border-border/60 p-4 shadow-soft transition-all duration-200 ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
         >
         {/* Image — fixed size, never shrinks */}
-        <div className="relative w-36 h-auto min-h-[120px] flex-shrink-0 rounded-xl overflow-hidden self-stretch">
+        <div className="relative w-1/3 h-36 sm:h-44 flex-shrink-0 rounded-xl overflow-hidden">
           <img
             src={images[imgIndex]}
             alt={ws.name}
@@ -434,7 +493,7 @@ const WorkspaceCard = ({
         <div className="flex-1 min-w-0 flex flex-col gap-2">
           {/* Name + Rating + Actions */}
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1">
+            <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1" style={{ fontFamily: "'Inter', sans-serif" }}>
               {ws.spaceId || ws.name}
               {ws.address && ` at ${getShortAddress(ws.address)}`}
             </h3>
@@ -489,12 +548,12 @@ const WorkspaceCard = ({
 
           {/* Pricing */}
           <div className="space-y-1">
-            {ws.plans.slice(0, 2).map((plan) => (
-              <div key={plan.label} className="flex items-center gap-3">
+            {ws.plans.map((plan) => (
+              <div key={plan.label} className="flex items-center justify-between gap-3">
                 <span className="text-[11px] text-muted-foreground w-24 flex-shrink-0">
                   {plan.label}
                 </span>
-                <span className="text-xs font-normal text-foreground">
+                <span className="text-xs font-normal text-foreground text-right">
                   {plan.price}
                 </span>
               </div>
@@ -633,7 +692,7 @@ const WorkspaceCard = ({
       <div className="p-4 flex flex-col flex-1">
         {/* Name + Rating */}
         <div className="flex items-center justify-between gap-2">
-          <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1">
+          <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1" style={{ fontFamily: "'Inter', sans-serif" }}>
             {ws.spaceId || ws.name}
             {ws.address && ` at ${getShortAddress(ws.address)}`}
           </h3>
@@ -760,6 +819,21 @@ const GetWorkspaces = () => {
   const [businessPaymentLoading, setBusinessPaymentLoading] = useState(false);
   const [businessTestPaymentLoading, setBusinessTestPaymentLoading] = useState(false);
   const [zoomedCardId, setZoomedCardId] = useState("");
+  const [mapFullscreen, setMapFullscreen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [showExpandMapBtn, setShowExpandMapBtn] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 550) {
+        setShowExpandMapBtn(true);
+      } else {
+        setShowExpandMapBtn(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Handle hash-based zoom for business setup cards (from header navigation)
   useEffect(() => {
@@ -1125,7 +1199,7 @@ const GetWorkspaces = () => {
             
             if (heading === "GST Registration") { 
                imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
-               price = "₹2499 only"; 
+               price = "₹2999 only"; 
                description = "Get your GST number and start invoicing legally across India.";
                features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"];
                timeline = "1-2 days";
@@ -1484,9 +1558,9 @@ const GetWorkspaces = () => {
                   <SelectValue placeholder="Product" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="virtual-office">Virtual Office</SelectItem>
-                  <SelectItem value="coworking">Coworking Space</SelectItem>
-                  <SelectItem value="business-setup">Business Setup</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="virtual-office">Virtual Office</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="coworking">Coworking Space</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="business-setup">Business Setup</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1540,10 +1614,10 @@ const GetWorkspaces = () => {
                   <SelectValue placeholder="Pricing" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Pricing</SelectItem>
-                  <SelectItem value="low">Under ₹5,000</SelectItem>
-                  <SelectItem value="mid">₹5,000 – ₹15,000</SelectItem>
-                  <SelectItem value="high">Above ₹15,000</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="all">All Pricing</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="low">Under ₹5,000</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="mid">₹5,000 – ₹15,000</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="high">Above ₹15,000</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1560,10 +1634,10 @@ const GetWorkspaces = () => {
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
-                  <SelectItem value="popular">Most Popular</SelectItem>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="rating">Highest Rated</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="popular">Most Popular</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="price-low">Price: Low to High</SelectItem>
+                  <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="price-high">Price: High to Low</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1575,7 +1649,7 @@ const GetWorkspaces = () => {
       <div className="hidden lg:flex flex-1 relative fs-container">
         {/* Left: Listings */}
         <div
-          className={`overflow-y-auto bg-muted/20 transition-all duration-300 ease-in-out relative ${(mapCollapsed || workspaceType === "business-setup") ? "w-full" : "w-[58%] border-r border-border/40"}`}
+          className={`bg-muted/20 transition-all duration-300 ease-in-out relative ${workspaceType === "business-setup" ? "w-full" : "w-[65%] border-r border-border/40"}`}
         >
           <div className="py-5 pr-5 sm:pr-8">
             {/* Results text + view toggle */}
@@ -1621,7 +1695,7 @@ const GetWorkspaces = () => {
                   workspaceType === "business-setup"
                     ? "grid gap-6 pb-8 pt-4 px-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                     : viewMode === "grid"
-                      ? `grid gap-4 pb-8 ${mapCollapsed ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
+                      ? "grid gap-4 pb-8 grid-cols-1 min-[700px]:grid-cols-2"
                       : "flex flex-col gap-4 pb-8 max-w-5xl"
                 }
               >
@@ -1633,21 +1707,40 @@ const GetWorkspaces = () => {
                   workspaceType === "business-setup"
                     ? "grid gap-6 pb-8 pt-4 px-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
                     : viewMode === "grid"
-                      ? `grid gap-4 pb-8 ${mapCollapsed ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1 min-[700px]:grid-cols-2"}`
+                      ? "grid gap-4 pb-8 grid-cols-1 min-[700px]:grid-cols-2"
                       : "flex flex-col gap-4 pb-8 max-w-5xl"
                 }
               >
                 {sortedWorkspaces.length > 0 ? (
-                  sortedWorkspaces.map((ws) => (
-                    <WorkspaceCard
-                      key={ws.id}
-                      ws={ws}
-                      view={workspaceType === "business-setup" ? "grid" : viewMode}
-                      type={workspaceType}
-                      onBusinessSetupBuy={setSelectedBusinessSetup}
-                      zoomedCardId={zoomedCardId}
-                      onCardZoom={setZoomedCardId}
-                    />
+                  sortedWorkspaces.map((ws, index) => (
+                    <div key={ws.id} className="contents">
+                      {index === 4 && workspaceType !== "business-setup" && (
+                        <div className="col-span-full py-4 my-2 flex flex-col items-center">
+                          <h3 className="text-[17px] font-semibold text-gray-900 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
+                            5,000+ {workspaceType === "virtual-office" ? "Virtual Office" : "Coworking Space"} clients served
+                          </h3>
+                          <div className="flex justify-between items-center gap-x-2 gap-y-4 opacity-90 transition-all duration-300 border border-border/60 rounded-xl bg-white shadow-sm px-6 sm:px-10 py-5 w-full overflow-hidden">
+                            <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-8 sm:h-12 object-contain shrink-0" />
+                            <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-12 sm:h-16 object-contain shrink-0" />
+                            <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-5 sm:h-7 object-contain shrink-0" />
+                            <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 sm:h-12 object-contain shrink-0" />
+                            <img src="/newLogo/Adda247.png" alt="Adda247" className="h-8 sm:h-12 object-contain shrink-0" />
+                            <img src="/newLogo/growthschool.png" alt="GrowthSchool" className="h-6 sm:h-9 object-contain shrink-0" />
+                          </div>
+                        </div>
+                      )}
+                      <WorkspaceCard
+                        ws={ws}
+                        view={workspaceType === "business-setup" ? "grid" : viewMode}
+                        type={workspaceType}
+                        onBusinessSetupBuy={setSelectedBusinessSetup}
+                        zoomedCardId={zoomedCardId}
+                        onCardZoom={setZoomedCardId}
+                      />
+                      {index === 5 && workspaceType !== "business-setup" && (
+                        <ReviewsCarousel />
+                      )}
+                    </div>
                   ))
                 ) : (
                   <div className="col-span-full py-16 text-center text-muted-foreground">
@@ -1658,27 +1751,36 @@ const GetWorkspaces = () => {
                 )}
               </div>
             )}
+            <DiscountBanner onClick={() => setIsContactOpen(true)} />
           </div>
-          <div className="flex items-center justify-between border-t border-border/40 py-4 pr-5 sm:pr-8 bg-background">
-              <span className="text-xs text-muted-foreground ml-5">
-                  Page {currentPage} of {totalPages}
-              </span>
-              <div className="flex items-center gap-2">
-                  <button
-                      onClick={goPrevPage}
-                      disabled={!pagination?.hasPrevPage}
-                      className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
-                  >
-                      Previous
-                  </button>
-                  <button
-                      onClick={goNextPage}
-                      disabled={!pagination?.hasNextPage}
-                      className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
-                  >
-                      Next
-                  </button>
-              </div>
+          <div className="flex items-center justify-center gap-1.5 border-t border-border/40 py-6 mt-2 bg-background">
+            <button
+                onClick={goPrevPage}
+                disabled={!pagination?.hasPrevPage}
+                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+            >
+                Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                  currentPage === p
+                    ? "bg-[#36503F] text-white"
+                    : "text-foreground hover:bg-muted"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+            <button
+                onClick={goNextPage}
+                disabled={!pagination?.hasNextPage}
+                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+            >
+                Next
+            </button>
           </div>
         </div>
 
@@ -1686,42 +1788,89 @@ const GetWorkspaces = () => {
         {workspaceType !== "business-setup" && (
           <>
             <div
-              className={`transition-all duration-300 ease-in-out relative ${mapCollapsed ? "w-0 overflow-hidden opacity-0" : "w-[42%] opacity-100"}`}
+              className="transition-all duration-300 ease-in-out relative hidden lg:block w-[35%] opacity-100"
             >
-              <div className="sticky top-20 h-[calc(100vh-5.5rem)] m-2 sm:m-4 rounded-xl overflow-hidden shadow-sm border border-border/30">
-                {/* Map toggle — fixed on the map */}
-                <button
-                  onClick={() => setMapCollapsed(!mapCollapsed)}
-                  className="absolute top-4 left-4 z-20 w-9 h-9 rounded-full border border-border bg-card shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 cursor-pointer"
-                  aria-label="Hide map"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-                <MapLibreMap
-                  center={mapCenter}
-                  markers={mapMarkers}
-                  height="100%"
-                  mapStyle="retro"
-                />
+              <div className="sticky top-[88px] h-[calc(100vh-100px)] max-h-[800px] m-2 sm:m-4 flex flex-col gap-3">
+                {/* Map Controls */}
+                <div className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-border/50 shadow-sm shrink-0">
+                  <button 
+                    onClick={() => setMapCollapsed(false)} 
+                    className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${!mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
+                  >
+                    Show Map
+                  </button>
+                  <button 
+                    onClick={() => setMapCollapsed(true)} 
+                    className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
+                  >
+                    Hide Map
+                  </button>
+                  <button 
+                    onClick={() => setMapFullscreen(true)} 
+                    className="flex-1 text-xs font-medium py-1.5 rounded-md text-gray-500 hover:bg-gray-50 transition-colors"
+                  >
+                    Full Map
+                  </button>
+                </div>
+
+                {/* Map Section */}
+                <div className={`relative rounded-xl overflow-hidden shadow-sm border transition-all duration-300 ${mapCollapsed ? "h-0 opacity-0 min-h-0 border-transparent flex-none" : "flex-1 min-h-[300px] border-border/30"}`}>
+                  <MapLibreMap
+                    center={mapCenter}
+                    markers={mapMarkers}
+                    height="100%"
+                    mapStyle="retro"
+                  />
+                </div>
+
+                {/* Consultant Card */}
+                <div className="bg-white rounded-xl p-4 border border-border shadow-[0_4px_20px_rgb(0,0,0,0.05)] flex flex-col overflow-y-auto custom-scrollbar shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  <div>
+                    <h3 className="text-[16px] font-bold text-gray-900 mb-4 leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      Get your Virtual Office in {activeCity} with Premjeet
+                    </h3>
+                    
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                        <img src="/newLogo/premjeet.png" alt="Premjeet" className="w-full h-full object-cover object-top" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-900 text-[15px] leading-tight mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>Premjeet</h4>
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <p className="text-gray-500 text-[13px]">+91 98886 87898</p>
+                          <a href="tel:+919888687898" className="inline-flex items-center justify-center bg-[#36503F] text-white px-3 py-1 rounded-sm text-[11px] font-bold hover:bg-[#2c4133] transition-colors shadow-sm">
+                            Contact Premjeet
+                          </a>
+                        </div>
+                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-[11px] font-bold text-gray-700">
+                          <BadgeCheck className="w-3.5 h-3.5 text-[#36503F]" /> FlashSpace Consultant
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mb-2">
+                      <h5 className="font-bold text-gray-900 text-[13px] mb-2">Premjeet will help you with:</h5>
+                      <div className="grid grid-cols-2 gap-y-2 gap-x-2">
+                        {["Compare Workspaces", "Expert Price Negotiation", "Seamless GST Setup", "Tailored Documentation"].map(item => (
+                          <div key={item} className="flex items-start gap-1.5 text-[11px] sm:text-[12px] text-gray-700 font-medium">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#36503F] shrink-0 mt-0.5" />
+                            <span className="leading-tight">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Floating map button — fixed top-right, below filter bar */}
-            {mapCollapsed && (
-              <button
-                onClick={() => setMapCollapsed(false)}
-                className="fixed top-[184px] right-8 z-30 w-10 h-10 rounded-full border border-border bg-card shadow-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all duration-200 cursor-pointer"
-                aria-label="Show map"
-              >
-                <MapIcon className="w-4.5 h-4.5" />
-              </button>
-            )}
+
           </>
         )}
       </div>
 
       {/* Mobile: full-width listings + expandable map */}
-      <div className="lg:hidden flex-1 relative fs-container">
+      <div className="lg:hidden flex-1 relative fs-container pb-24">
         <div className="py-3">
           {loading ? (
             <div
@@ -1742,14 +1891,32 @@ const GetWorkspaces = () => {
               }
             >
               {sortedWorkspaces.length > 0 ? (
-                sortedWorkspaces.map((ws) => (
-                  <WorkspaceCard
-                    key={ws.id}
-                    ws={ws}
-                    view={viewMode}
-                    type={workspaceType}
-                    onBusinessSetupBuy={setSelectedBusinessSetup}
-                  />
+                sortedWorkspaces.map((ws, index) => (
+                  <div key={ws.id} className="contents">
+                    {index === 4 && workspaceType !== "business-setup" && (
+                      <div className="col-span-full py-4 my-2 flex flex-col items-center">
+                        <h3 className="text-[15px] font-semibold text-gray-900 mb-4 text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
+                          5,000+ {workspaceType === "virtual-office" ? "Virtual Office" : "Coworking Space"} clients served
+                        </h3>
+                        <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-4 opacity-90 border border-border/60 rounded-xl bg-white shadow-sm px-4 py-4 w-full overflow-hidden">
+                          <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-6 object-contain shrink-0" />
+                          <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-10 object-contain shrink-0" />
+                          <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-5 object-contain shrink-0" />
+                          <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 object-contain shrink-0" />
+                          <img src="/newLogo/Adda247.png" alt="Adda247" className="h-8 object-contain shrink-0" />
+                        </div>
+                      </div>
+                    )}
+                    <WorkspaceCard
+                      ws={ws}
+                      view={viewMode}
+                      type={workspaceType}
+                      onBusinessSetupBuy={setSelectedBusinessSetup}
+                    />
+                    {index === 5 && workspaceType !== "business-setup" && (
+                      <ReviewsCarousel />
+                    )}
+                  </div>
                 ))
               ) : (
                 <div className="col-span-2 py-16 text-center text-muted-foreground">
@@ -1763,39 +1930,51 @@ const GetWorkspaces = () => {
               )}
             </div>
           )}
-           <div className="flex items-center justify-between border-t border-border/40 py-4 pb-8 bg-background">
-              <span className="text-xs text-muted-foreground">
-                  Page {currentPage} of {totalPages}
-              </span>
-              <div className="flex items-center gap-2">
-                  <button
-                      onClick={goPrevPage}
-                      disabled={!pagination?.hasPrevPage}
-                      className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
-                  >
-                      Prev
-                  </button>
-                  <button
-                      onClick={goNextPage}
-                      disabled={!pagination?.hasNextPage}
-                      className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
-                  >
-                      Next
-                  </button>
-              </div>
+          <DiscountBanner onClick={() => setIsContactOpen(true)} />
+           <div className="flex items-center justify-center gap-1.5 border-t border-border/40 py-6 pb-10 bg-background">
+            <button
+                onClick={goPrevPage}
+                disabled={!pagination?.hasPrevPage}
+                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+            >
+                Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPage(p)}
+                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors hidden sm:flex ${
+                  currentPage === p
+                    ? "bg-[#36503F] text-white"
+                    : "text-foreground hover:bg-muted"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+            <button
+                onClick={goNextPage}
+                disabled={!pagination?.hasNextPage}
+                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+            >
+                Next
+            </button>
           </div>
         </div>
 
         {/* Expand Map floating button and Map View */}
         {workspaceType !== "business-setup" && (
           <>
-            <button
-              onClick={() => setShowMap(!showMap)}
-              className="fixed bottom-4 right-4 z-40 flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-card border border-border shadow-soft-lg text-xs font-medium text-foreground hover:bg-muted transition-all"
-            >
-              <MapPin className="w-3.5 h-3.5 text-[#35503F]" />
-              {showMap ? "Hide Map" : "Expand Map"}
-            </button>
+            <style>
+              {`
+                @media (max-width: 1024px) {
+                  chat-widget {
+                    bottom: 75px !important;
+                  }
+                }
+              `}
+            </style>
+            {/* Expand map button removed as requested */}
 
             {showMap && (
               <div className="fixed inset-0 z-30 mt-16 bg-background">
@@ -1806,19 +1985,8 @@ const GetWorkspaces = () => {
                   <ChevronRight className="w-3.5 h-3.5 rotate-180" /> Back to list
                 </button>
                 <MapLibreMap
-                  center={useMemo(() => ({
-                    lat: sortedWorkspaces[0]?.lat || workspaces[0]?.lat || 28.6139,
-                    lng: sortedWorkspaces[0]?.lng || workspaces[0]?.lng || 77.209,
-                  }), [sortedWorkspaces, workspaces])}
-                  markers={useMemo(() => sortedWorkspaces.map((ws) => ({
-                    id: ws.id,
-                    position: { lat: ws.lat, lng: ws.lng },
-                    title: ws.spaceId || ws.name,
-                    image: ws.images?.[0] || ws.image,
-                    price: ws.plans?.[0]?.price,
-                    rating: ws.rating,
-                    address: ws.address,
-                  })), [sortedWorkspaces])}
+                  center={mapCenter}
+                  markers={mapMarkers}
                   height="100%"
                   mapStyle="retro"
                 />
@@ -1826,6 +1994,17 @@ const GetWorkspaces = () => {
             )}
           </>
         )}
+
+        {/* Mobile Fixed Bottom Action Bar */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 p-3 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+          <button
+            onClick={() => setIsContactOpen(true)}
+            className="flex-1 bg-[#36503F] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 hover:bg-[#2c4133] transition-colors shadow-sm"
+          >
+            <Phone className="w-4.5 h-4.5" />
+            Request Callback
+          </button>
+        </div>
       </div>
 
       <Dialog
@@ -1981,8 +2160,110 @@ const GetWorkspaces = () => {
           )}
         </DialogContent>
       </Dialog>
+      <Dialog open={mapFullscreen} onOpenChange={setMapFullscreen}>
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] p-0 overflow-hidden flex flex-col rounded-2xl">
+          <DialogHeader className="p-4 border-b sr-only">
+            <DialogTitle>Full Screen Map</DialogTitle>
+            <DialogDescription>View all workspaces on the map.</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 w-full h-full relative">
+            <MapLibreMap
+              center={mapCenter}
+              markers={mapMarkers}
+              height="100%"
+              mapStyle="retro"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Footer / Contact Modal */}
+      <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
+    </div>
+  );
+};
+
+const REVIEWS_DATA = [
+  {
+    text: "Nice space and well mannered staff,really happy 😊",
+    author: "Vijay",
+    avatar: "V",
+    color: "bg-orange-600",
+  },
+  {
+    text: "Co-operative guys...go for them if u need a virtual office.",
+    author: "asadullah jahangir",
+    avatar: "A",
+    color: "bg-blue-500",
+  },
+  {
+    text: "I strongly recommend Virtual Office in delhi for your workspace requirements.",
+    author: "Manoj Gusain",
+    avatar: "M",
+    color: "bg-purple-600",
+  },
+  {
+    text: "It felt smooth and professional from start to finish.",
+    author: "Ashutosh Mishra",
+    avatar: "A",
+    color: "bg-blue-600",
+  }
+];
+
+const ReviewsCarousel = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % REVIEWS_DATA.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const nextReview = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % REVIEWS_DATA.length);
+  };
+
+  const review = REVIEWS_DATA[currentIndex];
+
+  return (
+    <div className="col-span-full my-4 bg-white rounded-lg border border-border shadow-sm p-6 relative overflow-hidden transition-all duration-300">
+      <div className="flex gap-1 mb-3">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+        ))}
+      </div>
+      <div className="flex gap-4 items-start">
+        {review.image ? (
+          <img src={review.image} alt={review.author} className="w-10 h-10 rounded-full object-cover shrink-0 mt-1" />
+        ) : (
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0 mt-1 ${review.color}`}>
+            {review.avatar}
+          </div>
+        )}
+        <div>
+          <p className="text-gray-800 font-medium text-[16px] mb-2 leading-snug" style={{ fontFamily: "'Inter', sans-serif" }}>
+            "{review.text}"
+          </p>
+          {review.author !== review.avatar && (
+            <p className="text-gray-500 text-[13px]">
+              -{review.author}
+            </p>
+          )}
+        </div>
+      </div>
+      <div className="absolute bottom-5 right-5 flex items-center gap-1.5">
+        {REVIEWS_DATA.map((_, idx) => (
+          <div key={idx} className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-gray-600 scale-125' : 'bg-gray-300'}`}></div>
+        ))}
+        <button onClick={nextReview} className="ml-2 w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors border border-gray-200">
+          <ChevronRight className="w-3.5 h-3.5 text-gray-600" />
+        </button>
+      </div>
     </div>
   );
 };
 
 export default GetWorkspaces;
+

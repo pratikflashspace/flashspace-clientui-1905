@@ -58,14 +58,9 @@ const navData = [
         ]
       },
       {
-        title: "Business Tools",
+        title: "Add On",
         items: [
-          { label: "One CRM", href: "/solutions/one-crm" }
-        ]
-      },
-      {
-        title: "Services",
-        items: [
+          { label: "One CRM", href: "/solutions/one-crm" },
           { label: "Website Development", href: "/solutions/website-development" }
         ]
       }
@@ -95,8 +90,7 @@ const MegaMenuDropdown = ({ sections, closeMenu }: { sections: any[], closeMenu?
       case "Workspaces": return <Building2 className={`w-5 h-5 ${color}`} />;
       case "Business Setup": return <Briefcase className={`w-5 h-5 ${color}`} />;
       case "Filing & Taxation": return <FileText className={`w-5 h-5 ${color}`} />;
-      case "Business Tools": return <Wrench className={`w-5 h-5 ${color}`} />;
-      case "Services": return <Code className={`w-5 h-5 ${color}`} />;
+      case "Add On": return <Wrench className={`w-5 h-5 ${color}`} />;
       case "Pricing Plans": return <PieChart className={`w-5 h-5 ${color}`} />;
       case "Company": return <Building2 className={`w-5 h-5 ${color}`} />;
       case "Resources": return <Calculator className={`w-5 h-5 ${color}`} />;

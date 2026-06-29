@@ -1,0 +1,460 @@
+﻿commit b56d5ff26c2ebf4bc6d7f52700c84c54d961e0ac
+Author: imaayushk <kumaraayush327@gmail.com>
+Date:   Wed Jun 24 17:03:00 2026 +0530
+
+    new pages, new header
+
+diff --git a/src/pages/Solutions/virtual-office.tsx b/src/pages/Solutions/virtual-office.tsx
+index 332665d..71c254f 100644
+--- a/src/pages/Solutions/virtual-office.tsx
++++ b/src/pages/Solutions/virtual-office.tsx
+@@ -58,6 +58,9 @@ const aiCapabilities = [
+ ];
+ 
+ const VirtualOffice = () => {
++  useEffect(() => {
++    document.title = "Virtual Office - FlashSpace";
++  }, []);
+   const navigate = useNavigate();
+   const [active, setActive] = useState("features");
+   const [activeSubTab, setActiveSubTab] = useState(0);
+
+commit 6ead3efe44a6f0c13ac7d06a8b563cef1f0f25ec
+Author: imaayushk <kumaraayush327@gmail.com>
+Date:   Mon May 25 18:08:23 2026 +0530
+
+    affiliate functionalities
+
+diff --git a/src/pages/Solutions/virtual-office.tsx b/src/pages/Solutions/virtual-office.tsx
+index 452799b..332665d 100644
+--- a/src/pages/Solutions/virtual-office.tsx
++++ b/src/pages/Solutions/virtual-office.tsx
+@@ -367,8 +367,8 @@ const VirtualOffice = () => {
+       </div>
+ 
+       <div className="flex w-full">
+-        <aside className="hidden lg:block w-[300px] shrink-0">
+-          <nav className="sticky top-[120px] pl-10 pr-[24px] py-12 flex flex-col gap-1">
++        <aside className="hidden lg:block w-[300px] shrink-0">
++          <nav className="sticky top-[120px] pl-[max(2rem,calc((100vw-1280px)/2))] pr-[24px] py-12 flex flex-col gap-1">
+             {sidebarItems.map((n) => {
+               const isActive = active === n.id;
+               return (
+@@ -392,7 +392,7 @@ const VirtualOffice = () => {
+ 
+         <div className="flex-1 min-w-0">
+           <section ref={assignRef("features")} id="features" className="py-12 lg:py-16">
+-            <div className="space-y-10 px-6 lg:px-8">
++            <div className="space-y-10 px-6 lg:pl-8 lg:pr-[max(2rem,calc((100vw-1280px)/2))]">
+               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden">
+                 <img src={featureVirtualOffice} alt="Virtual office space" className="w-full h-[350px] lg:h-[420px] object-cover" />
+                 <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
+@@ -422,7 +422,7 @@ const VirtualOffice = () => {
+                 </Button>
+               </div>
+ 
+-              <div className="grid sm:grid-cols-2 gap-6">
++              <div className="grid sm:grid-cols-2 gap-6 mt-10">
+                 {voFeatures.map((f, i) => (
+                   <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="p-6 rounded-2xl bg-white border border-[#D4E0D0] flex items-start gap-4">
+                     <div className="w-10 h-10 rounded-xl bg-[#F0F4EE] flex items-center justify-center shrink-0">
+@@ -452,7 +452,7 @@ const VirtualOffice = () => {
+           </section>
+ 
+           <section ref={assignRef("ai")} id="ai" className="py-12 lg:py-16 border-t border-border/50">
+-            <div className="space-y-10 px-6 lg:px-8">
++            <div className="space-y-10 px-6 lg:pl-8 lg:pr-[max(2rem,calc((100vw-1280px)/2))]">
+               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden">
+                 <img src={officeIllustrated} alt="AI workspace platform" className="w-full h-[400px] lg:h-[500px] object-cover" />
+                 <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
+
+commit ddb851971e5e334536c77692dcb7043806ed63e8
+Author: imaayushk <kumaraayush327@gmail.com>
+Date:   Thu May 21 18:58:22 2026 +0530
+
+    fixed margins
+
+diff --git a/src/pages/Solutions/virtual-office.tsx b/src/pages/Solutions/virtual-office.tsx
+index d255bdd..452799b 100644
+--- a/src/pages/Solutions/virtual-office.tsx
++++ b/src/pages/Solutions/virtual-office.tsx
+@@ -44,7 +44,7 @@ const sidebarItems = [
+ ];
+ 
+ const voFeatures = [
+-  { icon: MapPin, title: "Premium Business Address", desc: "Get a prestigious address in top business districts across 100+ cities." },
++  { icon: MapPin, title: "Premium Business Address", desc: "Get a prestigious address in top business districts across 20+ states." },
+   { icon: Mail, title: "Mail Handling & Forwarding", desc: "Professional mail management with scanning and forwarding services." },
+   { icon: Phone, title: "Dedicated Phone Line", desc: "Local phone number with call answering and forwarding." },
+   { icon: FileText, title: "GST & Business Registration", desc: "Use your virtual office address for company registration and compliance." },
+@@ -438,7 +438,7 @@ const VirtualOffice = () => {
+ 
+               <div className="flex flex-wrap gap-8 lg:gap-16 pt-8 border-t border-border/50">
+                 {[
+-                  { value: "100+", label: "Cities covered" },
++                  { value: "20+", label: "States covered" },
+                   { value: "Γé╣699", label: "Starting price/month" },
+                   { value: "2-3 days", label: "Activation time" },
+                 ].map((stat) => (
+@@ -596,7 +596,7 @@ const VirtualOffice = () => {
+               {
+                 step: "01",
+                 title: "Choose Your Plan & City",
+-                description: "Select from Business Address, GST Registration, or Mailing Address plans. Pick a premium location across 100+ Indian cities.",
++                description: "Select from Business Address, GST Registration, or Mailing Address plans. Pick a premium location across 20+ Indian states.",
+                 cardTitle: "Business Address & GST Registration",
+                 cardText: "Get a prestigious address in a prime commercial district for company registration, branding, and seamless GST registration ΓÇö with all compliance documentation handled.",
+               },
+
+commit 9534a11df79d1f09604156528344c7958d2945ec
+Author: imaayushk <kumaraayush327@gmail.com>
+Date:   Wed May 20 19:15:01 2026 +0530
+
+    new ui
+
+diff --git a/src/pages/Solutions/virtual-office.tsx b/src/pages/Solutions/virtual-office.tsx
+index 8d12015..d255bdd 100644
+--- a/src/pages/Solutions/virtual-office.tsx
++++ b/src/pages/Solutions/virtual-office.tsx
+@@ -21,14 +21,14 @@ import {
+ } from "lucide-react";
+ import Header from "@/components/Header";
+ import Footer from "@/components/Footer";
+-import { FeatureCTA } from "@/components/sections/FeatureCTA";
++
+ import { Stats } from "@/components/sections/Stats";
+ import { FounderTestimonial } from "@/components/sections/FounderTestimonial";
+ 
+ import { CTA } from "@/components/sections/CTA";
+ 
+-const featureVirtualOffice = "/hero-illustrated.jpg";
+-const officeIllustrated = "/hero-illustrated.jpg";
++const featureVirtualOffice = "/home2.jpg";
++const officeIllustrated = "/home9.png";
+ 
+ const popularCities = ["Ahmedabad", "Bangalore", "Chennai", "Delhi", "Gurgaon", "Hyderabad", "Mumbai", "Noida", "Pune"];
+ const otherCities = ["Agra", "Aluva", "Ambala", "Ambarnath", "Amritsar", "Anand", "Bareja", "Bhagalpur", "Bhilai", "Bhopal", "Bhubaneswar", "Chandigarh", "Coimbatore", "Dehradun", "Dhanbad", "Dharamsala", "Faridabad", "Gandhinagar", "Ghaziabad", "Goa", "Guntur", "Guwahati", "Gwalior", "Haridwar", "Imphal", "Indore", "Jabalpur", "Jaipur", "Jalandhar", "Jammu", "Jamshedpur", "Jodhpur", "Kanpur", "Kochi", "Kolkata", "Lucknow", "Ludhiana", "Meerut", "Mohali", "Mysore", "Nagpur", "Nashik", "Patna", "Raipur", "Rajkot", "Ranchi", "Rohtak", "Surat", "Trivandrum", "Udaipur", "Vadodara", "Vijayawada", "Visakhapatnam"];
+@@ -105,13 +105,13 @@ const VirtualOffice = () => {
+   const currentDescription = subTabs[activeSubTab]?.description || "";
+ 
+   return (
+-    <div className="min-h-screen" style={{ backgroundColor: "#FAFAF7" }}>
++    <div className="min-h-screen" style={{ backgroundColor: "#FAFAF7" }}>
+       <Header />
+ 
+       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-16 overflow-hidden">
+         <div className="relative z-10 mx-auto max-w-3xl text-center px-6">
+           <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="text-4xl sm:text-5xl lg:text-[3.5rem] font-medium text-foreground leading-[1.12] mb-6 tracking-[-0.02em]">
+-            A Professional Business Address, <span className="text-[#36503F] italic">Anywhere in India.</span>
++            A Professional Business Address, <span className="text-[#36503F] italic">Anywhere in India.</span>
+           </motion.h1>
+           <motion.p initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }} className="text-lg text-muted-foreground max-w-[680px] mx-auto mb-10 leading-relaxed">
+             Get a premium business address, mail handling, and compliance support ΓÇö without leasing a physical office.
+@@ -129,8 +129,8 @@ const VirtualOffice = () => {
+                   key={sub.label}
+                   onClick={() => setActiveSubTab(i)}
+                   className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${activeSubTab === i
+-                      ? "border-[#36503F]/30 bg-[#F0F4EE] text-[#36503F]"
+-                      : "border-[#D4E0D0] bg-white text-[#6B8F78] hover:text-[#36503F] hover:border-[#36503F]/30"
++                    ? "border-[#36503F]/30 bg-[#F0F4EE] text-[#36503F]"
++                    : "border-[#D4E0D0] bg-white text-[#6B8F78] hover:text-[#36503F] hover:border-[#36503F]/30"
+                     }`}
+                 >
+                   <sub.icon className="w-4 h-4" />
+@@ -192,8 +192,8 @@ const VirtualOffice = () => {
+                                   <>
+                                     <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Popular Cities</div>
+                                     {filteredPopular.map((city) => (
+-                                      <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-[#F0F4EE] ${city === selectedCity ? "text-[#36503F] font-medium" : "text-foreground"}`}>
+-                                        {city}
++                                      <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-[#F0F4EE] ${city === selectedCity ? "text-[#36503F] font-medium" : "text-foreground"}`}>
++                                        {city}
+                                       </button>
+                                     ))}
+                                   </>
+@@ -202,7 +202,7 @@ const VirtualOffice = () => {
+                                   <>
+                                     <div className="px-4 pt-2.5 pb-1 text-[10px] uppercase tracking-widest text-muted-foreground font-medium border-t border-border/50">All Cities</div>
+                                     {filteredOther.map((city) => (
+-                                      <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-[#F0F4EE] ${city === selectedCity ? "text-[#36503F] font-medium" : "text-foreground"}`}>
++                                      <button key={city} onClick={() => { setSelectedCity(city); setShowCityDropdown(false); }} className={`w-full text-left px-4 py-2 text-sm transition-colors hover:bg-[#F0F4EE] ${city === selectedCity ? "text-[#36503F] font-medium" : "text-foreground"}`}>
+                                         {city}
+                                       </button>
+                                     ))}
+@@ -292,7 +292,7 @@ const VirtualOffice = () => {
+                           setAiMode(true);
+                           setTimeout(() => aiInputRef.current?.focus(), 100);
+                         }}
+-                        className="flex items-center justify-center gap-2 bg-[#FEF8C5] text-[#36503F] px-10 py-3 sm:py-2.5 rounded-xl text-sm font-bold sm:mr-2 hover:bg-[#F7ED9A] transition-colors shrink-0 shadow-sm sm:shadow-none"
++                        className="flex items-center justify-center gap-2 bg-[#36503F] text-[#FEF8C5] px-10 py-3 sm:py-2.5 rounded-xl text-sm font-bold sm:mr-2 hover:bg-[#1F2E26] transition-colors shrink-0 shadow-sm sm:shadow-none"
+                       >
+                         <Sparkles className="w-4 h-4" />
+                         Chat with AI
+@@ -306,12 +306,12 @@ const VirtualOffice = () => {
+                     animate={{ opacity: 1, x: 0 }}
+                     exit={{ opacity: 0, x: 40 }}
+                     transition={{ duration: 0.25 }}
+-                    className="flex flex-col sm:flex-row items-stretch sm:items-center bg-transparent sm:bg-background rounded-none sm:rounded-xl border-0 sm:border sm:border-[#36503F]/40 overflow-visible relative sm:shadow-[0_0_12px_-4px_rgba(54,80,63,0.3)] gap-3 sm:gap-0"
++                    className="flex flex-col sm:flex-row items-stretch sm:items-center bg-transparent sm:bg-background rounded-none sm:rounded-xl border-0 sm:border sm:border-[#36503F]/40 overflow-visible relative sm:shadow-[0_0_12px_-4px_rgba(54,80,63,0.3)] gap-3 sm:gap-0"
+                   >
+-                    <div className="flex items-center bg-background rounded-xl border border-[#36503F]/40 sm:border-0 sm:rounded-none flex-1 shadow-[0_0_12px_-4px_rgba(54,80,63,0.3)] sm:shadow-none">
++                    <div className="flex items-center bg-background rounded-xl border border-[#36503F]/40 sm:border-0 sm:rounded-none flex-1 shadow-[0_0_12px_-4px_rgba(54,80,63,0.3)] sm:shadow-none">
+                       <div className="flex items-center gap-2 px-4 border-r border-border shrink-0">
+-                        <Sparkles className="w-4 h-4 text-[#36503F]" />
+-                        <span className="text-sm font-medium text-[#36503F] py-3.5">AI</span>
++                        <Sparkles className="w-4 h-4 text-[#36503F]" />
++                        <span className="text-sm font-medium text-[#36503F] py-3.5">AI</span>
+                       </div>
+                       <input
+                         ref={aiInputRef}
+@@ -337,7 +337,7 @@ const VirtualOffice = () => {
+                       <button
+                         onClick={() => { if (aiQuery.trim()) navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`); }}
+                         disabled={!aiQuery.trim()}
+-                        className="flex items-center justify-center gap-2 bg-[#FEF8C5] text-[#36503F] px-5 py-3 sm:py-2.5 rounded-xl text-sm font-bold sm:mr-2 hover:bg-[#F7ED9A] transition-colors shrink-0 disabled:opacity-40 shadow-sm sm:shadow-none"
++                        className="flex items-center justify-center gap-2 bg-[#36503F] text-[#FEF8C5] px-5 py-3 sm:py-2.5 rounded-xl text-sm font-bold sm:mr-2 hover:bg-[#1F2E26] transition-colors shrink-0 disabled:opacity-40 shadow-sm sm:shadow-none"
+                       >
+                         <Search className="w-4 h-4" />
+                         Ask AI
+@@ -395,13 +395,13 @@ const VirtualOffice = () => {
+             <div className="space-y-10 px-6 lg:px-8">
+               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden">
+                 <img src={featureVirtualOffice} alt="Virtual office space" className="w-full h-[350px] lg:h-[420px] object-cover" />
+-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
++                <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
+                 <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
+-                  <span className="text-white/75 text-sm font-semibold uppercase tracking-wider mb-2 block">Virtual Office</span>
++                  <span className="text-[#FEF8C5]/90 text-sm font-semibold uppercase tracking-wider mb-2 block">Virtual Office</span>
+                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
+                     A Professional Business Address,
+                     <br />
+-                    <span className="text-white/70">Anywhere in India.</span>
++                    <span className="text-[#FEF8C5]">Anywhere in India.</span>
+                   </h2>
+                 </div>
+               </motion.div>
+@@ -414,7 +414,7 @@ const VirtualOffice = () => {
+                 <Button
+                   variant="outline"
+                   size="lg"
+-                  className="group border-[#36503F]/30 text-[#36503F] hover:bg-[#F0F4EE] font-semibold"
++                  className="group bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] font-bold border-none"
+                   onClick={() => navigate("/services/virtual-office")}
+                 >
+                   Explore Virtual Offices
+@@ -424,9 +424,9 @@ const VirtualOffice = () => {
+ 
+               <div className="grid sm:grid-cols-2 gap-6">
+                 {voFeatures.map((f, i) => (
+-                  <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="p-6 rounded-2xl bg-white border border-[#D4E0D0] flex items-start gap-4">
+-                    <div className="w-10 h-10 rounded-xl bg-[#F0F4EE] flex items-center justify-center shrink-0">
+-                      <f.icon className="w-5 h-5 text-[#36503F]" />
++                  <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="p-6 rounded-2xl bg-white border border-[#D4E0D0] flex items-start gap-4">
++                    <div className="w-10 h-10 rounded-xl bg-[#F0F4EE] flex items-center justify-center shrink-0">
++                      <f.icon className="w-5 h-5 text-[#36503F]" />
+                     </div>
+                     <div>
+                       <h4 className="font-semibold text-foreground mb-1">{f.title}</h4>
+@@ -440,7 +440,7 @@ const VirtualOffice = () => {
+                 {[
+                   { value: "100+", label: "Cities covered" },
+                   { value: "Γé╣699", label: "Starting price/month" },
+-                   { value: "2-3 days", label: "Activation time" },
++                  { value: "2-3 days", label: "Activation time" },
+                 ].map((stat) => (
+                   <div key={stat.label}>
+                     <div className="text-2xl lg:text-3xl font-bold text-foreground tracking-tight">{stat.value}</div>
+@@ -455,16 +455,16 @@ const VirtualOffice = () => {
+             <div className="space-y-10 px-6 lg:px-8">
+               <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden">
+                 <img src={officeIllustrated} alt="AI workspace platform" className="w-full h-[400px] lg:h-[500px] object-cover" />
+-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
++                <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" />
+                 <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12">
+-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-4">
+-                    <Sparkles className="w-4 h-4 text-secondary-foreground" />
+-                    <span className="text-white/90 text-sm font-medium">AI-Powered</span>
++                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-4">
++                    <Sparkles className="w-4 h-4 text-[#FEF8C5]" />
++                    <span className="text-[#FEF8C5] text-sm font-medium">AI-Powered</span>
+                   </div>
+                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
+                     Flash, The #1 AI
+                     <br />
+-                    <span className="text-white/70">for End to End Business Solutions.</span>
++                    <span className="text-[#FEF8C5]">for End to End Business Solutions.</span>
+                   </h2>
+                 </div>
+               </motion.div>
+@@ -476,25 +476,25 @@ const VirtualOffice = () => {
+                     to intelligent forecasting for renewals, smart recommendation engines, and beyond. One platform. End-to-end
+                     intelligence.
+                   </p>
+-                  <Button
+-                    variant="outline"
+-                    size="lg"
+-                    className="group border-[#36503F]/30 text-[#36503F] hover:bg-[#F0F4EE] font-semibold"
+-                    onClick={() => navigate("/start-chatting")}
+-                  >
+-                    Learn more
+-                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+-                  </Button>
++                  <Button
++                    variant="outline"
++                    size="lg"
++                    className="group bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] font-bold border-none"
++                    onClick={() => navigate("/start-chatting")}
++                  >
++                    Learn more
++                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
++                  </Button>
+                 </div>
+                 <div>
+-                  <div className="text-sm text-[#36503F] uppercase tracking-wider mb-4 font-semibold">Capabilities</div>
++                  <div className="text-sm text-[#36503F] uppercase tracking-wider mb-4 font-semibold">Capabilities</div>
+                   <h3 className="text-xl lg:text-2xl font-medium text-foreground mb-6 tracking-tight">Built to handle the most complex requirements.</h3>
+                   <div className="flex flex-wrap gap-2">
+                     {aiCapabilities.map((cap) => (
+-                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[#36503F] text-[#FEF8C5] shadow-sm cursor-default">
+-                        <cap.icon className="w-4 h-4" />
+-                        {cap.label}
+-                      </div>
++                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[#36503F] text-[#FEF8C5] shadow-sm cursor-default">
++                        <cap.icon className="w-4 h-4" />
++                        {cap.label}
++                      </div>
+                     ))}
+                   </div>
+                 </div>
+@@ -505,17 +505,17 @@ const VirtualOffice = () => {
+                   <div className="lg:col-span-2 p-6 border-r border-border">
+                     <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
+                       <div className="flex items-center gap-3">
+-                        <div className="w-10 h-10 rounded-full bg-[#36503F] flex items-center justify-center text-white font-bold">AP</div>
++                        <div className="w-10 h-10 rounded-full bg-[#36503F] flex items-center justify-center text-white font-bold">AP</div>
+                         <div>
+                           <span className="font-semibold text-foreground block">Amit Patel</span>
+                           <span className="text-xs text-muted-foreground">Mumbai HQ ΓÇó Virtual Office</span>
+                         </div>
+                       </div>
+-                      <span className="text-xs px-2 py-1 bg-[#F0F4EE] text-[#36503F] rounded-full font-medium">Γ£ô Active</span>
++                      <span className="text-xs px-2 py-1 bg-[#F0F4EE] text-[#36503F] rounded-full font-medium">Γ£ô Active</span>
+                     </div>
+                     <div className="space-y-4">
+                       <div className="flex gap-3">
+-                        <div className="w-8 h-8 rounded-full bg-[#36503F] flex-shrink-0" />
++                        <div className="w-8 h-8 rounded-full bg-[#36503F] flex-shrink-0" />
+                         <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm">
+                           <p className="text-sm text-foreground">Hi, I need to check the status of my GST registration. Can you help?</p>
+                         </div>
+@@ -525,10 +525,10 @@ const VirtualOffice = () => {
+                         <span className="text-xs text-muted-foreground">1m ago</span>
+                       </div>
+                       <div className="flex gap-3 justify-end">
+-                        <div className="bg-[#F0F4EE] border border-[#D4E0D0] rounded-2xl rounded-tr-sm px-4 py-3 max-w-md">
++                        <div className="bg-[#F0F4EE] border border-[#D4E0D0] rounded-2xl rounded-tr-sm px-4 py-3 max-w-md">
+                           <div className="flex items-center gap-2 mb-2">
+-                            <Bot className="w-4 h-4 text-[#36503F]" />
+-                            <span className="text-xs font-semibold text-[#36503F]">Flash AI</span>
++                            <Bot className="w-4 h-4 text-[#36503F]" />
++                            <span className="text-xs font-semibold text-[#36503F]">Flash AI</span>
+                           </div>
+                           <p className="text-sm text-foreground">Your GST registration is in progress. Documentation was submitted on Feb 18. Expected approval in 2-3 business days. I&apos;ll notify you once it&apos;s done.</p>
+                         </div>
+@@ -537,13 +537,13 @@ const VirtualOffice = () => {
+                   </div>
+                   <div className="p-6 bg-muted/30">
+                     <div className="flex items-center gap-4 mb-6">
+-                      <button className="text-sm font-semibold text-foreground border-b-2 border-[#36503F] pb-1">Details</button>
++                      <button className="text-sm font-semibold text-foreground border-b-2 border-[#36503F] pb-1">Details</button>
+                       <button className="text-sm text-muted-foreground font-medium">AI Assist</button>
+                     </div>
+                     <div className="space-y-4">
+-                      <div className="p-4 bg-[#F0F4EE] border border-[#D4E0D0] rounded-xl">
++                      <div className="p-4 bg-[#F0F4EE] border border-[#D4E0D0] rounded-xl">
+                         <div className="flex items-center gap-2 mb-2">
+-                          <MessageSquare className="w-4 h-4 text-[#36503F]" />
++                          <MessageSquare className="w-4 h-4 text-[#36503F]" />
+                           <h4 className="font-semibold text-foreground">Compliance Status</h4>
+                         </div>
+                         <p className="text-sm text-muted-foreground">GST registration in progress. All documents verified.</p>
+@@ -580,9 +580,9 @@ const VirtualOffice = () => {
+       <section className="py-20 lg:py-32 border-t border-border/50">
+         <div className="max-w-5xl mx-auto px-6 lg:px-8">
+           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20">
+-            <span className="text-sm font-semibold text-[#36503F] uppercase tracking-widest mb-3 block">How it works</span>
++            <span className="text-sm font-semibold text-[#36503F] uppercase tracking-widest mb-3 block">How it works</span>
+             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground tracking-tight leading-tight">
+-              Get started in <span className="text-[#36503F] italic">4 simple steps.</span>
++              Get started in <span className="text-[#36503F] italic">4 simple steps.</span>
+             </h2>
+             <p className="text-lg text-muted-foreground mt-4 max-w-xl mx-auto">
+               From choosing your plan to going live ΓÇö we handle the complexity so you can focus on your business.
+@@ -631,7 +631,7 @@ const VirtualOffice = () => {
+                 className={`relative flex flex-col lg:flex-row gap-8 lg:gap-16 mb-20 last:mb-0 ${index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
+                   }`}
+               >
+-                <div className="absolute left-6 lg:left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#36503F] text-white flex items-center justify-center text-sm font-bold z-10 shadow-lg shadow-[#36503F]/20">
++                <div className="absolute left-6 lg:left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-[#36503F] text-white flex items-center justify-center text-sm font-bold z-10 shadow-lg shadow-[#36503F]/20">
+                   {item.step}
+                 </div>
+ 
+@@ -650,7 +650,7 @@ const VirtualOffice = () => {
+                     whileInView={{ opacity: 1, x: 0 }}
+                     viewport={{ once: true }}
+                     transition={{ delay: 0.2 }}
+-                    className="p-5 rounded-2xl bg-white border border-[#D4E0D0] hover:border-[#36503F]/30 transition-colors"
++                    className="p-5 rounded-2xl bg-white border border-[#D4E0D0] hover:border-[#36503F]/30 transition-colors"
+                   >
+                     <h4 className="font-semibold text-foreground mb-1.5">{item.cardTitle}</h4>
+                     <p className="text-sm text-muted-foreground leading-relaxed">{item.cardText}</p>
+@@ -663,10 +663,10 @@ const VirtualOffice = () => {
+           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mt-20 pt-12 border-t border-border/50">
+             <h3 className="text-2xl font-bold text-foreground mb-3 tracking-tight">Ready to get started?</h3>
+             <p className="text-muted-foreground mb-6">Set up your virtual office in under 48 hours.</p>
+-            <Button 
+-              size="lg" 
+-              className="bg-[#FEF8C5] hover:bg-[#F7ED9A] text-[#36503F] font-bold px-8 rounded-xl"
+-              onClick={() => navigate("/services/virtual-office")}
++            <Button
++              size="lg"
++              className="bg-[#36503F] hover:bg-[#1F2E26] text-[#FEF8C5] font-bold px-8 rounded-xl border-none"
++              onClick={() => navigate("/services/virtual-office")}
+             >
+               Get Started Now
+               <ArrowUpRight className="w-4 h-4 ml-1" />
+@@ -675,7 +675,7 @@ const VirtualOffice = () => {
+         </div>
+       </section>
+ 
+-      <FeatureCTA />
++
+       <Stats />
+       <FounderTestimonial />
+ 
+
+commit c4db2676f68048cea911adfba90548074cfca5e3
+Author: imaayushk <kumaraayush327@gmail.com>
+Date:   Wed May 20 15:23:05 2026 +0530
+
+    new ui
+
+diff --git a/src/pages/Solutions/virtual-office.tsx b/src/pages/Solutions/virtual-office.tsx
+index 317b21f..8d12015 100644
+--- a/src/pages/Solutions/virtual-office.tsx
++++ b/src/pages/Solutions/virtual-office.tsx
+@@ -491,10 +491,10 @@ const VirtualOffice = () => {
+                   <h3 className="text-xl lg:text-2xl font-medium text-foreground mb-6 tracking-tight">Built to handle the most complex requirements.</h3>
+                   <div className="flex flex-wrap gap-2">
+                     {aiCapabilities.map((cap) => (
+-                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[#FEF8C5] text-[#36503F] shadow-sm cursor-default">
+-                        <cap.icon className="w-4 h-4" />
+-                        {cap.label}
+-                      </div>
++                      <div key={cap.id} className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-[#36503F] text-[#FEF8C5] shadow-sm cursor-default">
++                        <cap.icon className="w-4 h-4" />
++                        {cap.label}
++                      </div>
+                     ))}
+                   </div>
+                 </div>

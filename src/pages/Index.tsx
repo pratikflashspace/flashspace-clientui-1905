@@ -14,6 +14,7 @@ import { PricingSection } from "@/components/sections/PricingSection";
 import { PlanComparison } from "@/components/sections/PlanComparison";
 import Footer from "@/components/Footer";
 import { TrustedByFilmstrip } from "@/components/sections/TrustedByFilmstrip";
+import { TrustedByFilmstripMobile } from "@/components/sections/TrustedByFilmstripMobile";
 import { motion, AnimatePresence } from "framer-motion";
 import { ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -100,7 +101,7 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
           <MetricsOverview />
         </FadeInSection>
         <div className="block lg:hidden">
-          <TrustedByFilmstrip />
+          <TrustedByFilmstripMobile />
         </div>
         <FadeInSection>
           <FounderTestimonial />
@@ -112,6 +113,7 @@ const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
         <FadeInSection>
           <CTA />
         </FadeInSection>
+
 
 
 
