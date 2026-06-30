@@ -932,7 +932,6 @@
   /* More opaque thumb */
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
 }
 
 /* Scrollbar hover utility - prevents layout shift */

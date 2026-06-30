@@ -1,46 +1,8 @@
-import React, { useRef, useCallback } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { Leaf, Star, Gem, Crown, Check, Minus, Tag, Zap, IndianRupee } from "lucide-react";
 
 export const PlanComparison = () => {
-  // Universal drag-to-scroll for desktop
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeftPos = useRef(0);
-
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    isDragging.current = true;
-    startX.current = e.pageX - (scrollRef.current?.offsetLeft || 0);
-    scrollLeftPos.current = scrollRef.current?.scrollLeft || 0;
-    if (scrollRef.current) {
-      scrollRef.current.style.cursor = 'grabbing';
-      scrollRef.current.style.userSelect = 'none';
-    }
-  }, []);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!isDragging.current || !scrollRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX.current) * 1.5;
-    scrollRef.current.scrollLeft = scrollLeftPos.current - walk;
-  }, []);
-
-  const handleMouseUp = useCallback(() => {
-    isDragging.current = false;
-    if (scrollRef.current) {
-      scrollRef.current.style.cursor = 'grab';
-      scrollRef.current.style.userSelect = '';
-    }
-  }, []);
-
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-      window.scrollBy({ top: e.deltaY });
-    }
-  }, []);
-
   const plans = [
     {
       name: "BASIC",
@@ -142,16 +104,7 @@ export const PlanComparison = () => {
         </div>
 
         {/* Comparison Table Wrapper */}
-        <div 
-          ref={scrollRef}
-          className="relative mt-8 w-full overflow-x-scroll pb-6 pt-5 custom-scrollbar"
-          style={{ cursor: 'grab', touchAction: 'pan-x pan-y', WebkitOverflowScrolling: 'touch' }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onWheel={handleWheel}
-        >
+        <div className="relative mt-8 w-full overflow-x-auto pb-6 pt-5 custom-scrollbar">
           <div className="min-w-[900px] relative">
             {/* Badge outside to prevent overflow hidden clipping */}
             <div 
