@@ -296,12 +296,15 @@ export const ExpertsSection = () => {
                 </div>
               </div>
 
-              <a 
-                href="tel:+919888687898" 
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                }}
                 className="text-[#36503F] font-bold text-lg flex items-center gap-2 hover:gap-3 transition-all w-max"
               >
                 Request Callback <ArrowRight className="w-5 h-5" />
-              </a>
+              </button>
             </div>
 
             {/* Right side: Expert Photos */}

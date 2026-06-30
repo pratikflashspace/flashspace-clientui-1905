@@ -2,29 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Leaf, Star, Gem, Crown, Check, Minus, Tag, Zap, IndianRupee } from "lucide-react";
 
-import { useState, useEffect } from "react";
 export const PlanComparison = () => {
-  const [hoveredColumnState, setHoveredColumnState] = useState<number | null>(null);
-  const [hoveredRowState, setHoveredRowState] = useState<string | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  const setHoveredColumn = (val: number | null) => {
-    if (!isMobile) setHoveredColumnState(val);
-  };
-
-  const setHoveredRow = (val: string | null) => {
-    if (!isMobile) setHoveredRowState(val);
-  };
-
-  const hoveredColumn = isMobile ? null : hoveredColumnState;
-  const hoveredRow = isMobile ? null : hoveredRowState;
   const plans = [
     {
       name: "BASIC",
@@ -126,7 +104,7 @@ export const PlanComparison = () => {
         </div>
 
         {/* Comparison Table Wrapper */}
-        <div className="relative mt-8 overflow-x-auto pb-6 pt-5 -mx-4 px-4 lg:mx-0 lg:px-0 lg:overflow-visible custom-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="relative mt-8 w-full overflow-x-auto overflow-y-hidden pb-6 pt-5 custom-scrollbar">
           <div className="min-w-[900px] relative">
             {/* Badge outside to prevent overflow hidden clipping */}
             <div 
@@ -143,7 +121,7 @@ export const PlanComparison = () => {
             <div className="absolute top-[-2px] bottom-[-2px] w-[18.52%] border-[2px] border-[#FDE047] rounded-xl shadow-[0_0_20px_rgba(253,224,71,0.4)] pointer-events-none z-30 transition-all duration-300" style={{ left: '62.96%' }}></div>
             
             {/* Header Row */}
-            <div className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-gray-200 transition-all duration-300 ${hoveredRow === "market" ? "scale-[1.02] z-50 shadow-md relative bg-white rounded-lg" : ""}`}>
+            <div className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-gray-200 transition-all duration-300 hover:scale-[1.02] hover:z-50 hover:shadow-md hover:relative hover:bg-white hover:rounded-lg`}>
               {/* Top Left Header */}
               <div className="bg-[#36503F] text-white p-5 lg:p-6 flex flex-col justify-center rounded-tl-xl relative z-20 ">
                 <div className="w-12 h-12 border border-[#FEF8CF] rounded-full flex items-center justify-center mb-4 text-[#FEF8CF] shrink-0">
@@ -160,7 +138,7 @@ export const PlanComparison = () => {
               {plans.map((plan, i) => (
                 <div
                   key={i}
-                  className={`p-5 lg:p-6 flex flex-col items-center justify-center text-center relative transition-colors duration-300 cursor-default rounded-t-xl ${plans[i].highlight ? (hoveredColumn === i ? "bg-gray-300" : "bg-gray-100") : (hoveredColumn === i ? "bg-gray-100" : "bg-white")} z-20`} onMouseEnter={() => setHoveredColumn(i)} onMouseLeave={() => setHoveredColumn(null)}
+                  className={`p-5 lg:p-6 flex flex-col items-center justify-center text-center relative cursor-default rounded-t-xl ${plans[i].highlight ? "bg-gray-100" : "bg-white"} z-20`}
                 >
                   <div className={`w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center mb-4 shrink-0 transition-transform duration-300 hover:rotate-12 ${plans[i].highlight ? 'bg-[#36503F] text-[#FEF8CF] border-none shadow-md' : 'text-[#36503F]'}`}>
                     {plan.icon}
@@ -174,8 +152,8 @@ export const PlanComparison = () => {
           {/* Pricing Rows */}
           
           {/* Market Price Row */}
-          <div className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-gray-200 transition-all duration-300 ${hoveredRow === "market_price" ? "scale-[1.02] z-50 shadow-md relative bg-white rounded-lg" : ""}`}>
-            <div className="p-6 flex items-center justify-between border-r border-gray-100 bg-[#36503F]" onMouseEnter={() => setHoveredRow("market_price")} onMouseLeave={() => setHoveredRow(null)}>
+          <div className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-gray-200 transition-all duration-300 hover:scale-[1.02] hover:z-50 hover:shadow-md hover:relative hover:bg-white hover:rounded-lg`}>
+            <div className="p-6 flex items-center justify-between border-r border-gray-100 bg-[#36503F]">
               <div className="flex items-center gap-3">
                 <Tag className="w-4 h-4 text-gray-400" />
                 <div>
@@ -193,8 +171,8 @@ export const PlanComparison = () => {
           </div>
 
           {/* Our Price Row */}
-          <div className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-[#FEF8CF] bg-[#FEF8CF] transition-all duration-300 ${hoveredRow === "our_price" ? "scale-[1.02] z-50 shadow-md relative rounded-lg" : ""}`}>
-            <div className="p-6 flex items-center gap-3 border-r border-[#FEF8CF] bg-[#FEF8CF]" onMouseEnter={() => setHoveredRow("our_price")} onMouseLeave={() => setHoveredRow(null)}>
+          <div className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-[#FEF8CF] bg-[#FEF8CF] transition-all duration-300 hover:scale-[1.02] hover:z-50 hover:shadow-md hover:relative hover:rounded-lg`}>
+            <div className="p-6 flex items-center gap-3 border-r border-[#FEF8CF] bg-[#FEF8CF]">
               <Tag className="w-4 h-4 text-[#36503F]" />
               <div>
                 <div className="text-xs font-bold tracking-wider text-[#36503F]">OUR PRICE</div>
@@ -210,8 +188,8 @@ export const PlanComparison = () => {
           </div>
 
           {/* You Save Row */}
-          <div className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-gray-200 transition-all duration-300 ${hoveredRow === "save" ? "scale-[1.02] z-50 shadow-md relative bg-white rounded-lg" : ""}`}>
-            <div className={`p-6 flex items-center gap-3 border-r border-gray-100 transition-colors duration-300 ${hoveredColumn === -1 ? "bg-gray-100" : "bg-white"}`} onMouseEnter={() => { setHoveredColumn(-1); setHoveredRow("save"); }} onMouseLeave={() => { setHoveredColumn(null); setHoveredRow(null); }}>
+          <div className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-gray-200 transition-all duration-300 hover:scale-[1.02] hover:z-50 hover:shadow-md hover:relative hover:bg-white hover:rounded-lg`}>
+            <div className="p-6 flex items-center gap-3 border-r border-gray-100 bg-white">
               <Tag className="w-4 h-4 text-[#36503F]" />
               <div>
                 <div className="text-xs font-bold tracking-wider text-[#36503F]">YOU SAVE</div>
@@ -219,7 +197,7 @@ export const PlanComparison = () => {
               </div>
             </div>
             {plans.map((plan, i) => (
-              <div key={i} className={`p-6 flex items-center justify-center border-r border-gray-100 last:border-r-0 transition-colors duration-300 ${plans[i].highlight ? (hoveredColumn === i ? "bg-gray-300" : "bg-gray-100") : (hoveredColumn === i ? "bg-gray-100" : "")}`} onMouseEnter={() => setHoveredColumn(i)} onMouseLeave={() => setHoveredColumn(null)}>
+              <div key={i} className={`p-6 flex items-center justify-center border-r border-gray-100 last:border-r-0 ${plans[i].highlight ? "bg-gray-100" : ""}`}>
                 <span className={`font-sans text-lg text-[#36503F]`}>{plan.savings}</span>
                 {/* <span className={`text-xs ml-1 ${(activeCol === i) ? 'text-[#FEF8CF]/70' : 'text-gray-500'}`}>/month ({plan.savingsPct})</span> */}
               </div>
@@ -233,8 +211,8 @@ export const PlanComparison = () => {
 
           {/* Feature Rows */}
           {features.map((feature, idx) => (
-            <div key={idx} className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-gray-200 last:border-b-0 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"} transition-all duration-300 ${hoveredRow === `feature-${idx}` ? "scale-[1.02] z-50 shadow-md relative bg-white rounded-lg" : ""}`}>
-              <div className={`p-5 flex items-center gap-3 border-r border-gray-100 transition-colors duration-300 ${hoveredColumn === -1 ? "bg-gray-100" : ""}`} onMouseEnter={() => { setHoveredColumn(-1); setHoveredRow(`feature-${idx}`); }} onMouseLeave={() => { setHoveredColumn(null); setHoveredRow(null); }}>
+            <div key={idx} className={`grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] border-b border-gray-200 last:border-b-0 ${idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"} transition-all duration-300 hover:scale-[1.02] hover:z-50 hover:shadow-md hover:relative hover:bg-white hover:rounded-lg`}>
+              <div className="p-5 flex items-center gap-3 border-r border-gray-100">
                 <div className="w-5 h-5 flex items-center justify-center text-gray-400">
                   <Zap className="w-4 h-4" />
                 </div>
@@ -248,7 +226,7 @@ export const PlanComparison = () => {
                 )}
               </div>
               {feature.availability.map((isAvailable, i) => (
-                <div key={i} className={`p-5 flex items-center justify-center border-r border-gray-100 last:border-r-0 transition-colors duration-300 ${plans[i].highlight ? (hoveredColumn === i ? "bg-gray-300" : "bg-gray-100") : (hoveredColumn === i ? "bg-gray-100" : "")}`} onMouseEnter={() => setHoveredColumn(i)} onMouseLeave={() => setHoveredColumn(null)}>
+                <div key={i} className={`p-5 flex items-center justify-center border-r border-gray-100 last:border-r-0 ${plans[i].highlight ? "bg-gray-100" : ""}`}>
                   {isAvailable ? (
                     <div className="w-5 h-5 rounded-full bg-[#36503F] flex items-center justify-center text-white">
                       <Check className="w-3 h-3" strokeWidth={3} />
@@ -263,9 +241,9 @@ export const PlanComparison = () => {
 
                     {/* Action Row */}
           <div className="grid grid-cols-[1.4fr_1fr_1fr_1fr_1fr] bg-white border-t border-gray-200">
-            <div className={`p-6 border-r border-gray-100 transition-colors duration-300 ${hoveredColumn === -1 ? "bg-gray-100" : "bg-white"}`} onMouseEnter={() => setHoveredColumn(-1)} onMouseLeave={() => setHoveredColumn(null)}></div>
+            <div className="p-6 border-r border-gray-100 bg-white"></div>
             {plans.map((plan, i) => (
-              <div key={i} className={`p-6 flex items-center justify-center border-r border-gray-100 last:border-r-0 transition-colors duration-300 ${plans[i].highlight ? (hoveredColumn === i ? "bg-gray-300" : "bg-gray-100") : (hoveredColumn === i ? "bg-gray-100" : "")}`} onMouseEnter={() => setHoveredColumn(i)} onMouseLeave={() => setHoveredColumn(null)}>
+              <div key={i} className={`p-6 flex items-center justify-center border-r border-gray-100 last:border-r-0 ${plans[i].highlight ? "bg-gray-100" : ""}`}>
                 <button 
                   onClick={() => window.location.href = `/packages/${plan.name.toLowerCase()}`}
                   className={`w-full py-3 px-4 rounded-sm text-xs font-bold tracking-wider transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${
