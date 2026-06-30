@@ -27,7 +27,7 @@ interface HeaderProps {
 const navData = [
   {
     label: "Solutions",
-    isMegaMenu: true,
+    isMegaMenu: true, 
     sections: [
       {
         title: "Workspaces",
