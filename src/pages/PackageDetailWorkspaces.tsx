@@ -247,7 +247,7 @@ const DiscountBanner = ({ onClick }: { onClick: () => void }) => (
   </div>
 );
 
-export const WorkspacesFAQ = ({ city, type }: { city: string, type: string }) => {
+const WorkspacesFAQ = ({ city, type }: { city: string, type: string }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   
   const typeName = type === "virtual-office" ? "Virtual Office" : type === "coworking" ? "Coworking Space" : "Business Setup";

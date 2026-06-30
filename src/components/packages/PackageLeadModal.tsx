@@ -21,13 +21,15 @@ interface PackageLeadModalProps {
   onClose: () => void;
   planName: string;
   planKey: string;
+  spaceId?: string;
 }
 
 export const PackageLeadModal = ({
   isOpen,
   onClose,
   planName,
-  planKey
+  planKey,
+  spaceId
 }: PackageLeadModalProps) => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -85,6 +87,7 @@ export const PackageLeadModal = ({
             source: 'pricing_flow',
             planName,
             planKey,
+            spaceId,
             timestamp: new Date().toISOString(),
           },
         }, {
@@ -100,13 +103,17 @@ export const PackageLeadModal = ({
       onClose();
 
       // Ensure user is authenticated before checkout
+      const redirectUrl = spaceId 
+        ? `/package-checkout?plan=${planKey}&spaceId=${spaceId}` 
+        : `/package-checkout?plan=${planKey}`;
+
       if (!isAuthenticated) {
         hotToast('Please login to continue your purchase', { icon: '🔒' });
-        navigate(`/auth/login?redirect=/package-checkout?plan=${planKey}`);
+        navigate(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
         return;
       }
 
-      navigate(`/package-checkout?plan=${planKey}`);
+      navigate(redirectUrl);
     } catch (error: any) {
       console.error('Failed to process:', error);
       hotToast.error('Something went wrong. Please try again.');

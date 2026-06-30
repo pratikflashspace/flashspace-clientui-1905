@@ -6,6 +6,8 @@ import { PricingSection } from "@/components/sections/PricingSection";
 import { CheckCircle2, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import { PackageLeadModal } from "@/components/packages/PackageLeadModal";
+import { PackageWorkspaces } from "@/components/packages/PackageWorkspaces";
+import { WorkspacesFAQ } from "@/pages/services/GetWorkspaces";
 
 const allFeatures = [
   { name: "Virtual office", plans: ["basic", "pro", "premium", "elite"], description: "Establish a professional business address without the need for physical space. Ideal for remote teams and startups." },
@@ -22,6 +24,7 @@ export default function PackageDetail() {
   const location = useLocation();
   const plan = planId?.toLowerCase() || "";
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSpaceId, setSelectedSpaceId] = useState<string>("");
 
   useEffect(() => {
     if (location.hash) {
@@ -99,16 +102,26 @@ export default function PackageDetail() {
                   </motion.div>
                 ))}
               </div>
-
-              <div className="mt-14 text-center relative z-10">
-                <button 
-                  onClick={() => setIsModalOpen(true)}
-                  className="bg-[#36503F] hover:bg-[#1F2E26] text-[#FEF8C5] px-10 py-4 rounded-full font-bold tracking-widest text-sm transition-all duration-300 shadow-[0_8px_20px_rgba(54,80,63,0.2)] hover:shadow-[0_10px_25px_rgba(54,80,63,0.3)] hover:-translate-y-1"
-                >
-                  PROCEED TO CHECKOUT
-                </button>
-              </div>
             </div>
+          </div>
+        </section>
+
+        {/* New City & Space Selection Section */}
+        <PackageWorkspaces 
+          planName={plan.toUpperCase()} 
+          onSelectSpace={(spaceId) => {
+            setSelectedSpaceId(spaceId);
+            setIsModalOpen(true);
+          }} 
+        />
+
+        {/* FAQs */}
+        <section className="bg-white py-16">
+          <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
+            <h2 className="text-3xl font-bold text-center text-[#36503F] mb-12" style={{ fontFamily: "'Inter', sans-serif" }}>
+              Frequently Asked Questions
+            </h2>
+            <WorkspacesFAQ city="your selected city" type="virtual-office" />
           </div>
         </section>
       </main>
@@ -118,6 +131,7 @@ export default function PackageDetail() {
         onClose={() => setIsModalOpen(false)}
         planName={plan.toUpperCase()}
         planKey={plan}
+        spaceId={selectedSpaceId}
       />
 
       <Footer />
