@@ -1129,7 +1129,7 @@ const GetWorkspacesV2 = () => {
   };
   const [pricingFilter, setPricingFilter] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const [showMap, setShowMap] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(false);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
