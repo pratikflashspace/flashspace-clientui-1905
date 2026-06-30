@@ -147,6 +147,12 @@ const VirtualOfficeAds = () => {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const rawBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
@@ -171,6 +177,7 @@ const VirtualOfficeAds = () => {
       if (data.ok || res.ok) {
         toast.success("Thank you! Our workspace expert will call you within 15 minutes.");
         setFormData({ name: "", phone: "", email: "", city: "" });
+        navigate("/thank-you");
       } else {
         toast.error(data.message || "Something went wrong. Please try again.");
       }
