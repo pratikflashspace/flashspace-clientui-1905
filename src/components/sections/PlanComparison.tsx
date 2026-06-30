@@ -104,11 +104,11 @@ export const PlanComparison = () => {
         </div>
 
         {/* Comparison Table Wrapper */}
-        <div className="relative mt-8 w-full overflow-x-auto pb-6 pt-5 custom-scrollbar">
+        <div className="relative mt-8 w-full overflow-x-auto lg:overflow-visible pb-6 pt-5 custom-scrollbar">
           <div className="min-w-[900px] relative">
             {/* Badge outside to prevent overflow hidden clipping */}
             <div 
-              className="absolute top-0 bg-[#36503F] text-[#FEF8CF] text-[10px] font-bold px-4 py-1.5 rounded-full tracking-wider uppercase shadow-md whitespace-nowrap z-40 border border-[#36503F]"
+              className="absolute top-0 bg-[#36503F] text-[#FEF8CF] text-[10px] font-bold px-4 py-1.5 rounded-full tracking-wider uppercase shadow-md whitespace-nowrap z-[60] border border-[#36503F]"
               style={{ left: '72.22%', transform: 'translate(-50%, -50%)' }}
             >
               Most Popular
