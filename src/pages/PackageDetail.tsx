@@ -24,10 +24,9 @@ export default function PackageDetail() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (location.hash) {
+    if (location.state && (location.state as any).scrollToIncluded) {
       setTimeout(() => {
-        const id = location.hash.replace('#', '');
-        const element = document.getElementById(id);
+        const element = document.getElementById('whats-included');
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
         }
@@ -35,7 +34,7 @@ export default function PackageDetail() {
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [location.pathname, location.hash]);
+  }, [location.pathname, location.state]);
 
   useEffect(() => {
     document.title = `${plan.toUpperCase()} Package — FlashSpace`;

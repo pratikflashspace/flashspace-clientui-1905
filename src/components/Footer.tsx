@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useScrollAnimation, getAnimationClasses } from "@/hooks/use-scroll-animation";
 import { cn } from "@/lib/utils";
+import { FooterSEO } from "./FooterSEO";
 
 const footerLinks = {
   solutions: [
@@ -28,7 +29,8 @@ const Footer = () => {
   const isVisible = useScrollAnimation("footer");
 
   return (
-    <footer id="footer" className="bg-[#1F2E26] text-white border-t border-[#FEF8C5]/25 overflow-hidden">
+    <>
+      <footer id="footer" className="bg-[#1F2E26] text-white border-t border-[#FEF8C5]/25 overflow-hidden">
       {/* Links Section */}
       <div className={cn(
         "container mx-auto px-4 sm:px-6 py-12 sm:py-16",
@@ -145,13 +147,12 @@ const Footer = () => {
               <Link to="/terms" className="hover:text-white transition-colors">Legal</Link>
               <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             </div>
-            <p className="text-[9px] sm:text-[10px] font-bold text-white uppercase tracking-[0.2em] sm:tracking-[0.3em]">
-              © {currentYear} Stirring Minds Services Private Limited.
-            </p>
           </div>
         </div>
       </div>
     </footer>
+      <FooterSEO />
+    </>
   );
 };
 

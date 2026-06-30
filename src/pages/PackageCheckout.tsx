@@ -175,8 +175,8 @@ const PackageCheckout = () => {
                     <ArrowLeft className="w-4 h-4" /> Back to Packages
                 </button>
 
-                <h1 className="text-3xl font-bold text-[#1F2E26] mb-1">Complete Your Purchase</h1>
-                <p className="text-muted-foreground mb-8 text-sm">
+                <h1 className="text-3xl font-bold text-[#1F2E26] mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>Complete Your Purchase</h1>
+                <p className="text-muted-foreground mb-8 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
                     You are purchasing the <span className="font-medium text-[#36503F]">{planKey.toUpperCase()}</span> package.
                 </p>
 
@@ -277,8 +277,8 @@ const PackageCheckout = () => {
 
                                 <div className="flex items-end justify-between">
                                     <div>
-                                        <p className="text-xs text-[#677E73] uppercase tracking-wider font-bold mb-1">Total Amount</p>
-                                        <p className="text-4xl font-serif text-[#36503F]">{formatCurrency(finalTotal)}</p>
+                                        <p className="text-xs text-[#677E73] uppercase tracking-wider font-bold mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>Total Amount</p>
+                                        <p className="text-4xl font-bold text-[#36503F] tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>{formatCurrency(finalTotal)}</p>
                                     </div>
                                 </div>
 
