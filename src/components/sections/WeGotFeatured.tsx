@@ -34,10 +34,10 @@ const LogoTextCard = ({ logo, index }: { logo: LogoItem; index: number }) => {
           <img
             src={logo.src}
             alt={logo.name}
-            className={`${logo.customImageClass || "h-7 sm:h-12"} w-auto object-contain md:grayscale opacity-100 md:opacity-70 md:group-hover:grayscale-0 md:group-hover:opacity-100 group-hover:scale-110 transition-all duration-300`}
+            className={`${logo.customImageClass || "h-7 sm:h-12"} w-auto object-contain opacity-100 group-hover:scale-110 transition-all duration-300`}
           />
         ) : (
-          <span className={`${logo.styleClass} text-[#1A1A1A] md:text-gray-400 md:group-hover:text-[#1A1A1A] group-hover:scale-110 transition-all duration-300 whitespace-nowrap`}>
+          <span className={`${logo.styleClass} text-[#1A1A1A] group-hover:scale-110 transition-all duration-300 whitespace-nowrap`}>
             {logo.name}
           </span>
         )}

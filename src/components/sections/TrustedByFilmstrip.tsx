@@ -11,37 +11,37 @@ const clientLogos: LogoItem[] = [
   {
     name: "Agrizy",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/agrizy_vpn5mj.png",
-    className: "h-24 sm:h-24",
+    className: "h-32 sm:h-24",
   },
   {
     name: "Adda247",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/Adda247_bbmaft.png",
-    className: "h-32 sm:h-16",
+    className: "h-36 sm:h-16",
   },
   {
     name: "Flipkart",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/Flipkart-Logo_uzked4.png",
-    className: "h-32 sm:h-20",
+    src: "/newLogo/flipkart-logo-png_seeklogo-284422.png",
+    className: "h-40 sm:h-24",
   },
   {
     name: "Growth School",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/growthschool_-_Copy_iip2zr.png",
-    className: "h-24 sm:h-12",
+    className: "h-28 sm:h-12",
   },
   {
     name: "Plum",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/plum_logo_lstdop.png",
-    className: "h-24 sm:h-14",
+    className: "h-28 sm:h-14",
   },
   {
     name: "Study IQ",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/study_iq_xdxdkd.png",
-    className: "h-20 sm:h-18",
+    className: "h-28 sm:h-18",
   },
   {
     name: "Truly Madly",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/truly_madly_b78smk.png",
-    className: "h-24 sm:h-20",
+    className: "h-36 sm:h-20",
   },
 ];
 
@@ -55,7 +55,7 @@ const LogoCard = ({ logo, index }: { logo: LogoItem; index: number }) => {
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: index * 0.05, duration: 0.4 }}
-      className="group relative flex shrink-0 items-center justify-center cursor-pointer min-w-[340px] sm:min-w-[220px] px-2 sm:px-10"
+      className="group relative flex shrink-0 items-center justify-center cursor-pointer min-w-[280px] sm:min-w-[220px] px-2 sm:px-10"
     >
       {/* Glassmorphic background card */}
       <div
@@ -144,16 +144,7 @@ export const TrustedByFilmstrip = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative py-8 overflow-hidden bg-[#FAFAF7]"
-    >
-
-      {/* Section Heading */}
-      <div className="text-center mb-8 px-4 relative z-10 md:hidden">
-        <h2 className="text-[24px] md:text-[36px] font-bold tracking-[-0.02em] text-[#1A1A1A]">
-          Trusted by Elite
-        </h2>
-      </div>
-
+      className="relative py-8 overflow-hidden bg-[#FAFAF7] hidden md:block">
       {/* Logo scroll rows */}
       <div className="relative z-10 fs-container space-y-2 sm:space-y-3 overflow-hidden">
         {/* Smooth gradient fades on edges */}
@@ -167,57 +158,24 @@ export const TrustedByFilmstrip = () => {
         />
 
         {/* Desktop Scrolling Animation */}
-        <div className="hidden md:block">
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <ScrollRow logos={row1Logos} speed={0.4} />
-          </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <ScrollRow logos={row1Logos} speed={0.4} />
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <ScrollRow logos={row2Logos} speed={0.4} reverse />
-          </motion.div>
-        </div>
-
-        {/* Mobile Static Collage */}
-        <div className="md:hidden grid grid-cols-2 justify-items-center items-center gap-x-6 gap-y-8 px-4 py-4">
-          {clientLogos.map((logo, index) => {
-            // Individually tune mobile heights to perfectly balance wide vs square logos
-            let mobileHeight = "h-[48px]";
-            if (logo.name === "Agrizy") mobileHeight = "h-[64px]";
-            if (logo.name === "Adda247") mobileHeight = "h-[56px]";
-            if (logo.name === "Flipkart") mobileHeight = "h-[56px]";
-            if (logo.name === "Growth School") mobileHeight = "h-[32px]";
-            if (logo.name === "Plum") mobileHeight = "h-[36px]";
-            if (logo.name === "Study IQ") mobileHeight = "h-[48px]";
-            if (logo.name === "Truly Madly") mobileHeight = "h-[48px]";
-
-            return (
-              <motion.div
-                key={logo.name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ delay: index * 0.08, duration: 0.5, ease: "easeOut" }}
-                className={`flex items-center justify-center w-full ${
-                  index === clientLogos.length - 1 && clientLogos.length % 2 !== 0 ? 'col-span-2' : ''
-                }`}
-              >
-                <img
-                  src={logo.src}
-                  alt={logo.name}
-                  className={`${mobileHeight} w-auto max-w-full object-contain brightness-105 contrast-[1.1] transition-all duration-300`}
-                />
-              </motion.div>
-            );
-          })}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          <ScrollRow logos={row2Logos} speed={0.4} reverse />
+        </motion.div>
       </div>
+
+
 
 
     </section>

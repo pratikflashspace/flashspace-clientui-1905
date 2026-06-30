@@ -64,7 +64,9 @@ export const FloatingAiButton = () => {
           
           // Mobile visibility
           const pastHero = window.scrollY > window.innerHeight * 0.7;
-          setShowMobileFlashAi(pastHero);
+          const isVirtualOfficePage = window.location.pathname.toLowerCase().includes('virtual-office');
+          const isCoworkingPage = window.location.pathname.toLowerCase().includes('coworking-space');
+          setShowMobileFlashAi(pastHero && !isVirtualOfficePage && !isCoworkingPage);
           enforceGHLPosition();
 
           if (buttonRef.current) {
@@ -130,7 +132,12 @@ export const FloatingAiButton = () => {
     };
   }, []);
 
-  if (location.pathname === "/start-chatting" || location.pathname.includes("payment")) {
+  if (
+    location.pathname === "/start-chatting" || 
+    location.pathname.includes("payment") ||
+    location.pathname.toLowerCase().includes("virtual-office") ||
+    location.pathname.toLowerCase().includes("coworking-space")
+  ) {
     return null;
   }
 

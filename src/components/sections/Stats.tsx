@@ -61,7 +61,7 @@ export const Stats = () => {
             <div
               className="text-[16px] sm:text-[18px] font-bold leading-none text-[#36503F] md:text-[40px]"
               style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 transitionDelay: `${index * 90}ms`,
               }}
             >
