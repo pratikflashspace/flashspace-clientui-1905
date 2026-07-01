@@ -227,11 +227,15 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     const container = mapContainer.current;
 
     try {
+      // Validate center coordinates
+      const validLng = center && typeof center.lng === 'number' && !isNaN(center.lng) ? center.lng : 77.2090;
+      const validLat = center && typeof center.lat === 'number' && !isNaN(center.lat) ? center.lat : 28.6139;
+
       // Create map instance
       map.current = new maplibregl.Map({
         container: container,
         style: MAP_STYLES[currentStyle].url,
-        center: [center.lng, center.lat],
+        center: [validLng, validLat],
         zoom: zoom,
         minZoom: 4, // Never show whole world
         maxZoom: 20,
@@ -318,8 +322,11 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
   useEffect(() => {
     if (!map.current || !isLoaded) return;
 
+    const validLng = center && typeof center.lng === 'number' && !isNaN(center.lng) ? center.lng : 77.2090;
+    const validLat = center && typeof center.lat === 'number' && !isNaN(center.lat) ? center.lat : 28.6139;
+
     map.current.flyTo({
-      center: [center.lng, center.lat],
+      center: [validLng, validLat],
       zoom: zoom,
       essential: true,
     });
@@ -361,6 +368,12 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     // Add new markers
     markers.forEach((markerData, index) => {
       if (!map.current) return;
+
+      const mLat = markerData.position?.lat;
+      const mLng = markerData.position?.lng;
+      if (typeof mLat !== 'number' || isNaN(mLat) || typeof mLng !== 'number' || isNaN(mLng)) {
+        return;
+      }
 
       const el = document.createElement('div');
       el.className = 'custom-marker';
@@ -587,13 +600,20 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       if (bounds) {
         safeFitBounds(() => {
           map.current!.fitBounds(
-            [[bounds.sw.lng, bounds.sw.lat], [bounds.ne.lng, bounds.ne.lat]],
+            [
+              [bounds.sw?.lng ?? 77.2090, bounds.sw?.lat ?? 28.6139], 
+              [bounds.ne?.lng ?? 77.2090, bounds.ne?.lat ?? 28.6139]
+            ],
             { padding: { top: 70, bottom: 50, left: 50, right: 50 }, maxZoom: 16.5, duration: 1200 }
           );
         });
       } else if (focusMarkers.length > 0) {
         const focusBounds = new maplibregl.LngLatBounds();
-        focusMarkers.forEach(m => focusBounds.extend([m.position.lng, m.position.lat]));
+        focusMarkers.forEach(m => {
+          if (m?.position?.lng != null && m?.position?.lat != null && !isNaN(m.position.lng) && !isNaN(m.position.lat)) {
+            focusBounds.extend([m.position.lng, m.position.lat]);
+          }
+        });
 
         safeFitBounds(() => {
           map.current!.fitBounds(focusBounds, {
@@ -604,7 +624,11 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
         });
       } else if (markers.length > 0 && markers.length < 50 && !bounds) {
         const markerBounds = new maplibregl.LngLatBounds();
-        markers.forEach(m => markerBounds.extend([m.position.lng, m.position.lat]));
+        markers.forEach(m => {
+          if (m?.position?.lng != null && m?.position?.lat != null && !isNaN(m.position.lng) && !isNaN(m.position.lat)) {
+            markerBounds.extend([m.position.lng, m.position.lat]);
+          }
+        });
 
         safeFitBounds(() => {
           map.current!.fitBounds(markerBounds, {
@@ -617,7 +641,9 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           // focus back on the center point instead.
           const currentZoom = map.current?.getZoom() || 0;
           if (currentZoom < 6) {
-            map.current?.flyTo({ center: [center.lng, center.lat], zoom: 11, duration: 1000 });
+            const validLng = center && typeof center.lng === 'number' && !isNaN(center.lng) ? center.lng : 77.2090;
+            const validLat = center && typeof center.lat === 'number' && !isNaN(center.lat) ? center.lat : 28.6139;
+            map.current?.flyTo({ center: [validLng, validLat], zoom: 11, duration: 1000 });
           }
         });
       }

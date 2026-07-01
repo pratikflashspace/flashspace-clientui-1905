@@ -21,7 +21,7 @@ export const BusinessSetupSection = () => {
                     <img
                         src={featureBusinessSetup}
                         alt="Business setup services"
-                        className="w-full h-[350px] lg:h-[420px] object-cover"
+                        className="w-full h-[220px] sm:h-[260px] lg:h-[320px] object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1F2E26]/90 via-[#1F2E26]/40 to-transparent" style={{ fontFamily: "'Inter', sans-serif" }} />
                     <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 lg:p-12" style={{ fontFamily: "'Inter', sans-serif" }}>

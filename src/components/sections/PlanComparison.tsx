@@ -103,8 +103,8 @@ export const PlanComparison = () => {
           <div className="w-12 h-[2px] bg-[#FEF8CF] mx-auto mt-6"></div>
         </div>
 
-        {/* Comparison Table Wrapper */}
-        <div className="relative mt-8 w-full overflow-x-auto lg:overflow-visible pb-6 pt-5 custom-scrollbar">
+        {/* Desktop Comparison Table (Hidden on Mobile) */}
+        <div className="hidden lg:block relative mt-8 w-full overflow-visible pb-6 pt-5">
           <div className="min-w-[900px] relative">
             {/* Badge outside to prevent overflow hidden clipping */}
             <div 
@@ -281,6 +281,63 @@ export const PlanComparison = () => {
           </div>
         </div>
 
+        {/* Mobile Plan Cards (Hidden on Desktop) */}
+        <div className="lg:hidden mt-8 flex flex-col gap-6 pb-8">
+          {plans.map((plan, planIdx) => (
+            <div key={plan.name} className={`bg-white rounded-2xl p-6 border ${plan.highlight ? 'border-[#FDE047] shadow-[0_0_20px_rgba(253,224,71,0.25)] relative' : 'border-gray-200'}`}>
+              {plan.highlight && (
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#36503F] text-[#FEF8CF] text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-wider whitespace-nowrap shadow-sm">
+                  Most Popular
+                </div>
+              )}
+              
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-12 h-12 rounded-full bg-[#36503F] text-[#FEF8CF] flex items-center justify-center shrink-0">
+                  {plan.icon}
+                </div>
+                <div>
+                  <h4 className="font-bold text-xl text-[#36503F] tracking-tight">{plan.name}</h4>
+                  <p className="text-xs text-gray-500 whitespace-pre-line leading-relaxed mt-0.5">{plan.subtitle}</p>
+                </div>
+              </div>
+
+              <div className="mb-6 bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <div className="flex items-end gap-2 mb-1.5">
+                  <span className="text-3xl font-black text-[#1A1A1A]">{plan.ourPrice}</span>
+                  <span className="text-sm text-gray-400 line-through mb-1.5">{plan.marketPrice}</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 text-green-700 bg-green-100/80 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wide">
+                  <Tag className="w-3.5 h-3.5" />
+                  Save {plan.savings} ({plan.savingsPct})
+                </div>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">What's included</div>
+                {features.map((feature, featIdx) => (
+                  <div key={feature.name} className={`flex items-start gap-3 ${!feature.availability[planIdx] ? 'opacity-50' : ''}`}>
+                    {feature.availability[planIdx] ? (
+                      <div className="w-5 h-5 rounded-full bg-[#36503F] text-white flex items-center justify-center shrink-0 mt-0.5">
+                        <Check className="w-3 h-3" strokeWidth={3} />
+                      </div>
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-gray-200 text-gray-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <Minus className="w-3 h-3" strokeWidth={3} />
+                      </div>
+                    )}
+                    <span className={`text-sm leading-tight pt-0.5 ${feature.availability[planIdx] ? 'text-gray-800 font-medium' : 'text-gray-400'}`}>
+                      {feature.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <button className={`w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] ${plan.highlight ? 'bg-[#FEF8CF] text-[#36503F] hover:bg-[#F2E8C0] border-2 border-[#D6C560]' : 'bg-[#36503F] text-[#FEF8CF] hover:bg-[#1F2E26]'}`}>
+                Get {plan.name}
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
