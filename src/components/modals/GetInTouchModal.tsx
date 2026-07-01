@@ -58,6 +58,10 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+            (window as any).fbq('track', 'Contact');
+        }
 
         // Basic 10-digit validation
         const phoneRegex = /^[0-9]{10}$/;
