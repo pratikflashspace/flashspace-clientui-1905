@@ -61,7 +61,7 @@ export const PremiumServices = () => {
           <div className="relative mb-6">
 
 
-            <h2 className="text-[56px] leading-[1.1] font-bold mt-10 mb-6 tracking-tight">
+            <h2 className="text-4xl sm:text-[44px] md:text-[56px] leading-[1.1] font-bold mt-10 mb-6 tracking-tight">
               <span className="text-black">Premium Services </span>
               <span className="text-[#36503F]">Real Impact</span>
             </h2>

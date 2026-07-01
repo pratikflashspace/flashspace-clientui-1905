@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Headphones, TrendingUp, Handshake, Mail, Phone } from "lucide-react";
 import { createContactForm } from "@/Api/contactForm.service";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface GetInTouchModalProps {
     open: boolean;
@@ -42,6 +43,7 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (open) {
@@ -56,11 +58,22 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (typeof window !== 'undefined' && (window as any).fbq) {
+            (window as any).fbq('track', 'Contact');
+        }
 
         // Basic 10-digit validation
         const phoneRegex = /^[0-9]{10}$/;
         if (!phoneRegex.test(phone)) {
             toast.error("Please enter a valid 10-digit mobile number.");
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            toast.error("Please enter a valid email address.");
             return;
         }
 
@@ -96,6 +109,7 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                 setName("");
                 setPhone("");
                 setEmail("");
+                navigate("/thank-you");
             } else {
                 toast.error(data.message || "Something went wrong. Please try again.");
             }
@@ -193,7 +207,7 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                                         <input
                                             type="text"
                                             value={name}
-                                            onChange={(e) => setName(e.target.value)}
+                                            onChange={(e) => setName(e.target.value.replace(/[0-9]/g, ''))}
                                             placeholder="Name*"
                                             className="w-full px-5 py-4 rounded-xl border-2 border-border/60 bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm group-hover:border-primary/30"
                                             required
@@ -204,7 +218,8 @@ export const GetInTouchModal = ({ open, onClose }: GetInTouchModalProps) => {
                                         <input
                                             type="tel"
                                             value={phone}
-                                            onChange={(e) => setPhone(e.target.value)}
+                                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                                            maxLength={10}
                                             placeholder="Mobile number*"
                                             className="w-full px-5 py-4 rounded-xl border-2 border-border/60 bg-background text-foreground text-sm placeholder:text-muted-foreground outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm group-hover:border-primary/30"
                                             required

@@ -136,22 +136,24 @@ export const HeroWithSearch = () => {
               </div>
             ) : (
               <div className="flex flex-col gap-2.5 sm:flex-row">
-                <label className="flex h-10 md:h-12 flex-1 items-center gap-2 md:gap-3 rounded-lg border border-[#36503F] bg-white px-3 md:px-4 focus-within:bg-[#F0F4EE] transition-all">
-                  <Sparkles className="h-3.5 w-3.5 md:h-4 md:w-4 text-[#36503F]" />
-                  <input
-                    value={aiQuery}
-                    onChange={(event) => setAiQuery(event.target.value)}
-                    onKeyDown={(event) => event.key === "Enter" && aiQuery.trim() && navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`)}
-                    placeholder="Ask about spaces, plans, GST..."
-                    className="w-full bg-transparent text-xs md:text-sm text-[#1A1A1A] outline-none border-none border-transparent focus:border-transparent focus:ring-0 focus:outline-none focus:shadow-none shadow-none placeholder:text-[#6B8F78]"
-                    autoFocus
-                  />
-                </label>
+                <div className="relative flex-1">
+                  <label className="flex h-10 md:h-12 items-center gap-2 md:gap-3 rounded-lg border border-[#36503F] bg-white px-3 md:px-4 focus-within:bg-[#F0F4EE] transition-all">
+                    <Sparkles className="h-3.5 w-3.5 md:h-4 md:w-4 text-[#36503F]" />
+                    <input
+                      value={aiQuery}
+                      onChange={(event) => setAiQuery(event.target.value)}
+                      onKeyDown={(event) => event.key === "Enter" && aiQuery.trim() && navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`)}
+                      placeholder="Ask about spaces, plans, GST..."
+                      className="w-full bg-transparent text-xs md:text-sm text-[#1A1A1A] outline-none border-none border-transparent focus:border-transparent focus:ring-0 focus:outline-none focus:shadow-none shadow-none placeholder:text-[#6B8F78]"
+                      autoFocus
+                    />
+                  </label>
+                </div>
                 <div className="flex gap-2 w-full sm:w-auto">
-                  <button onClick={() => { setAiMode(false); setAiQuery(""); }} className="h-10 md:h-12 flex-1 sm:flex-none rounded-lg border border-[#36503F]/20 bg-white px-4 text-xs md:text-sm font-semibold text-[#36503F] hover:bg-[#F0F4EE] transition-colors whitespace-nowrap">
+                  <button onClick={() => { setAiMode(false); setAiQuery(""); }} className="inline-flex items-center justify-center h-10 md:h-12 flex-1 sm:flex-none rounded-lg border border-[#36503F]/20 bg-white px-4 text-xs md:text-sm font-semibold text-[#36503F] hover:bg-[#F0F4EE] transition-colors whitespace-nowrap">
                     Cancel
                   </button>
-                  <button onClick={() => aiQuery.trim() && navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`)} className="flex-1 sm:flex-none h-10 md:h-12 px-4 md:px-5 py-0 whitespace-nowrap text-xs md:text-sm rounded-lg font-semibold bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-colors shadow-sm">
+                  <button onClick={() => aiQuery.trim() && navigate(`/start-chatting?q=${encodeURIComponent(aiQuery.trim())}`)} className="inline-flex items-center justify-center flex-1 sm:flex-none h-10 md:h-12 px-4 md:px-5 py-0 whitespace-nowrap text-xs md:text-sm rounded-lg font-semibold bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] transition-colors shadow-sm">
                     Ask
                   </button>
                 </div>

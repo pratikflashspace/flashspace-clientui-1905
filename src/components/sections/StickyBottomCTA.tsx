@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { GetInTouchModal } from "@/components/modals/GetInTouchModal";
 
 export const StickyBottomCTA = () => {
@@ -9,6 +10,7 @@ export const StickyBottomCTA = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", city: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,10 +35,19 @@ export const StickyBottomCTA = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Contact');
+    }
 
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(formData.phone)) {
       toast.error("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
       return;
     }
 
@@ -65,6 +76,7 @@ export const StickyBottomCTA = () => {
         toast.success("Thank you! Our workspace expert will call you within 15 minutes.");
         setFormData({ name: "", phone: "", email: "", city: "" });
         setIsVisible(false); // Optionally hide it after success
+        navigate("/thank-you");
       } else {
         toast.error(data.message || "Something went wrong. Please try again.");
       }

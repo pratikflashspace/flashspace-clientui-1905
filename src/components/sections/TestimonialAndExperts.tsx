@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { 
   Building2, Mail, Briefcase, Users, Clock, 
   IndianRupee, PhoneForwarded, Landmark, ArrowRight, Quote, Star, Check, ShieldCheck, Loader2
@@ -80,13 +82,60 @@ export const TestimonialSection = () => {
     city: ''
   });
 
+  const navigate = useNavigate();
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Contact');
+    }
+
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      toast.error("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log("Form submitted:", formData);
-    setIsSubmitting(false);
-    setFormData({ name: '', phone: '', email: '', city: '' });
+    try {
+      const rawBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
+      const base = rawBase.replace(/\/$/, "");
+
+      const res = await fetch(`${base}/api/leads`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "flashspace123",
+          "x-flashspace-csrf": "true",
+        },
+        body: JSON.stringify({
+          ...formData,
+          source: "Virtual Office Testimonial Section",
+          page: window.location.href,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.ok || res.ok) {
+        toast.success("Thank you! Our workspace expert will call you within 15 minutes.");
+        setFormData({ name: "", phone: "", email: "", city: "" });
+        navigate("/thank-you");
+      } else {
+        toast.error(data.message || "Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Server error. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -296,12 +345,15 @@ export const ExpertsSection = () => {
                 </div>
               </div>
 
-              <a 
-                href="tel:+919888687898" 
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                }}
                 className="text-[#36503F] font-bold text-lg flex items-center gap-2 hover:gap-3 transition-all w-max"
               >
                 Request Callback <ArrowRight className="w-5 h-5" />
-              </a>
+              </button>
             </div>
 
             {/* Right side: Expert Photos */}
