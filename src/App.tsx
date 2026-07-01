@@ -60,7 +60,6 @@ const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 const Blogs = lazy(() => import("./pages/Blogs"));
 const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 const PackageDetail = lazy(() => import("./pages/PackageDetail"));
-const PackageCheckout = lazy(() => import("./pages/PackageCheckout"));
 const CalculatorsHub = lazy(() => import("./pages/CalculatorsHub"));
 const CalculatorDetail = lazy(() => import("./pages/CalculatorDetail"));
 const ThankYouPage = lazy(() => import("./pages/ThankYouPage"));
@@ -329,12 +328,6 @@ const App = () => (
                       />
 
                       {/* Payment Routes */}
-                      <Route element={<ProtectedRoute />}>
-                        <Route
-                          path="/package-checkout"
-                          element={<PackageCheckout />}
-                        />
-                      </Route>
                       <Route
                         path="/payment/success"
                         element={<PaymentSuccessPage />}

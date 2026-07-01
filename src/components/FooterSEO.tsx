@@ -55,16 +55,16 @@ const businessCalculators = [
 
 const seoCategories = [
   {
-    title: "Coworking Spaces by top cities",
-    baseSlug: "/services/coworking-space",
-    prefix: "Coworking Space in",
-    cities: activeCoworkingCities
-  },
-  {
     title: "Virtual Offices by top cities",
     baseSlug: "/services/virtual-office",
     prefix: "Virtual Office in",
     cities: virtualOfficeCities
+  },
+  {
+    title: "Coworking Spaces by top cities",
+    baseSlug: "/services/coworking-space",
+    prefix: "Coworking Space in",
+    cities: activeCoworkingCities
   },
   {
     title: "Top Business Setup & Compliance Services",

@@ -332,7 +332,7 @@ export const PlanComparison = () => {
                 ))}
               </div>
 
-              <button className={`w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] ${plan.highlight ? 'bg-[#FDE047] text-[#36503F] hover:bg-[#fceb86]' : 'bg-[#36503F] text-[#FEF8CF] hover:bg-[#1F2E26]'}`}>
+              <button className={`w-full py-3.5 rounded-xl font-bold transition-all active:scale-[0.98] ${plan.highlight ? 'bg-[#FEF8CF] text-[#36503F] hover:bg-[#F2E8C0] border-2 border-[#D6C560]' : 'bg-[#36503F] text-[#FEF8CF] hover:bg-[#1F2E26]'}`}>
                 Get {plan.name}
               </button>
             </div>

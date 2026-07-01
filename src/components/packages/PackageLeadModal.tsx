@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, Mail, Phone, ArrowRight, User } from "lucide-react";
+import { Loader2, Mail, Phone, ArrowRight, User, MapPin } from "lucide-react";
 import axios from 'axios';
 import hotToast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -36,7 +36,15 @@ export const PackageLeadModal = ({
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
+  const [selectedPlan, setSelectedPlan] = useState(planKey);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedPlan(planKey);
+    }
+  }, [planKey, isOpen]);
 
   useEffect(() => {
     if (user) {
@@ -63,6 +71,11 @@ export const PackageLeadModal = ({
       return;
     }
 
+    if (!city) {
+      hotToast.error('Please select a city');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -79,14 +92,15 @@ export const PackageLeadModal = ({
           userId: user?.id || (user as any)?._id,
           email,
           phone,
+          city,
           businessType: 'Package Purchase',
-          message: `Interested in purchasing ${planName} package`,
+          message: `Interested in purchasing ${selectedPlan} package`,
           source: 'Pricing Flow',
           page: window.location.href,
           utm: {
             source: 'pricing_flow',
-            planName,
-            planKey,
+            planName: selectedPlan,
+            planKey: selectedPlan,
             spaceId,
             timestamp: new Date().toISOString(),
           },
@@ -100,20 +114,10 @@ export const PackageLeadModal = ({
         console.error('Non-critical error logging lead:', err);
       }
 
+      // Show success toast and close
+      hotToast.success('Thank you! Our team will contact you shortly.', { duration: 4000 });
       onClose();
 
-      // Ensure user is authenticated before checkout
-      const redirectUrl = spaceId 
-        ? `/package-checkout?plan=${planKey}&spaceId=${spaceId}` 
-        : `/package-checkout?plan=${planKey}`;
-
-      if (!isAuthenticated) {
-        hotToast('Please login to continue your purchase', { icon: '🔒' });
-        navigate(`/auth/login?redirect=/package-checkout?plan=${planKey}`);
-        return;
-      }
-
-      navigate(redirectUrl);
     } catch (error: any) {
       console.error('Failed to process:', error);
       hotToast.error('Something went wrong. Please try again.');
@@ -128,11 +132,34 @@ export const PackageLeadModal = ({
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-[#1F2E26]">Confirm Your Details</DialogTitle>
           <DialogDescription className="text-[#677E73]">
-            Please confirm your contact information to proceed with the <span className="font-semibold text-[#35503F]">{planName}</span> plan.
+            Please confirm your contact information to proceed with your selected plan.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 pt-4">
           <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="lead-plan" className="text-sm font-bold text-[#1F2E26]">Select Package</Label>
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A2AEA8] flex items-center justify-center">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                </div>
+                <select
+                  id="lead-plan"
+                  value={selectedPlan}
+                  onChange={(e) => setSelectedPlan(e.target.value)}
+                  className="w-full pl-10 h-12 rounded-xl border border-[#DDE5DA] focus:ring-1 focus:ring-[#35503F] focus:border-[#35503F] appearance-none bg-white capitalize"
+                  required
+                >
+                  <option value="basic">Basic Package</option>
+                  <option value="pro">Pro Package</option>
+                  <option value="premium">Premium Package</option>
+                  <option value="elite">Elite Package</option>
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#A2AEA8]">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                </div>
+              </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="lead-name" className="text-sm font-bold text-[#1F2E26]">Full Name</Label>
               <div className="relative">
@@ -180,6 +207,29 @@ export const PackageLeadModal = ({
                   className="pl-10 h-12 rounded-xl border-[#DDE5DA] focus:ring-[#35503F]/15 focus:border-[#35503F]"
                   required
                 />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lead-city" className="text-sm font-bold text-[#1F2E26]">Select City</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#A2AEA8]" />
+                <select
+                  id="lead-city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="w-full pl-10 h-12 rounded-xl border border-[#DDE5DA] focus:ring-1 focus:ring-[#35503F] focus:border-[#35503F] appearance-none bg-white"
+                  required
+                >
+                  <option value="" disabled>Select your city</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Noida">Noida</option>
+                  <option value="Gurgaon">Gurgaon</option>
+                  <option value="Bangalore">Bangalore</option>
+                  <option value="Others">Others</option>
+                </select>
+                <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#A2AEA8]">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
+                </div>
               </div>
             </div>
           </div>

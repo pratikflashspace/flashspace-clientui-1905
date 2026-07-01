@@ -127,7 +127,7 @@ export const PricingSection = ({ highlightPlan, compact }: { highlightPlan?: str
                             }
                           }, 100);
                         }}
-                        className="w-full py-3.5 px-6 rounded-md text-xs font-bold tracking-wider transition-all duration-300 bg-[#36503F] text-[#FEF8C5] hover:bg-[#25362B] shadow-md"
+                        className="w-full py-3.5 px-6 rounded-md text-xs font-bold tracking-wider transition-all duration-300 bg-[#FEF8C5] text-[#36503F] hover:bg-[#F2EAAC] shadow-md"
                         style={{ fontFamily: "'Inter', sans-serif" }}
                       >
                         {plan.buttonText}
@@ -143,10 +143,15 @@ export const PricingSection = ({ highlightPlan, compact }: { highlightPlan?: str
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
                   onClick={(e) => {
                     if ((e.target as HTMLElement).tagName.toLowerCase() === 'button') return;
                     navigate(`/packages/${plan.name.toLowerCase()}#whats-included`);
+                    setTimeout(() => {
+                      const element = document.getElementById('whats-included');
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    }, 100);
                   }}
                   className="relative z-10 w-full lg:w-[24%] bg-[#FCFBF8] py-12 px-6 text-center border border-[#E8E2D9] rounded-xl shadow-sm cursor-pointer hover:border-[#36503F]/50 transition-colors"
                 >
@@ -179,13 +184,7 @@ export const PricingSection = ({ highlightPlan, compact }: { highlightPlan?: str
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/packages/${plan.name.toLowerCase()}#whats-included`);
-                      setTimeout(() => {
-                        const element = document.getElementById('whats-included');
-                        if (element) {
-                          element.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 100);
+                      setSelectedPlanForLead({ name: plan.name, key: plan.name.toLowerCase() });
                     }}
                     className="w-full py-3.5 px-6 rounded-md text-xs font-semibold tracking-wider transition-all duration-300 bg-transparent text-[#36503F] border border-gray-300 hover:border-[#36503F] hover:bg-gray-50"
                     style={{ fontFamily: "'Inter', sans-serif" }}

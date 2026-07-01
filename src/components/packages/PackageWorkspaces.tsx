@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { getAvailableCities, getVirtualOfficesByCity } from "@/services/virtualOffice.service";
 import { MapPin, Search, ChevronDown, ChevronUp, Star, Phone, Bookmark, ShoppingCart, BadgeCheck, CheckCircle2, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,33 @@ import { getSafeImageUrl, isInvalidImageUrl } from "@/utils/imageUrl";
 import { getShortAddress } from "@/utils/address";
 
 const DEFAULT_WORKSPACE_IMAGE = "/hero-illustrated.jpg";
+
+const googleReviews = [
+  {
+    text: '"Nice space and well mannered staff,really happy 😊"',
+    author: "-Vijay",
+    initial: "V",
+    bgColor: "bg-orange-600"
+  },
+  {
+    text: '"Co-operative guys...go for them if u need a virtual office."',
+    author: "-asadullah jahangir",
+    initial: "A",
+    bgColor: "bg-blue-500"
+  },
+  {
+    text: '"I strongly recommend Virtual Office in delhi for your workspace requirements."',
+    author: "-Manoj Gusain",
+    initial: "M",
+    bgColor: "bg-purple-600"
+  },
+  {
+    text: '"It felt smooth and professional from start to finish."',
+    author: "-Ashutosh Mishra",
+    initial: "A",
+    bgColor: "bg-blue-600"
+  }
+];
 
 export const PackageWorkspaces = ({ 
   planName, 
@@ -20,12 +47,20 @@ export const PackageWorkspaces = ({
   const [activeCity, setActiveCity] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [workspaces, setWorkspaces] = useState<any[]>([]);
+  const [currentReview, setCurrentReview] = useState(0);
 
   useEffect(() => {
     getAvailableCities("virtual-office").then((res) => {
       setCities(res);
       if (res.length > 0) setActiveCity(res[0]);
     });
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentReview((prev) => (prev + 1) % googleReviews.length);
+    }, 4000);
+    return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -80,22 +115,19 @@ export const PackageWorkspaces = ({
         
         {/* Header & City Selection */}
         <div className="mb-10 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>
             Select Your Virtual Office Location
           </h2>
-          <p className="text-gray-600 text-lg mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>
-            Choose a premium business address in your preferred city.
-          </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 max-w-5xl mx-auto px-2">
             {cities.map((city) => (
               <button
                 key={city}
                 onClick={() => setActiveCity(city)}
-                className={`px-6 py-3 rounded-xl border text-sm font-semibold transition-all duration-300 ${
+                className={`px-5 py-2.5 rounded-full border text-[13px] md:text-sm font-medium transition-all duration-300 ${
                   activeCity === city 
                     ? "bg-[#36503F] text-[#FEF8C5] border-[#36503F] shadow-md" 
-                    : "bg-white text-gray-700 border-gray-200 hover:border-[#36503F] hover:bg-gray-50"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-[#36503F] hover:bg-gray-50 hover:text-gray-900"
                 }`}
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
@@ -112,13 +144,14 @@ export const PackageWorkspaces = ({
             {loading ? (
               <SkeletonCardGrid count={4} view="list" />
             ) : workspaces.length > 0 ? (
-              workspaces.map((ws) => {
+              workspaces.map((ws, index) => {
                 const rawImages = ws.images && ws.images.length > 0 ? ws.images : [ws.image];
                 const images = rawImages.filter((img: string) => !isInvalidImageUrl(img)).map((img: string) => getSafeImageUrl(img));
                 if (images.length === 0) images.push(DEFAULT_WORKSPACE_IMAGE);
 
                 return (
-                  <div key={ws.id} className="flex flex-col sm:flex-row gap-6 bg-white rounded-2xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-all duration-200 sm:h-[270px]">
+                  <Fragment key={ws.id}>
+                    <div className="flex flex-col sm:flex-row gap-6 bg-white rounded-2xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-all duration-200 sm:h-[270px]">
                     <div className="w-full sm:w-1/3 h-48 sm:h-full rounded-xl overflow-hidden shrink-0 relative">
                       <img src={images[0]} alt={ws.name} className="w-full h-full object-cover" />
                       {ws.popular && (
@@ -152,7 +185,7 @@ export const PackageWorkspaces = ({
                           <div key={i} className="flex items-center justify-between text-xs border-b border-gray-50 pb-1.5 last:border-0 last:pb-0">
                             <span className="text-gray-500">{plan.label}</span>
                             <span className="font-bold text-gray-900">
-                              {plan.price && plan.price !== "0" ? plan.price + "/yr" : "N/A"}
+                              {plan.price && plan.price !== "0" ? plan.price : "N/A"}
                             </span>
                           </div>
                         ))}
@@ -173,6 +206,23 @@ export const PackageWorkspaces = ({
                       </div>
                     </div>
                   </div>
+                  
+                  {index === 1 && (
+                    <div className="my-4">
+                      <h3 className="text-[13px] font-bold text-gray-500 mb-3 uppercase tracking-wider text-center">Trusted by 5000+ businesses</h3>
+                      <div className="bg-[#F0F4EE]/50 rounded-2xl p-6 border border-[#D4E0D0] shadow-sm text-center overflow-hidden">
+                        <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10">
+                          <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/agrizy_vpn5mj.png" alt="Agrizy" className="h-12 md:h-14 object-contain mix-blend-multiply" />
+                          <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/Adda247_bbmaft.png" alt="Adda247" className="h-9 md:h-11 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-10 md:h-12 object-contain mix-blend-multiply" />
+                          <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/growthschool_-_Copy_iip2zr.png" alt="Growth School" className="h-6 md:h-7 object-contain mix-blend-multiply" />
+                          <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/plum_logo_lstdop.png" alt="Plum" className="h-9 md:h-11 object-contain mix-blend-multiply" />
+                          <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-10 md:h-12 object-contain mix-blend-multiply" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </Fragment>
                 );
               })
             ) : (
@@ -228,15 +278,45 @@ export const PackageWorkspaces = ({
                 </div>
               </div>
 
-              {/* Clients Section */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center">
-                <h3 className="text-[14px] font-bold text-gray-900 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
-                  5,000+ Virtual Office clients served
-                </h3>
-                <div className="flex flex-wrap justify-center items-center gap-4 opacity-80">
-                  <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-6 object-contain" />
-                  <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-8 object-contain" />
-                  <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 object-contain" />
+              {/* Review Card */}
+              <div className="bg-white rounded-2xl p-6 border border-[#D4E0D0] shadow-sm relative overflow-hidden flex flex-col gap-4 min-h-[160px]">
+                <div className="flex text-[#FFB800] gap-1">
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                  <Star className="w-5 h-5 fill-current" />
+                </div>
+                <div className="flex gap-4 items-start">
+                  <div className={`w-12 h-12 ${googleReviews[currentReview].bgColor} text-white rounded-full flex items-center justify-center font-bold text-xl shrink-0 mt-1 transition-colors duration-300`}>
+                    {googleReviews[currentReview].initial}
+                  </div>
+                  <div>
+                    <p className="text-gray-900 font-medium text-[15px] leading-snug mb-2 transition-all duration-300" style={{ fontFamily: "'Inter', sans-serif" }}>
+                      {googleReviews[currentReview].text}
+                    </p>
+                    <p className="text-gray-400 text-sm transition-all duration-300">
+                      {googleReviews[currentReview].author}
+                    </p>
+                  </div>
+                </div>
+                {/* Dots and arrow */}
+                <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center gap-1.5">
+                    {googleReviews.map((_, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => setCurrentReview(idx)}
+                        className={`rounded-full transition-all duration-300 ${currentReview === idx ? 'w-2 h-2 bg-gray-600' : 'w-1.5 h-1.5 bg-gray-300 hover:bg-gray-400'}`}
+                      />
+                    ))}
+                  </div>
+                  <button 
+                    onClick={() => setCurrentReview((prev) => (prev + 1) % googleReviews.length)}
+                    className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100 shadow-sm cursor-pointer hover:bg-gray-100 active:scale-95 transition-all"
+                  >
+                    <ChevronRight className="w-4 h-4 text-gray-600" />
+                  </button>
                 </div>
               </div>
               

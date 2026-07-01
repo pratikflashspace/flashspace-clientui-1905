@@ -64,9 +64,10 @@ export const FloatingAiButton = () => {
           
           // Mobile visibility
           const pastHero = window.scrollY > window.innerHeight * 0.7;
+          const isNearBottom = window.scrollY + window.innerHeight >= document.body.offsetHeight - 500;
           const isVirtualOfficePage = window.location.pathname.toLowerCase().includes('virtual-office');
           const isCoworkingPage = window.location.pathname.toLowerCase().includes('coworking-space');
-          setShowMobileFlashAi(pastHero && !isVirtualOfficePage && !isCoworkingPage);
+          setShowMobileFlashAi(pastHero && !isVirtualOfficePage && !isCoworkingPage && !isNearBottom);
           enforceGHLPosition();
 
           if (buttonRef.current) {
