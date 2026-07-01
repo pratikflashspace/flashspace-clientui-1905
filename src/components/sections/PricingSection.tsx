@@ -85,7 +85,7 @@ export const PricingSection = ({ highlightPlan, compact }: { highlightPlan?: str
                       onClick={(e) => {
                         // Prevent navigation if the click originated from the button
                         if ((e.target as HTMLElement).tagName.toLowerCase() === 'button') return;
-                        navigate(`/packages/${plan.name.toLowerCase()}#select-city-spaces`);
+                        navigate(`/packages/${plan.name.toLowerCase()}#whats-included`);
                       }}
                       className="bg-[#FCFBF8] border-2 border-[#36503F] ring-1 ring-[#36503F]/50 rounded-xl pt-16 pb-16 px-6 lg:px-8 text-center shadow-[0_0_25px_rgba(54,80,63,0.35)] flex flex-col h-full relative overflow-hidden scale-100 lg:scale-[1.03] z-20 cursor-pointer"
                     >
@@ -119,9 +119,9 @@ export const PricingSection = ({ highlightPlan, compact }: { highlightPlan?: str
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/packages/${plan.name.toLowerCase()}#select-city-spaces`);
+                          navigate(`/packages/${plan.name.toLowerCase()}#whats-included`);
                           setTimeout(() => {
-                            const element = document.getElementById('select-city-spaces');
+                            const element = document.getElementById('whats-included');
                             if (element) {
                               element.scrollIntoView({ behavior: 'smooth' });
                             }
@@ -146,7 +146,7 @@ export const PricingSection = ({ highlightPlan, compact }: { highlightPlan?: str
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   onClick={(e) => {
                     if ((e.target as HTMLElement).tagName.toLowerCase() === 'button') return;
-                    navigate(`/packages/${plan.name.toLowerCase()}#select-city-spaces`);
+                    navigate(`/packages/${plan.name.toLowerCase()}#whats-included`);
                   }}
                   className="relative z-10 w-full lg:w-[24%] bg-[#FCFBF8] py-12 px-6 text-center border border-[#E8E2D9] rounded-xl shadow-sm cursor-pointer hover:border-[#36503F]/50 transition-colors"
                 >
@@ -179,9 +179,9 @@ export const PricingSection = ({ highlightPlan, compact }: { highlightPlan?: str
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/packages/${plan.name.toLowerCase()}#select-city-spaces`);
+                      navigate(`/packages/${plan.name.toLowerCase()}#whats-included`);
                       setTimeout(() => {
-                        const element = document.getElementById('select-city-spaces');
+                        const element = document.getElementById('whats-included');
                         if (element) {
                           element.scrollIntoView({ behavior: 'smooth' });
                         }

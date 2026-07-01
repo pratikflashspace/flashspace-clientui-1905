@@ -140,10 +140,19 @@ const VirtualOfficeAds = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Contact');
+    }
 
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(formData.phone)) {
       toast.error("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
       return;
     }
 
@@ -171,6 +180,7 @@ const VirtualOfficeAds = () => {
       if (data.ok || res.ok) {
         toast.success("Thank you! Our workspace expert will call you within 15 minutes.");
         setFormData({ name: "", phone: "", email: "", city: "" });
+        navigate("/thank-you");
       } else {
         toast.error(data.message || "Something went wrong. Please try again.");
       }

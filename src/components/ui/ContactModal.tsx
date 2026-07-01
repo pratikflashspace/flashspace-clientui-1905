@@ -105,7 +105,17 @@ export default function ContactModal({ isOpen, onClose }: Props) {
             Get in <span className="text-[#35503F]">Touch</span>
           </h3>
 
-          <form className="flex flex-col gap-3">
+          <form 
+            className="flex flex-col gap-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (typeof window !== 'undefined' && (window as any).fbq) {
+                (window as any).fbq('track', 'Contact');
+              }
+              // Form submission logic can go here later
+              onClose(); // Optional: close the modal after submitting
+            }}
+          >
             {/* Full Name */}
             <div>
               <label className="block text-[13px] font-bold text-[#1F2E26] mb-1">

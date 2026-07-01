@@ -838,7 +838,11 @@ const GetWorkspaces = () => {
   // Handle hash-based zoom for business setup cards (from header navigation)
   useEffect(() => {
     if (workspaceType === "business-setup" && location.hash) {
-      const hashId = location.hash.substring(1);
+      let hashId = location.hash.substring(1);
+      if (hashId.startsWith('bs-card-')) {
+        hashId = hashId.replace('bs-card-', '');
+      }
+      
       // Wait for cards to render then scroll and zoom
       const timer = setTimeout(() => {
         const el = document.getElementById(`bs-card-${hashId}`);
@@ -846,7 +850,7 @@ const GetWorkspaces = () => {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           setZoomedCardId(hashId);
         }
-      }, 1500);
+      }, 500); // reduced timeout slightly since ScrollToTop also does it
       return () => clearTimeout(timer);
     }
   }, [workspaceType, location.hash, location.key]);

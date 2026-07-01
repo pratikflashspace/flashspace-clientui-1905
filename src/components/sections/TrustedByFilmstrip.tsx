@@ -36,7 +36,7 @@ const clientLogos: LogoItem[] = [
   {
     name: "Study IQ",
     src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/study_iq_xdxdkd.png",
-    className: "h-28 sm:h-18",
+    className: "h-24 sm:h-16 translate-x-2 sm:translate-x-4",
   },
   {
     name: "Truly Madly",

@@ -63,6 +63,7 @@ const PackageDetail = lazy(() => import("./pages/PackageDetail"));
 const PackageCheckout = lazy(() => import("./pages/PackageCheckout"));
 const CalculatorsHub = lazy(() => import("./pages/CalculatorsHub"));
 const CalculatorDetail = lazy(() => import("./pages/CalculatorDetail"));
+const ThankYouPage = lazy(() => import("./pages/ThankYouPage"));
 
 // Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -216,6 +217,7 @@ const App = () => (
                       <Route path="/" element={<Index />} />
                       <Route path="/oauth/authorize" element={<OAuthConsent />} />
                       <Route path="/services" element={<Services />} />
+                      <Route path="/thank-you" element={<ThankYouPage />} />
 
                       <Route
                         path="/services/virtual-office"

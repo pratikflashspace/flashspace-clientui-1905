@@ -109,7 +109,7 @@ export const PackageLeadModal = ({
 
       if (!isAuthenticated) {
         hotToast('Please login to continue your purchase', { icon: '🔒' });
-        navigate(`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`);
+        navigate(`/auth/login?redirect=/package-checkout?plan=${planKey}`);
         return;
       }
 

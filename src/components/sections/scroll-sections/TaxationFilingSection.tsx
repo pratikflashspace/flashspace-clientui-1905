@@ -54,7 +54,7 @@ export const TaxationFilingSection = () => {
                         </Link>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 sm:gap-6" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6" style={{ fontFamily: "'Inter', sans-serif" }}>
                         {services.map((service, i) => (
                             <motion.div
                                 key={service.title}
@@ -62,11 +62,11 @@ export const TaxationFilingSection = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: i * 0.1 }}
-                                className="p-3 sm:p-5 rounded-xl bg-card border border-border hover:border-primary/20 transition-colors"
+                                className="p-5 rounded-xl bg-card border border-border hover:border-primary/20 transition-colors"
                             >
-                                <service.icon className="w-6 h-6 sm:w-8 sm:h-8 text-[#36503F] mb-2 sm:mb-4" />
-                                <h4 className="text-sm sm:text-base font-bold text-foreground mb-1 sm:mb-2" style={{ fontFamily: "'Inter', sans-serif" }}>{service.title}</h4>
-                                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>{service.desc}</p>
+                                <service.icon className="w-8 h-8 text-[#36503F] mb-4" />
+                                <h4 className="text-sm sm:text-base font-medium sm:font-bold text-foreground mb-2" style={{ fontFamily: "'Inter', sans-serif" }}>{service.title}</h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed hidden sm:block" style={{ fontFamily: "'Inter', sans-serif" }}>{service.desc}</p>
                             </motion.div>
                         ))}
                     </div>

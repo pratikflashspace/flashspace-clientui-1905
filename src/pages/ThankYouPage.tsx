@@ -8,20 +8,21 @@ const ThankYouPage = () => {
 
   useEffect(() => {
     // Update progress bar smoothly over 5 seconds
+    // Update progress bar smoothly over 10 seconds
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
           return 100;
         }
-        return prev + (100 / (5000 / 50));
+        return prev + (100 / (10000 / 50));
       });
     }, 50);
 
-    // Redirect after 5 seconds
+    // Redirect to home after 10 seconds
     const timer = setTimeout(() => {
       navigate("/");
-    }, 5000);
+    }, 10000);
 
     return () => {
       clearTimeout(timer);
@@ -30,7 +31,7 @@ const ThankYouPage = () => {
   }, [navigate]);
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden bg-[#FAF9F6]">
+    <div className="relative min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden bg-[#FAF9F6]" style={{ fontFamily: "'Inter', sans-serif" }}>
       {/* Dynamic Background Glowing Orbs */}
       <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#36503F]/10 blur-[100px] animate-pulse duration-1000"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-[#FEF8C5]/60 blur-[120px] animate-pulse" style={{ animationDuration: '3s' }}></div>
@@ -48,11 +49,11 @@ const ThankYouPage = () => {
         </div>
         
         <div className="mt-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-[#1F2E26] mb-5 tracking-tight" style={{ fontFamily: "'Inter Tight', sans-serif" }}>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-[#1F2E26] mb-5 tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
             You're All Set!
           </h1>
           
-          <p className="text-gray-600 mb-10 leading-relaxed text-lg font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <p className="text-gray-600 mb-10 leading-relaxed text-lg font-medium">
             Thank you for choosing us. Our team is already on it and will connect with you shortly with our premium solutions.
           </p>
 
@@ -71,7 +72,6 @@ const ThankYouPage = () => {
             <button
               onClick={() => navigate("/")}
               className="group relative w-full flex items-center justify-center gap-3 bg-[#36503F] overflow-hidden text-[#FEF8C5] px-6 py-4 rounded-2xl font-bold hover:bg-[#25362B] transition-all duration-300 active:scale-[0.98] shadow-xl shadow-[#36503F]/20 mt-4"
-              style={{ fontFamily: "'Inter', sans-serif" }}
             >
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
               <span className="relative z-10 text-base">Return to Homepage</span> 
