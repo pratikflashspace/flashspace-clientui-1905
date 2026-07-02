@@ -20,6 +20,18 @@ const testimonials = [
     name: "Rohit Malhotra",
     role: "Operations Head, Gurugram",
   },
+  {
+    quote:
+      "Got my virtual office from Flashspace and I honestly didn't expect it to be this easy. I just shared the documents and in less than an hour everything was ready. The team was super responsive and actually guided me step by step. No running around or complicated process. It felt smooth and professional from start to finish. If anyone needs a virtual office setup without stress, I'd definitely point them to Flashspace.",
+    name: "Ashutosh Mishra",
+    role: "Founders Office, Growth School",
+  },
+  {
+    quote:
+      "I've been using a virtual office provided by FlashSpace for my startup for the last four years. I strongly recommend them for your workspace requirements in Delhi. They offer an excellent range of office spaces and have a quick, professional support team.",
+    name: "Manoj Gusain",
+    role: "Director, Black Seas",
+  }
 ];
 
 export const FounderTestimonial = () => {
@@ -29,7 +41,7 @@ export const FounderTestimonial = () => {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % testimonials.length);
-    }, 4000);
+    }, 6000);
 
     return () => window.clearInterval(timer);
   }, []);

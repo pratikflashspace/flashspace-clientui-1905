@@ -18,7 +18,7 @@ const testimonials = [
   },
   {
     id: 2,
-    text: "I've been using FlashSpace as a virtual office for my startup for the last four year's. I strongly recommend Virtual Office in delhi for your workspace requirements. Excellent range of office spaces and a quick, professional support team.",
+    text: "I've been using a virtual office provided by FlashSpace for my startup for the last four years. I strongly recommend them for your workspace requirements in Delhi. They offer an excellent range of office spaces and have a quick, professional support team.",
     name: "Manoj Gusain",
     role: "Director, Black Seas",
     image: "https://ui-avatars.com/api/?name=manoj+gusain&background=9c27b0&color=fff",
@@ -78,6 +78,14 @@ export const PackageTestimonial = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { planId } = useParams();
   const plan = planId?.toLowerCase() || "";
+
+  React.useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveTestimonial((current) => (current + 1) % testimonials.length);
+    }, 6000);
+
+    return () => window.clearInterval(timer);
+  }, []);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -153,7 +161,7 @@ export const PackageTestimonial = () => {
             
             {/* Left Column: Testimonial */}
             <div className="flex flex-col h-full">
-              <h2 className="text-xl sm:text-2xl text-white leading-relaxed mb-8">
+              <h2 className="text-xl sm:text-2xl text-white leading-relaxed mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>
                 FlashSpace has helped <span className="text-[#FEF8C5] font-bold">5,000+ clients</span> get their Virtual Office, boosting productivity and driving business growth.
               </h2>
 
@@ -211,7 +219,7 @@ export const PackageTestimonial = () => {
               <div className="bg-white rounded-3xl shadow-xl overflow-hidden relative z-10 border border-gray-100">
                 {/* Form Header */}
                 <div className="pt-8 px-8 pb-4 text-center relative z-10">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight capitalize">Get Your {plan} Package</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight capitalize" style={{ fontFamily: "'Inter', sans-serif" }}>Get Your {plan} Package</h3>
                   <p className="text-gray-500 text-sm">Please confirm your contact details to proceed.</p>
                 </div>
 
