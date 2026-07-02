@@ -148,6 +148,17 @@ export const PackageWorkspaces = ({
                 const rawImages = ws.images && ws.images.length > 0 ? ws.images : [ws.image];
                 const images = rawImages.filter((img: string) => !isInvalidImageUrl(img)).map((img: string) => getSafeImageUrl(img));
                 if (images.length === 0) images.push(DEFAULT_WORKSPACE_IMAGE);
+                
+                if (ws.location) {
+                  const locLower = ws.location.toLowerCase();
+                  if (locLower === 'bangalore' || locLower === 'bengaluru') {
+                    images[0] = '/newLogo/banglore.jpg';
+                  } else if (locLower === 'gurgaon' || locLower === 'gurugram') {
+                    images[0] = '/newLogo/gurgaon.jpg';
+                  } else if (locLower === 'noida') {
+                    images[0] = '/newLogo/noida.jpg';
+                  }
+                }
 
                 return (
                   <Fragment key={ws.id}>

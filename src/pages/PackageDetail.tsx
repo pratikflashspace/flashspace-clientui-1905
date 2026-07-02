@@ -212,7 +212,7 @@ export default function PackageDetail() {
                       { city: "Delhi", price: "1025", image: "/to_cloudinary/delhi_city_1782458486025.png" },
                       { city: "Gurgaon", price: "1158", image: "/newLogo/gurgaon.jpg" },
                       { city: "Noida", price: "1000", image: "/newLogo/noida.jpg" },
-                      { city: "Bangalore", price: "1117", image: "/to_cloudinary/bangalore_city_1782458444683.png" }
+                      { city: "Bangalore", price: "1117", image: "/newLogo/banglore.jpg" }
                     ].map((item) => (
                       <div 
                         key={item.city} 
