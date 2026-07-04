@@ -180,7 +180,7 @@ const InvoicePaper = ({ data }: { data: Invoice }) => {
             {/* Header Row */}
             <div className="flex justify-between items-start mb-8">
                 <div>
-                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
                         FlashSpace
                     </h1>
                     <p className="text-[16px] text-[#6B7280] font-medium">
@@ -382,7 +382,7 @@ const Invoices = () => {
             <div className="w-full space-y-8 no-print animate-slide-up">
                 {/* Header */}
                 <div>
-                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
                         Invoices
                     </h1>
                     <p className="text-[#6B7280] text-[16px]">

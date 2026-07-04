@@ -125,7 +125,7 @@ const SpaceComponent = () => {
   const handleBookNow = () => {
     if (!spaceDetails || !pricing) return;
     if (spaceDetails.availability?.toLowerCase() === 'unavailable') return;
-    
+
     const executeBooking = () => {
       navigate(`/booking/${spaceDetails._id}?plan=${selectedPlan}`);
     };

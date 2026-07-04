@@ -140,10 +140,19 @@ const VirtualOfficeAds = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Contact');
+    }
 
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(formData.phone)) {
       toast.error("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
       return;
     }
 
@@ -171,6 +180,7 @@ const VirtualOfficeAds = () => {
       if (data.ok || res.ok) {
         toast.success("Thank you! Our workspace expert will call you within 15 minutes.");
         setFormData({ name: "", phone: "", email: "", city: "" });
+        navigate("/thank-you");
       } else {
         toast.error(data.message || "Something went wrong. Please try again.");
       }
@@ -493,7 +503,7 @@ const VirtualOfficeAds = () => {
                 <div className="mt-0.5 shrink-0 bg-[#E5F0E8] p-1 rounded-full text-[#36503F]">
                   <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" strokeWidth={3} />
                 </div>
-                <span className="text-[#1F1F1F] font-semibold text-[13px] sm:text-[15px] leading-tight">{feature}</span>
+                <span className="text-[#1F1F1F]  font-semibold text-[13px] sm:text-[15px] leading-tight">{feature}</span>
               </div>
             ))}
           </div>

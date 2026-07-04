@@ -226,7 +226,7 @@ const CouponsAndVouchers = () => {
  <div className="min-h-screen p-4 md:p-6 lg:p-8 bg-[#FAFAF7] font-sans">
       <div className="max-w-7xl mx-auto space-y-8">
       <div className="space-y-1">
-        <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight">
+        <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
           <span className="text-[#1A1A1A]">Coupons</span>
         </h1>
         <p className="text-[16px] text-[#6B7280] font-medium">Generate and manage your affiliate coupons</p>

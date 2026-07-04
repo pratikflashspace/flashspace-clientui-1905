@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { 
   Building2, Mail, Briefcase, Users, Clock, 
   IndianRupee, PhoneForwarded, Landmark, ArrowRight, Quote, Star, Check, ShieldCheck, Loader2
@@ -8,16 +10,16 @@ import {
 const testimonials = [
   {
     id: 1,
-    text: "Everything was arranged swiftly by FlashSpace and all my requests were adhered to within a day\n\nI greatly appreciate FlashSpace's quick response in helping me secure a virtual address. Everything was arranged swiftly and all my requests were adhered to within a day. I've received all the documents and the support has been extraordinary. Great work, keep it up!",
+    text: "Everything was arranged swiftly by FlashSpace and all my requests were adhered to within a day. I've received all the documents and the support has been extraordinary.",
     name: "Ashutosh Mishra",
     role: "Founders Office, Growth school",
     image: "https://ui-avatars.com/api/?name=Ashutosh+Mishra&background=36503F&color=fff", 
   },
   {
     id: 2,
-    text: "I've been using FlashSpace as a virtual office for my startup for the last four year's. I strongly recommend Virtual Office in delhi for your workspace requirements. Excellent range of office spaces and a quick, professional support team.",
+    text: "I've been using a virtual office from FlashSpace for four years. I strongly recommend them for your workspace requirements. They offer great spaces and a professional support team.",
     name: "Manoj Gusain",
-    role: "Director, Black Seas",
+    role: "Manager, Black Seas",
     image: "https://ui-avatars.com/api/?name=manoj+gusain&background=9c27b0&color=fff",
   },
   {
@@ -65,14 +67,22 @@ const additionalServices = [
 ];
 
 const experts = [
-  { name: "Rishi", role: "VO Expert", image: "/newLogo/rishi.png" },
-  { name: "Premjeet", role: "VO Expert", image: "/newLogo/premjeet.png" },
-  { name: "Shubham", role: "VO Expert", image: "/newLogo/shubham.png" },
+  { name: "Rishi", role: "VO Expert", image: "/to_cloudinary/rishi.png" },
+  { name: "Premjeet", role: "VO Expert", image: "/to_cloudinary/premjeet.png" },
+  { name: "Shubham", role: "VO Expert", image: "/to_cloudinary/shubham.png" },
 ];
 
 export const TestimonialSection = () => {
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  React.useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveTestimonial((current) => (current + 1) % testimonials.length);
+    }, 6000);
+
+    return () => window.clearInterval(timer);
+  }, []);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -80,13 +90,60 @@ export const TestimonialSection = () => {
     city: ''
   });
 
+  const navigate = useNavigate();
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Contact');
+    }
+
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      toast.error("Please enter a valid 10-digit mobile number.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    console.log("Form submitted:", formData);
-    setIsSubmitting(false);
-    setFormData({ name: '', phone: '', email: '', city: '' });
+    try {
+      const rawBase = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:5000" : window.location.origin);
+      const base = rawBase.replace(/\/$/, "");
+
+      const res = await fetch(`${base}/api/leads`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "flashspace123",
+          "x-flashspace-csrf": "true",
+        },
+        body: JSON.stringify({
+          ...formData,
+          source: "Virtual Office Testimonial Section",
+          page: window.location.href,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.ok || res.ok) {
+        toast.success("Thank you! Our workspace expert will call you within 15 minutes.");
+        setFormData({ name: "", phone: "", email: "", city: "" });
+        navigate("/thank-you");
+      } else {
+        toast.error(data.message || "Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Server error. Please try again later.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -98,7 +155,7 @@ export const TestimonialSection = () => {
             
             {/* Left Column: Testimonial */}
             <div className="flex flex-col h-full">
-              <h2 className="text-xl sm:text-2xl text-white leading-relaxed mb-8">
+              <h2 className="text-xl sm:text-2xl text-white leading-relaxed mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>
                 FlashSpace has helped <span className="text-[#FEF8C5] font-bold">5,000+ clients</span> get their Virtual Office, boosting productivity and driving business growth.
               </h2>
 
@@ -156,7 +213,7 @@ export const TestimonialSection = () => {
               <div className="bg-white rounded-3xl shadow-xl overflow-hidden relative z-10 border border-gray-100">
                 {/* Form Header */}
                 <div className="pt-8 px-8 pb-4 text-center relative z-10">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">Claim Your Address</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight" style={{ fontFamily: "'Inter', sans-serif" }}>Claim Your Address</h3>
                   <p className="text-gray-500 text-sm">Our experts will connect with you in 15 mins.</p>
                 </div>
 
@@ -296,12 +353,15 @@ export const ExpertsSection = () => {
                 </div>
               </div>
 
-              <a 
-                href="tel:+919888687898" 
+              <button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('open-contact-modal'));
+                }}
                 className="text-[#36503F] font-bold text-lg flex items-center gap-2 hover:gap-3 transition-all w-max"
               >
                 Request Callback <ArrowRight className="w-5 h-5" />
-              </a>
+              </button>
             </div>
 
             {/* Right side: Expert Photos */}

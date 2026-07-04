@@ -12,7 +12,7 @@ const AffiliateKYC = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
                         KYC <span className="text-[#36503F] italic">Verification</span>
                         <Shield className="w-8 h-8 text-[#35503F]" />
                     </h1>

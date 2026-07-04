@@ -321,7 +321,7 @@ const Notifications = () => {
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
               <div className="space-y-1">
-                <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
                   My <span className="text-[#36503F] italic">Notifications</span>
                 </h1>
                 <p className="text-[16px] text-[#6B7280] font-medium">

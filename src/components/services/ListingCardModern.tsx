@@ -309,62 +309,44 @@ const ListingCardModern = memo<ListingCardModernProps>(
           </div>
 
           {/* Pricing Section */}
-          <div className="space-y-2 mb-4">
+          <div className="space-y-2 mb-4 mt-auto">
             {/* Virtual Office Plans */}
-            {(("finalGstPricePerYear" in item && item.finalGstPricePerYear) ||
-              ("gstPlanPricePerYear" in item && item.gstPlanPricePerYear) ||
-              ("gstPlanPrice" in item && item.gstPlanPrice)) && (
+            {("finalGstPricePerYear" in item || "gstPlanPricePerYear" in item || "gstPlanPrice" in item) ? (
+              <>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">GST Plan</span>
                   <span className="font-bold text-foreground">
                     {"finalGstPricePerYear" in item && item.finalGstPricePerYear
-                      ? formatCurrency(item.finalGstPricePerYear)
+                      ? formatCurrency(item.finalGstPricePerYear) + "/yr"
                       : "gstPlanPricePerYear" in item && item.gstPlanPricePerYear
-                        ? formatCurrency(item.gstPlanPricePerYear)
-                        : item.gstPlanPrice}
-                    /yr
+                        ? formatCurrency(item.gstPlanPricePerYear) + "/yr"
+                        : item.gstPlanPrice ? item.gstPlanPrice + "/yr" : "N/A"}
                   </span>
                 </div>
-              )}
 
-            {(("finalMailingPricePerYear" in item &&
-              item.finalMailingPricePerYear) ||
-              ("mailingPlanPricePerYear" in item &&
-                item.mailingPlanPricePerYear) ||
-              ("mailingPlanPrice" in item && item.mailingPlanPrice)) && (
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Mailing Plan</span>
                   <span className="font-bold text-foreground">
-                    {"finalMailingPricePerYear" in item &&
-                      item.finalMailingPricePerYear
-                      ? formatCurrency(item.finalMailingPricePerYear)
-                      : "mailingPlanPricePerYear" in item &&
-                        item.mailingPlanPricePerYear
-                        ? formatCurrency(item.mailingPlanPricePerYear)
-                        : item.mailingPlanPrice}
-                    /yr
+                    {"finalMailingPricePerYear" in item && item.finalMailingPricePerYear
+                      ? formatCurrency(item.finalMailingPricePerYear) + "/yr"
+                      : "mailingPlanPricePerYear" in item && item.mailingPlanPricePerYear
+                        ? formatCurrency(item.mailingPlanPricePerYear) + "/yr"
+                        : item.mailingPlanPrice ? item.mailingPlanPrice + "/yr" : "N/A"}
                   </span>
                 </div>
-              )}
 
-            {(("finalBrPricePerYear" in item && item.finalBrPricePerYear) ||
-              ("brPlanPricePerYear" in item && item.brPlanPricePerYear) ||
-              ("brPlanPrice" in item && item.brPlanPrice)) && (
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Business Reg</span>
                   <span className="font-bold text-foreground">
-                    {"finalBrPricePerYear" in item && item.finalBrPricePerYear ? (
-                      formatCurrency(item.finalBrPricePerYear)
-                    ) : "brPlanPricePerYear" in item &&
-                      item.brPlanPricePerYear ? (
-                      formatCurrency(item.brPlanPricePerYear)
-                    ) : (
-                      item.brPlanPrice
-                    )}
-                    /yr
+                    {"finalBrPricePerYear" in item && item.finalBrPricePerYear
+                      ? formatCurrency(item.finalBrPricePerYear) + "/yr"
+                      : "brPlanPricePerYear" in item && item.brPlanPricePerYear
+                        ? formatCurrency(item.brPlanPricePerYear) + "/yr"
+                        : item.brPlanPrice ? item.brPlanPrice + "/yr" : "N/A"}
                   </span>
                 </div>
-              )}
+              </>
+            ) : null}
 
             {/* Default Starting from for Coworking/Meeting */}
             {!("gstPlanPricePerYear" in item) && !("gstPlanPrice" in item) && (

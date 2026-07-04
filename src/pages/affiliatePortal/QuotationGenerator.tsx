@@ -487,7 +487,7 @@ const QuotationGenerator = () => {
             )}
             {/* Header Section */}
             <div className="mb-10">
-                <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
                     Quotation <span className="text-[#36503F] italic">Generator</span>
                 </h1>
                 <p className="text-[#6b7280] mt-2 text-[16px] font-medium text-[#6B7280]">

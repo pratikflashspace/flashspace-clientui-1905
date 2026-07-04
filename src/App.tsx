@@ -22,6 +22,7 @@ const VirtualOffice = lazy(() => import("./pages/services/VirtualOffice"));
 const OnDemand = lazy(() => import("./pages/services/OnDemand"));
 const GetWorkspaces = lazy(() => import("./pages/services/GetWorkspaces"));
 const GetWorkspacesV2 = lazy(() => import("./pages/services/GetWorkspacesV2"));
+const GetCoworkingSpacesV2 = lazy(() => import("./pages/services/GetCoworkingSpacesV2"));
 const EventSpaces = lazy(() => import("./pages/services/EventSpaces"));
 const BusinessSetup = lazy(() => import("./pages/services/BusinessSetup"));
 const StartChatting = lazy(() => import("./pages/StartChatting"));
@@ -61,9 +62,9 @@ const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 const Blogs = lazy(() => import("./pages/Blogs"));
 const BlogDetail = lazy(() => import("./pages/BlogDetail"));
 const PackageDetail = lazy(() => import("./pages/PackageDetail"));
-const PackageCheckout = lazy(() => import("./pages/PackageCheckout"));
 const CalculatorsHub = lazy(() => import("./pages/CalculatorsHub"));
 const CalculatorDetail = lazy(() => import("./pages/CalculatorDetail"));
+const ThankYouPage = lazy(() => import("./pages/ThankYouPage"));
 
 // Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -205,34 +206,43 @@ const App = () => (
         <AuthProvider>
           <SocketProvider>
             <NotificationProvider>
-                <ChatProvider>
-                  <ScrollToTop />
-                  <FloatingAiButton />
-                  {/* <MouseFollower/> */}
-                  <Suspense fallback={<LoadingScreen />}>
-                    <ErrorBoundary>
-                      <Routes>
-                        {/* Public Routes */}
+              <ChatProvider>
+                <ScrollToTop />
+                <FloatingAiButton />
+                {/* <MouseFollower/> */}
+                <Suspense fallback={<LoadingScreen />}>
+                  <ErrorBoundary>
+                    <Routes>
+                      {/* Public Routes */}
 
                       <Route path="/" element={<Index />} />
                       <Route path="/oauth/authorize" element={<OAuthConsent />} />
                       <Route path="/services" element={<Services />} />
+                      <Route path="/thank-you" element={<ThankYouPage />} />
 
                       <Route
                         path="/services/virtual-office"
-                        element={<GetWorkspaces />}
+                        element={<GetWorkspacesV2 />}
+                      />
+                      <Route
+                        path="/services/virtual-office/:city"
+                        element={<GetWorkspacesV2 />}
                       />
                       <Route
                         path="/services/virtual-office/1"
-                        element={<GetWorkspacesV2 />}
-                      />
-                      <Route
-                        path="/services/coworking-space"
                         element={<GetWorkspaces />}
                       />
                       <Route
+                        path="/services/coworking-space"
+                        element={<GetCoworkingSpacesV2 />}
+                      />
+                      <Route
+                        path="/services/coworking-space/:city"
+                        element={<GetCoworkingSpacesV2 />}
+                      />
+                      <Route
                         path="/services/coworking-space/1"
-                        element={<GetWorkspacesV2 />}
+                        element={<GetWorkspaces />}
                       />
                       <Route
                         path="/services/on-demand"
@@ -244,6 +254,10 @@ const App = () => (
                       />
                       <Route
                         path="/services/business-setup"
+                        element={<GetWorkspaces />}
+                      />
+                      <Route
+                        path="/services/business-setup/:city"
                         element={<GetWorkspaces />}
                       />
                       <Route
@@ -336,12 +350,6 @@ const App = () => (
                       />
 
                       {/* Payment Routes */}
-                      <Route element={<ProtectedRoute />}>
-                        <Route
-                          path="/package-checkout"
-                          element={<PackageCheckout />}
-                        />
-                      </Route>
                       <Route
                         path="/payment/success"
                         element={<PaymentSuccessPage />}
@@ -653,7 +661,7 @@ const App = () => (
                     </Routes>
                   </ErrorBoundary>
                 </Suspense>
-                </ChatProvider>
+              </ChatProvider>
             </NotificationProvider>
           </SocketProvider>
         </AuthProvider>

@@ -289,7 +289,7 @@ export const FAQSection = () => {
                     <div
                         ref={scrollRef}
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                        className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory px-1 [&::-webkit-scrollbar]:hidden"
+                        className="flex gap-4 overflow-x-auto overflow-y-hidden py-4 snap-x snap-mandatory px-4 -mx-4 [&::-webkit-scrollbar]:hidden items-stretch"
                     >
                         {filtered.map((faq, i) => (
                             <motion.div

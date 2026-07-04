@@ -104,7 +104,7 @@ const TestimonialsSection = () => {
   return (
     <section
       id="testimonials"
-      className="py-20 px-4 relative bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300"
+      className="py-10 px-4 relative bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300"
     >
       <div className="container mx-auto relative z-10">
         {/* Section Header */}

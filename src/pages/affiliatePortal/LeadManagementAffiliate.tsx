@@ -134,7 +134,7 @@ const LeadManagementAffiliate = () => {
                 {/* 1. Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-fade-in-down">
                     <div>
-                        <h1 className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                        <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
                             Lead <span className="italic">Management</span>
                         </h1>
                         <p className="mt-2 text-[16px] font-medium text-[#6B7280] tracking-tight">

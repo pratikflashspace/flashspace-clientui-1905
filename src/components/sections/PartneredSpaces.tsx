@@ -9,37 +9,37 @@ const panIndiaCities = [
     id: 1,
     title: "Ahmedabad",
     price: "749",
-    image: "/cities/sardar-patel-statue-2.webp",
+    image: "/to_cloudinary/sardar-patel-statue-2.webp",
   },
   {
     id: 2,
     title: "Bangalore",
-    price: "749",
-    image: "/cities/bangalore_city_1782458444683.png",
+    price: "1117",
+    image: "/to_cloudinary/bangalore_city_1782458444683.png",
   },
   {
     id: 3,
     title: "Chennai",
-    price: "749",
-    image: "/cities/chennai_city_1782458457106.png",
+    price: "1000",
+    image: "/to_cloudinary/chennai_city_1782458457106.png",
   },
   {
     id: 4,
     title: "Delhi",
-    price: "749",
-    image: "/cities/delhi_city_1782458486025.png",
+    price: "1025",
+    image: "/to_cloudinary/delhi_city_1782458486025.png",
   },
   {
     id: 5,
     title: "Mumbai",
-    price: "749",
-    image: "/cities/mumbai_city_1782458467763.png",
+    price: "1500",
+    image: "/to_cloudinary/mumbai_city_1782458467763.png",
   },
   {
     id: 6,
     title: "Pune",
-    price: "749",
-    image: "/cities/pune_city_1782458497049.png",
+    price: "1000",
+    image: "/to_cloudinary/pune_city_1782458497049.png",
   }
 ];
 

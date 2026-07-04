@@ -96,7 +96,7 @@ const LeaderBoard: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
+            <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
               Affiliate <span className="italic text-[#36503F]">Leaderboard</span>
             </h1>
             <p className="mt-2 text-[16px] font-medium text-[#6B7280]">

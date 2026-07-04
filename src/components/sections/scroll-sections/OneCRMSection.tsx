@@ -34,17 +34,17 @@ export const OneCRMSection = () => {
                 <div className="grid lg:grid-cols-[1fr_1.5fr] gap-12 items-start px-5 sm:px-0" style={{ fontFamily: "'Inter', sans-serif" }}>
                     <div className="text-justify sm:text-left" style={{ fontFamily: "'Inter', sans-serif" }}>
                         <p className="text-[15px] sm:text-lg text-muted-foreground mb-6 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
-                            Take complete control of your customer journey. Our powerful CRM tool brings your sales, marketing, and support teams together on one unified platform to drive growth and build lasting relationships.
+                            Take complete control of your customer journey. Our powerful Free CRM tool brings your sales, marketing, and support teams together on one unified platform to drive growth and build lasting relationships.
                         </p>
                         <Link to="/solutions/one-crm" onClick={() => window.scrollTo(0, 0)}>
                             <Button variant="outline" size="lg" className="group border-primary/30 hover:bg-primary/5 font-semibold w-full sm:w-auto">
-                                Explore One CRM
+                                Explore Free One CRM
                                 <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                             </Button>
                         </Link>
                     </div>
 
-                    <div className="grid sm:grid-cols-2 gap-6" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    <div className="grid grid-cols-2 gap-4 sm:gap-6" style={{ fontFamily: "'Inter', sans-serif" }}>
                         {services.map((service, i) => (
                             <motion.div
                                 key={service.title}
@@ -55,8 +55,8 @@ export const OneCRMSection = () => {
                                 className="p-5 rounded-xl bg-card border border-border hover:border-primary/20 transition-colors"
                             >
                                 <service.icon className="w-8 h-8 text-[#36503F] mb-4" />
-                                <h4 className="text-base font-bold text-foreground mb-2" style={{ fontFamily: "'Inter', sans-serif" }}>{service.title}</h4>
-                                <p className="text-sm text-muted-foreground leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>{service.desc}</p>
+                                <h4 className="text-sm sm:text-base font-medium sm:font-bold text-foreground mb-2" style={{ fontFamily: "'Inter', sans-serif" }}>{service.title}</h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed hidden sm:block" style={{ fontFamily: "'Inter', sans-serif" }}>{service.desc}</p>
                             </motion.div>
                         ))}
                     </div>

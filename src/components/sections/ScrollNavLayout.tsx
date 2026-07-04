@@ -5,7 +5,8 @@ import { WorkspacesSection } from "@/components/sections/scroll-sections/Workspa
 import { BusinessSetupSection } from "@/components/sections/scroll-sections/BusinessSetupSection";
 import { GlobalAccessSection } from "@/components/sections/scroll-sections/GlobalAccessSection";
 import { TaxationFilingSection } from "@/components/sections/scroll-sections/TaxationFilingSection";
-import { AddOnSection } from "@/components/sections/scroll-sections/AddOnSection";
+import { WebsiteDevelopmentSection } from "@/components/sections/scroll-sections/WebsiteDevelopmentSection";
+import { OneCRMSection } from "@/components/sections/scroll-sections/OneCRMSection";
 
 type NavItem = {
     id: string;
@@ -103,7 +104,10 @@ export const ScrollNavLayout = () => {
                         <WorkspacesSection />
                         <BusinessSetupSection />
                         <TaxationFilingSection />
-                        <AddOnSection />
+                        <div id="add-on">
+                            <OneCRMSection />
+                            <WebsiteDevelopmentSection />
+                        </div>
                         {/* <GlobalAccessSection /> */}
                         <AISection />
                     </div>

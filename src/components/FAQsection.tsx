@@ -67,7 +67,7 @@ const FAQSection = ({ faqs = SALES_FAQS }: FAQSectionProps) => {
   return (
     <section
       id="faq"
-      className="py-20 px-4 relative overflow-hidden bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300"
+      className="py-10 px-4 relative overflow-hidden bg-transparent dark:bg-[#0a0a0a] transition-colors duration-300"
     >
       <div className="container mx-auto max-w-5xl relative z-10">
         {/* Section Header */}

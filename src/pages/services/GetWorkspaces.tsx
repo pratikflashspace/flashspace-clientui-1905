@@ -234,7 +234,6 @@ const DiscountBanner = ({ onClick }: { onClick: () => void }) => (
     <div className="flex items-center gap-3 sm:gap-4">
       <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-white border border-[#E9EFEA] shadow-[0_2px_10px_rgba(0,0,0,0.03)] shrink-0">
         <BadgePercent className="w-6 h-6 text-[#10B981]" />
-        <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-[#F59E0B] fill-[#F59E0B] animate-pulse" />
       </div>
       <div className="flex flex-col">
         <h4 className="text-[15px] sm:text-[17px] font-bold text-[#1a2b21] mb-0.5" style={{ fontFamily: "'Inter', sans-serif" }}>Looking for the Best Deal?</h4>
@@ -247,26 +246,55 @@ const DiscountBanner = ({ onClick }: { onClick: () => void }) => (
   </div>
 );
 
-const WorkspacesFAQ = ({ city, type }: { city: string, type: string }) => {
+export const WorkspacesFAQ = ({ city, type }: { city: string, type: string }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  
+
   const typeName = type === "virtual-office" ? "Virtual Office" : type === "coworking" ? "Coworking Space" : "Business Setup";
-  
-  const faqs = [
+
+  const existingFaqs = [
     { question: `What is included in the ${typeName} amenities in ${city}?`, answer: `Our ${typeName.toLowerCase()} workspaces in ${city} typically include high-speed Wi-Fi, ergonomic furniture, access to meeting rooms, printing facilities, and complimentary tea/coffee.` },
     { question: `Can I book a workspace in ${city} for just a few hours?`, answer: `Yes, many of our partner locations in ${city} offer hourly, daily, and weekly passes depending on your requirement.` },
     { question: `Is parking available at the ${city} locations?`, answer: `Most locations in ${city} offer dedicated or shared parking spaces. Please check the specific workspace details for exact parking availability.` },
     { question: "How does the pricing and discount work?", answer: "You can lock in the best price directly through FlashSpace. For bulk bookings or long-term commitments, our experts can negotiate additional discounts." },
   ];
 
+  const virtualOfficeFaqs = [
+    { question: `What is a virtual office?`, answer: `A virtual office provides a business address, mail handling, and telephone answering services without physical office space. It allows businesses to establish a professional presence while working remotely.` },
+    { question: `Are virtual offices legal in India?`, answer: `Yes, virtual offices are completely legal in India. They are widely used for company incorporation and GST registration as long as you have the required compliance documents such as NOC, Rent Agreement, and Utility Bills.` },
+    { question: `How much does a virtual office cost in ${city}?`, answer: `Virtual office pricing in ${city} generally starts from ₹849 per month, depending on the location and specific services you require like GST registration or mailing handling.` },
+    { question: `Can I use a virtual office for company registration in ${city}?`, answer: `Yes, you can use a virtual office for company registration in ${city}. We provide all the necessary documents including a No Objection Certificate (NOC) and electricity bill for Registrar of Companies (ROC) compliance.` },
+    { question: `Can I use a virtual office for GST registration in ${city}?`, answer: `Absolutely. A virtual office is a fully compliant solution for GST registration in ${city}. We provide the required documentation such as a rent agreement and utility bills for GST approval.` },
+    { question: `How does a virtual office differ from a traditional office in ${city}?`, answer: `Unlike a traditional office in ${city} which requires physical space, high rent, and maintenance costs, a virtual office provides you with a premium business address and compliance documents at a fraction of the cost, without the dedicated physical workspace.` },
+    { question: `What documents do I require to buy a virtual office in ${city}?`, answer: `To purchase a virtual office in ${city}, you typically need to provide your PAN card, Aadhaar card, Certificate of Incorporation (if already registered), and passport-size photographs of the directors.` }
+  ];
+
+  const faqs = type === "virtual-office" ? [...virtualOfficeFaqs, ...existingFaqs] : existingFaqs;
+
   return (
     <div className="w-full bg-[#F4F7F5] border-t border-border/40 mt-12 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((faq) => ({
+              "@type": "Question",
+              name: faq.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.answer,
+              },
+            })),
+          }),
+        }}
+      />
       <div className="fs-container max-w-4xl mx-auto">
         <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#1a2b21] mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>Frequently Asked Questions about {typeName} in {city}</h2>
         <div className="space-y-4">
           {faqs.map((faq, index) => (
             <div key={index} className="border border-border/60 rounded-xl overflow-hidden bg-white shadow-sm transition-all">
-              <button 
+              <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full px-6 py-4 flex items-center justify-between text-left focus:outline-none hover:bg-muted/30 transition-colors"
               >
@@ -456,11 +484,11 @@ const WorkspaceCard = ({
   }
 
   if (view === "list") {
-      return (
-        <div
-          onClick={type !== "business-setup" ? handleNavigate : undefined}
-          className={`flex gap-6 sm:gap-8 group bg-card rounded-2xl border border-border/60 p-4 shadow-soft transition-all duration-200 ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
-        >
+    return (
+      <div
+        onClick={type !== "business-setup" ? handleNavigate : undefined}
+        className={`flex gap-6 sm:gap-8 group bg-card rounded-2xl border border-border/60 p-4 shadow-soft transition-all duration-200 ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
+      >
         {/* Image — fixed size, never shrinks */}
         <div className="relative w-1/3 h-36 sm:h-44 flex-shrink-0 rounded-xl overflow-hidden">
           <img
@@ -583,11 +611,10 @@ const WorkspaceCard = ({
                     window.location.href = "tel:+919888687898";
                   }
                 }}
-                className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                  type === "business-setup" 
-                    ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm" 
+                className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${type === "business-setup"
+                    ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm"
                     : "bg-transparent text-[#36503F] hover:bg-[#36503F]/5"
-                }`}
+                  }`}
               >
                 {type === "business-setup" ? <ShoppingCart className="w-3.5 h-3.5" /> : <Phone className="w-3.5 h-3.5" />}
                 {type === "business-setup" ? "Buy Now" : "Contact Sales"}
@@ -763,11 +790,10 @@ const WorkspaceCard = ({
                   window.location.href = "tel:+919888687898";
                 }
               }}
-              className={`flex-1 py-2.5 px-2 text-[12px] font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                type === "business-setup" 
-                  ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm" 
+              className={`flex-1 py-2.5 px-2 text-[12px] font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${type === "business-setup"
+                  ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm"
                   : "bg-transparent text-[#36503F] hover:bg-[#36503F]/5"
-              }`}
+                }`}
             >
               {type === "business-setup" ? <ShoppingCart className="w-3.5 h-3.5" /> : <Phone className="w-3.5 h-3.5" />}
               <span>{type === "business-setup" ? "Buy Now" : "Contact Sales"}</span>
@@ -838,7 +864,11 @@ const GetWorkspaces = () => {
   // Handle hash-based zoom for business setup cards (from header navigation)
   useEffect(() => {
     if (workspaceType === "business-setup" && location.hash) {
-      const hashId = location.hash.substring(1);
+      let hashId = location.hash.substring(1);
+      if (hashId.startsWith('bs-card-')) {
+        hashId = hashId.replace('bs-card-', '');
+      }
+
       // Wait for cards to render then scroll and zoom
       const timer = setTimeout(() => {
         const el = document.getElementById(`bs-card-${hashId}`);
@@ -846,7 +876,7 @@ const GetWorkspaces = () => {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
           setZoomedCardId(hashId);
         }
-      }, 1500);
+      }, 500); // reduced timeout slightly since ScrollToTop also does it
       return () => clearTimeout(timer);
     }
   }, [workspaceType, location.hash, location.key]);
@@ -919,15 +949,15 @@ const GetWorkspaces = () => {
 
     let couponDiscount = 0;
     if (appliedCoupon && basePrice > 0) {
-        if (appliedCoupon.discountType === 'percentage') {
-            couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
-            if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
-                couponDiscount = appliedCoupon.maxDiscount;
-            }
-        } else {
-            couponDiscount = appliedCoupon.discountValue;
+      if (appliedCoupon.discountType === 'percentage') {
+        couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
+        if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
+          couponDiscount = appliedCoupon.maxDiscount;
         }
-        couponDiscount = Math.round(couponDiscount);
+      } else {
+        couponDiscount = appliedCoupon.discountValue;
+      }
+      couponDiscount = Math.round(couponDiscount);
     }
 
     const taxableAmount = Math.max(basePrice - couponDiscount, 0);
@@ -1015,15 +1045,15 @@ const GetWorkspaces = () => {
 
     let couponDiscount = 0;
     if (appliedCoupon && basePrice > 0) {
-        if (appliedCoupon.discountType === 'percentage') {
-            couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
-            if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
-                couponDiscount = appliedCoupon.maxDiscount;
-            }
-        } else {
-            couponDiscount = appliedCoupon.discountValue;
+      if (appliedCoupon.discountType === 'percentage') {
+        couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
+        if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
+          couponDiscount = appliedCoupon.maxDiscount;
         }
-        couponDiscount = Math.round(couponDiscount);
+      } else {
+        couponDiscount = appliedCoupon.discountValue;
+      }
+      couponDiscount = Math.round(couponDiscount);
     }
 
     const taxableAmount = Math.max(basePrice - couponDiscount, 0);
@@ -1051,32 +1081,32 @@ const GetWorkspaces = () => {
   };
 
   const handleApplyCoupon = async () => {
-      if (!couponCode.trim()) return;
-      if (!isAuthenticated || !user) {
-          hotToast.error('Please log in to apply a coupon.');
-          return;
+    if (!couponCode.trim()) return;
+    if (!isAuthenticated || !user) {
+      hotToast.error('Please log in to apply a coupon.');
+      return;
+    }
+    setCouponLoading(true);
+    try {
+      const result = await validateCoupon(couponCode.trim().toUpperCase(), selectedBusinessSetup?.name);
+      if (result.success && result.data) {
+        setAppliedCoupon(result.data);
+        hotToast.success('Coupon applied successfully!');
+      } else {
+        setAppliedCoupon(null);
+        hotToast.error(result.message || 'Invalid or expired coupon');
       }
-      setCouponLoading(true);
-      try {
-          const result = await validateCoupon(couponCode.trim().toUpperCase(), selectedBusinessSetup?.name);
-          if (result.success && result.data) {
-              setAppliedCoupon(result.data);
-              hotToast.success('Coupon applied successfully!');
-          } else {
-              setAppliedCoupon(null);
-              hotToast.error(result.message || 'Invalid or expired coupon');
-          }
-      } catch (error: any) {
-          setAppliedCoupon(null);
-          hotToast.error(error.message || 'Failed to validate coupon');
-      } finally {
-          setCouponLoading(false);
-      }
+    } catch (error: any) {
+      setAppliedCoupon(null);
+      hotToast.error(error.message || 'Failed to validate coupon');
+    } finally {
+      setCouponLoading(false);
+    }
   };
 
   const handleRemoveCoupon = () => {
-      setAppliedCoupon(null);
-      setCouponCode('');
+    setAppliedCoupon(null);
+    setCouponCode('');
   };
 
   useEffect(() => {
@@ -1104,12 +1134,12 @@ const GetWorkspaces = () => {
     setWorkspaceType(value);
     const params = new URLSearchParams(location.search);
     const currentCity = params.get("city") || activeCity;
-    const searchStr = `?city=${encodeURIComponent(currentCity)}`;
+    const slug = currentCity.toLowerCase().replace(/\s+/g, '-');
 
     if (value === "coworking")
-      navigate(`/services/coworking-space${searchStr}`, { replace: true });
-    else if (value === "business-setup") navigate(`/services/business-setup${searchStr}`, { replace: true });
-    else navigate(`/services/virtual-office${searchStr}`, { replace: true });
+      navigate(`/services/coworking-space/${slug}`, { replace: true });
+    else if (value === "business-setup") navigate(`/services/business-setup`, { replace: true });
+    else navigate(`/services/virtual-office/${slug}`, { replace: true });
   };
 
   const handleCityChange = (city: string) => {
@@ -1191,85 +1221,85 @@ const GetWorkspaces = () => {
             "Accounting Services"
           ];
           const demoBusinessSetups = headings.map((heading, i) => {
-            let imgPath = `/home${i+1}.jpg`;
+            let imgPath = `/home${i + 1}.jpg`;
             let price = "4999";
             let description = "";
             let features: string[] = [];
             let timeline = "";
-            
-            if (heading === "GST Registration") { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
-               price = "₹2999 only"; 
-               description = "Get your GST number and start invoicing legally across India.";
-               features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"];
-               timeline = "1-2 days";
+
+            if (heading === "GST Registration") {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
+              price = "₹2999 only";
+              description = "Get your GST number and start invoicing legally across India.";
+              features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"];
+              timeline = "1-2 days";
             }
-            else if (heading.includes("Company Registration")) { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
-               price = "₹11999 only"; 
-               description = "Register your private limited company with end-to-end legal setup.";
-               features = ["Company Name Approval", "Incorporation Certificate", "PAN & TAN", "MOA & AOA Filing"];
-               timeline = "10-15 days";
+            else if (heading.includes("Company Registration")) {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
+              price = "₹11999 only";
+              description = "Register your private limited company with end-to-end legal setup.";
+              features = ["Company Name Approval", "Incorporation Certificate", "PAN & TAN", "MOA & AOA Filing"];
+              timeline = "10-15 days";
             }
-            else if (heading.includes("MSME")) { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
-               price = "₹1499 only"; 
-               description = "Unlock MSME benefits, subsidies, and government schemes.";
-               features = ["Udyam Registration", "MSME Certificate", "Loan Benefits", "Priority Lending Support"];
-               timeline = "1-2 days";
+            else if (heading.includes("MSME")) {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
+              price = "₹1499 only";
+              description = "Unlock MSME benefits, subsidies, and government schemes.";
+              features = ["Udyam Registration", "MSME Certificate", "Loan Benefits", "Priority Lending Support"];
+              timeline = "1-2 days";
             }
-            else if (heading === "Startup India Registration") { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
-               price = "₹1499 only"; 
-               description = "Get DPIIT recognition and startup tax benefits.";
-               features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification", "Investor Ready Setup"];
-               timeline = "5-7 days";
+            else if (heading === "Startup India Registration") {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
+              price = "₹1499 only";
+              description = "Get DPIIT recognition and startup tax benefits.";
+              features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification", "Investor Ready Setup"];
+              timeline = "5-7 days";
             }
-            else if (heading === "FSSAI Registration") { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
-               price = "₹2999 only"; 
-               description = "Food business license and compliance support for restaurants & brands.";
-               features = ["Food License Support", "State/Central License", "Compliance Guidance", "Renewal Support"];
-               timeline = "20-30 days";
+            else if (heading === "FSSAI Registration") {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
+              price = "₹2999 only";
+              description = "Food business license and compliance support for restaurants & brands.";
+              features = ["Food License Support", "State/Central License", "Compliance Guidance", "Renewal Support"];
+              timeline = "20-30 days";
             }
             else if (heading === "GST Filing") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
-               price = "Customized";
-               description = "Monthly and annual GST return filing handled by experts.";
-               features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"];
-               timeline = "Monthly / Quarterly";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
+              price = "Customized";
+              description = "Monthly and annual GST return filing handled by experts.";
+              features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"];
+              timeline = "Monthly / Quarterly";
             }
             else if (heading === "LLP Annual Compliance") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
-               price = "Customized";
-               description = "Stay compliant with annual LLP filing and legal requirements.";
-               features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
-               timeline = "Ongoing Annual Compliance";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
+              price = "Customized";
+              description = "Stay compliant with annual LLP filing and legal requirements.";
+              features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
+              timeline = "Ongoing Annual Compliance";
             }
             else if (heading === "MCA Annual Compliance") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
-               price = "Customized";
-               description = "Complete MCA compliance and ROC filing support for companies.";
-               features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
-               timeline = "Monthly / Annual";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
+              price = "Customized";
+              description = "Complete MCA compliance and ROC filing support for companies.";
+              features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
+              timeline = "Monthly / Annual";
             }
             else if (heading === "Section 8 Registration") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
-               price = "₹14999 only";
-               description = "Register your NGO or non-profit organization as a Section 8 company.";
-               features = ["NGO Registration", "80G & 12A Support", "MOA & AOA Filing", "PAN & TAN"];
-               timeline = "15-20 days";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
+              price = "₹14999 only";
+              description = "Register your NGO or non-profit organization as a Section 8 company.";
+              features = ["NGO Registration", "80G & 12A Support", "MOA & AOA Filing", "PAN & TAN"];
+              timeline = "15-20 days";
             }
             else if (heading === "Accounting Services") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
-               price = "Customized";
-               description = "Professional accounting and bookkeeping services for your business.";
-               features = ["Bookkeeping", "Financial Statements", "Payroll Processing", "Tax Advisory"];
-               timeline = "Monthly / Ongoing";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
+              price = "Customized";
+              description = "Professional accounting and bookkeeping services for your business.";
+              features = ["Bookkeeping", "Financial Statements", "Payroll Processing", "Tax Advisory"];
+              timeline = "Monthly / Ongoing";
             }
-            
+
             return {
-              id: `bs-${i+1}`,
+              id: `bs-${i + 1}`,
               name: heading,
               location: activeCity,
               address: "",
@@ -1287,7 +1317,7 @@ const GetWorkspaces = () => {
               negotiable: true,
               lat: 28.6139,
               lng: 77.209,
-              spaceId: `BS-2024-${i+1}`
+              spaceId: `BS-2024-${i + 1}`
             };
           });
           setWorkspaces(demoBusinessSetups);
@@ -1340,16 +1370,16 @@ const GetWorkspaces = () => {
               spaceId: vo.spaceId || vo.property?.spaceId || "",
             })),
           );
-          } else if (workspaceType === "coworking") {
-            const { spaces, pagination } = await getCoworkingSpacesByCity(
-              activeCity,
-              page,
-              PAGE_SIZE,
-              debouncedSearch
-            );
-            setPagination(pagination || null);
-            fetchedData = spaces.filter(isPubliclyVisibleWorkspace);
-            setWorkspaces(
+        } else if (workspaceType === "coworking") {
+          const { spaces, pagination } = await getCoworkingSpacesByCity(
+            activeCity,
+            page,
+            PAGE_SIZE,
+            debouncedSearch
+          );
+          setPagination(pagination || null);
+          fetchedData = spaces.filter(isPubliclyVisibleWorkspace);
+          setWorkspaces(
             fetchedData.map((cw) => ({
               id: cw._id || "",
               name: cw.property?.name || cw.name || "Coworking Space",
@@ -1496,15 +1526,15 @@ const GetWorkspaces = () => {
   // Coupon discount logic for render
   let renderCouponDiscount = 0;
   if (appliedCoupon && selectedBusinessBaseAmount > 0) {
-      if (appliedCoupon.discountType === 'percentage') {
-          renderCouponDiscount = (selectedBusinessBaseAmount * appliedCoupon.discountValue) / 100;
-          if (appliedCoupon.maxDiscount && renderCouponDiscount > appliedCoupon.maxDiscount) {
-              renderCouponDiscount = appliedCoupon.maxDiscount;
-          }
-      } else {
-          renderCouponDiscount = appliedCoupon.discountValue;
+    if (appliedCoupon.discountType === 'percentage') {
+      renderCouponDiscount = (selectedBusinessBaseAmount * appliedCoupon.discountValue) / 100;
+      if (appliedCoupon.maxDiscount && renderCouponDiscount > appliedCoupon.maxDiscount) {
+        renderCouponDiscount = appliedCoupon.maxDiscount;
       }
-      renderCouponDiscount = Math.round(renderCouponDiscount);
+    } else {
+      renderCouponDiscount = appliedCoupon.discountValue;
+    }
+    renderCouponDiscount = Math.round(renderCouponDiscount);
   }
 
   const renderTaxableAmount = Math.max(selectedBusinessBaseAmount - renderCouponDiscount, 0);
@@ -1755,31 +1785,30 @@ const GetWorkspaces = () => {
           </div>
           <div className="flex items-center justify-center gap-1.5 border-t border-border/40 py-6 mt-2 bg-background">
             <button
-                onClick={goPrevPage}
-                disabled={!pagination?.hasPrevPage}
-                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+              onClick={goPrevPage}
+              disabled={!pagination?.hasPrevPage}
+              className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
             >
-                Previous
+              Previous
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
-                  currentPage === p
+                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${currentPage === p
                     ? "bg-[#36503F] text-white"
                     : "text-foreground hover:bg-muted"
-                }`}
+                  }`}
               >
                 {p}
               </button>
             ))}
             <button
-                onClick={goNextPage}
-                disabled={!pagination?.hasNextPage}
-                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+              onClick={goNextPage}
+              disabled={!pagination?.hasNextPage}
+              className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
             >
-                Next
+              Next
             </button>
           </div>
         </div>
@@ -1793,20 +1822,20 @@ const GetWorkspaces = () => {
               <div className="sticky top-[88px] h-[calc(100vh-100px)] max-h-[800px] m-2 sm:m-4 flex flex-col gap-3">
                 {/* Map Controls */}
                 <div className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-border/50 shadow-sm shrink-0">
-                  <button 
-                    onClick={() => setMapCollapsed(false)} 
+                  <button
+                    onClick={() => setMapCollapsed(false)}
                     className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${!mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
                   >
                     Show Map
                   </button>
-                  <button 
-                    onClick={() => setMapCollapsed(true)} 
+                  <button
+                    onClick={() => setMapCollapsed(true)}
                     className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
                   >
                     Hide Map
                   </button>
-                  <button 
-                    onClick={() => setMapFullscreen(true)} 
+                  <button
+                    onClick={() => setMapFullscreen(true)}
                     className="flex-1 text-xs font-medium py-1.5 rounded-md text-gray-500 hover:bg-gray-50 transition-colors"
                   >
                     Full Map
@@ -1829,10 +1858,10 @@ const GetWorkspaces = () => {
                     <h3 className="text-[16px] font-bold text-gray-900 mb-4 leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
                       Get your Virtual Office in {activeCity} with Premjeet
                     </h3>
-                    
+
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 shrink-0">
-                        <img src="/newLogo/premjeet.png" alt="Premjeet" className="w-full h-full object-cover object-top" />
+                        <img src="/to_cloudinary/premjeet.png" alt="Premjeet" className="w-full h-full object-cover object-top" />
                       </div>
                       <div className="flex-1">
                         <h4 className="font-bold text-gray-900 text-[15px] leading-tight mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>Premjeet</h4>
@@ -1940,33 +1969,32 @@ const GetWorkspaces = () => {
               )}
             </div>
           )}
-           <div className="flex items-center justify-center gap-1.5 border-t border-border/40 py-6 pb-10 bg-background">
+          <div className="flex items-center justify-center gap-1.5 border-t border-border/40 py-6 pb-10 bg-background">
             <button
-                onClick={goPrevPage}
-                disabled={!pagination?.hasPrevPage}
-                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+              onClick={goPrevPage}
+              disabled={!pagination?.hasPrevPage}
+              className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
             >
-                Previous
+              Previous
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors hidden sm:flex ${
-                  currentPage === p
+                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors hidden sm:flex ${currentPage === p
                     ? "bg-[#36503F] text-white"
                     : "text-foreground hover:bg-muted"
-                }`}
+                  }`}
               >
                 {p}
               </button>
             ))}
             <button
-                onClick={goNextPage}
-                disabled={!pagination?.hasNextPage}
-                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+              onClick={goNextPage}
+              disabled={!pagination?.hasNextPage}
+              className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
             >
-                Next
+              Next
             </button>
           </div>
         </div>
@@ -2091,45 +2119,45 @@ const GetWorkspaces = () => {
 
                 {/* Coupon Section */}
                 <div className="mb-5">
-                    {appliedCoupon ? (
-                        <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl p-3">
-                            <div className="flex items-center gap-2">
-                                <Bookmark className="w-4 h-4 text-green-600" />
-                                <div>
-                                    <p className="text-sm font-semibold text-green-700">'{appliedCoupon.code}' applied</p>
-                                    <p className="text-xs text-green-600 font-medium">You saved {formatInr(renderCouponDiscount)}!</p>
-                                </div>
-                            </div>
-                            <button 
-                                onClick={handleRemoveCoupon}
-                                className="text-sm font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
-                            >
-                                Remove
-                            </button>
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl p-3">
+                      <div className="flex items-center gap-2">
+                        <Bookmark className="w-4 h-4 text-green-600" />
+                        <div>
+                          <p className="text-sm font-semibold text-green-700">'{appliedCoupon.code}' applied</p>
+                          <p className="text-xs text-green-600 font-medium">You saved {formatInr(renderCouponDiscount)}!</p>
                         </div>
-                    ) : (
-                        <div className="flex items-center gap-2 relative">
-                            <div className="relative flex-1">
-                                <Bookmark className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <input 
-                                    type="text" 
-                                    placeholder="Enter coupon code" 
-                                    className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-[#D4E0D0] rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#36503F]/20 uppercase"
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
-                                    disabled={couponLoading}
-                                />
-                            </div>
-                            <button 
-                                onClick={handleApplyCoupon}
-                                disabled={!couponCode.trim() || couponLoading}
-                                className="px-5 py-2.5 bg-[#36503F] text-[#FEF8C5] text-sm font-bold rounded-xl hover:bg-[#1F2E26] disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[80px]"
-                            >
-                                {couponLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Apply'}
-                            </button>
-                        </div>
-                    )}
+                      </div>
+                      <button
+                        onClick={handleRemoveCoupon}
+                        className="text-sm font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 relative">
+                      <div className="relative flex-1">
+                        <Bookmark className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Enter coupon code"
+                          className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-[#D4E0D0] rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#36503F]/20 uppercase"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                          disabled={couponLoading}
+                        />
+                      </div>
+                      <button
+                        onClick={handleApplyCoupon}
+                        disabled={!couponCode.trim() || couponLoading}
+                        className="px-5 py-2.5 bg-[#36503F] text-[#FEF8C5] text-sm font-bold rounded-xl hover:bg-[#1F2E26] disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[80px]"
+                      >
+                        {couponLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Apply'}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mb-5">
@@ -2193,7 +2221,7 @@ const GetWorkspaces = () => {
           </div>
         </DialogContent>
       </Dialog>
-      
+
       {/* Footer / Contact Modal */}
       <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
     </div>

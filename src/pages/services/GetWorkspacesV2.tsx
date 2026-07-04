@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,7 +11,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { GetInTouchModal } from "@/components/modals/GetInTouchModal";
+import { DelhiSeoContent } from "@/components/sections/DelhiSeoContent";
+import { GurgaonSeoContent } from "@/components/sections/GurgaonSeoContent";
+import { NoidaSeoContent } from "@/components/sections/NoidaSeoContent";
+import { MumbaiSeoContent } from "@/components/sections/MumbaiSeoContent";
+import { BangaloreSeoContent } from "@/components/sections/BangaloreSeoContent";
+import { KolkataSeoContent } from "@/components/sections/KolkataSeoContent";
+import { AhmedabadSeoContent } from "@/components/sections/AhmedabadSeoContent";
+import { ChennaiSeoContent } from "@/components/sections/ChennaiSeoContent";
+import { ChandigarhSeoContent } from "@/components/sections/ChandigarhSeoContent";
+import { ChhattisgarhSeoContent } from "@/components/sections/ChhattisgarhSeoContent";
+import { HimachalPradeshSeoContent } from "@/components/sections/HimachalPradeshSeoContent";
+import { HyderabadSeoContent } from "@/components/sections/HyderabadSeoContent";
+import { JaipurSeoContent } from "@/components/sections/JaipurSeoContent";
+import { JammuandKashmirSeoContent } from "@/components/sections/JammuandKashmirSeoContent";
+import { JharkhandSeoContent } from "@/components/sections/JharkhandSeoContent";
+import { JodhpurSeoContent } from "@/components/sections/JodhpurSeoContent";
+import { KochiSeoContent } from "@/components/sections/KochiSeoContent";
+import { MadhyaPradeshSeoContent } from "@/components/sections/MadhyaPradeshSeoContent";
+import { MysuruSeoContent } from "@/components/sections/MysuruSeoContent";
+import { PatnaSeoContent } from "@/components/sections/PatnaSeoContent";
+import { PuneSeoContent } from "@/components/sections/PuneSeoContent";
+import { PunjabSeoContent } from "@/components/sections/PunjabSeoContent";
+import { UttarakhandSeoContent } from "@/components/sections/UttarakhandSeoContent";
+import Footer from "@/components/Footer";
+
 import {
   Search,
   Star,
@@ -26,11 +58,19 @@ import {
   Phone,
   Flame,
   Map as MapIcon,
-  CheckCircle,
+  Check, CheckCircle,
   CheckCircle2,
   BadgeCheck,
   BadgePercent,
-  Sparkles
+  Sparkles,
+  Tag,
+  Coffee,
+  Wifi,
+  Printer,
+  Zap,
+  Dice5,
+  Users,
+  DoorClosed
 } from "lucide-react";
 import WorkspacesFAQData from "../../data/faq_data.json";
 import { FounderTestimonial } from "../../components/sections/FounderTestimonial";
@@ -236,7 +276,6 @@ const DiscountBanner = ({ onClick }: { onClick: () => void }) => (
     <div className="flex items-center gap-3 sm:gap-4">
       <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-white border border-[#E9EFEA] shadow-[0_2px_10px_rgba(0,0,0,0.03)] shrink-0">
         <BadgePercent className="w-6 h-6 text-[#10B981]" />
-        <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-[#F59E0B] fill-[#F59E0B] animate-pulse" />
       </div>
       <div className="flex flex-col">
         <h4 className="text-[15px] sm:text-[17px] font-bold text-[#1a2b21] mb-0.5" style={{ fontFamily: "'Inter', sans-serif" }}>Looking for the Best Deal?</h4>
@@ -251,24 +290,64 @@ const DiscountBanner = ({ onClick }: { onClick: () => void }) => (
 
 const WorkspacesFAQ = ({ city, type }: { city: string, type: string }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  
+
   const typeName = type === "virtual-office" ? "Virtual Office" : type === "coworking" ? "Coworking Space" : "Business Setup";
-  
-  const faqs = [
+
+  const existingFaqs = [
     { question: `What is included in the ${typeName} amenities in ${city}?`, answer: `Our ${typeName.toLowerCase()} workspaces in ${city} typically include high-speed Wi-Fi, ergonomic furniture, access to meeting rooms, printing facilities, and complimentary tea/coffee.` },
     { question: `Can I book a workspace in ${city} for just a few hours?`, answer: `Yes, many of our partner locations in ${city} offer hourly, daily, and weekly passes depending on your requirement.` },
     { question: `Is parking available at the ${city} locations?`, answer: `Most locations in ${city} offer dedicated or shared parking spaces. Please check the specific workspace details for exact parking availability.` },
     { question: "How does the pricing and discount work?", answer: "You can lock in the best price directly through FlashSpace. For bulk bookings or long-term commitments, our experts can negotiate additional discounts." },
   ];
 
+  const virtualOfficeFaqs = [
+    { question: `What is a virtual office?`, answer: `A virtual office provides a business address, mail handling, and telephone answering services without physical office space. It allows businesses to establish a professional presence while working remotely.` },
+    { question: `Are virtual offices legal in India?`, answer: `Yes, virtual offices are completely legal in India. They are widely used for company incorporation and GST registration as long as you have the required compliance documents such as NOC, Rent Agreement, and Utility Bills.` },
+    { question: `How much does a virtual office cost in ${city}?`, answer: `Virtual office pricing in ${city} generally starts from ₹849 per month, depending on the location and specific services you require like GST registration or mailing handling.` },
+    { question: `Can I use a virtual office for company registration in ${city}?`, answer: `Yes, you can use a virtual office for company registration in ${city}. We provide all the necessary documents including a No Objection Certificate (NOC) and electricity bill for Registrar of Companies (ROC) compliance.` },
+    { question: `Can I use a virtual office for GST registration in ${city}?`, answer: `Absolutely. A virtual office is a fully compliant solution for GST registration in ${city}. We provide the required documentation such as a rent agreement and utility bills for GST approval.` },
+    { question: `How does a virtual office differ from a traditional office in ${city}?`, answer: `Unlike a traditional office in ${city} which requires physical space, high rent, and maintenance costs, a virtual office provides you with a premium business address and compliance documents at a fraction of the cost, without the dedicated physical workspace.` },
+    { question: `What documents do I require to buy a virtual office in ${city}?`, answer: `To purchase a virtual office in ${city}, you typically need to provide your PAN card, Aadhaar card, Certificate of Incorporation (if already registered), and passport-size photographs of the directors.` }
+  ];
+
+  const coworkingFaqs = [
+    { question: `What team sizes can coworking spaces in ${city} accommodate?`, answer: `Coworking spaces in ${city} cater to a variety of team sizes, from individual freelancers needing a single desk to large enterprises requiring private offices for 100+ employees. You can easily scale up or down based on your requirements.` },
+    { question: `What is the cost of coworking space in ${city} per seat?`, answer: `The cost of a coworking seat in ${city} varies depending on the location and amenities, but typically starts around ₹4,999 per month for a flexible desk and goes up for dedicated desks or premium private cabins.` },
+    { question: `What amenities are typically offered in coworking spaces in ${city}?`, answer: `Standard amenities in ${city} coworking spaces include high-speed internet, ergonomic seating, power backup, meeting room access, cafeteria, printing facilities, and complimentary tea or coffee.` },
+    { question: `Which location in ${city} has the best coworking spaces?`, answer: `The best locations for coworking spaces in ${city} typically include major commercial hubs and IT parks which offer excellent connectivity, networking opportunities, and proximity to public transport.` },
+    { question: `How can I find the ideal shared office space in ${city} that suits my specific needs?`, answer: `You can use FlashSpace to browse, filter, and compare shared office spaces in ${city} based on your budget, preferred location, team size, and required amenities. Our experts can also assist you in finding the perfect match.` },
+    { question: `Are taxes and GST applicable when renting a coworking space in ${city}?`, answer: `Yes, renting a coworking space in ${city} is subject to an 18% GST over and above the monthly rental cost, which can be claimed as an input tax credit if your business is GST registered.` },
+    { question: `Can I host client meetings in a coworking office space in ${city}?`, answer: `Absolutely. Most coworking spaces in ${city} have professional meeting and conference rooms equipped with AV facilities that you can book on an hourly basis to host clients and team meetings.` }
+  ];
+
+  const faqs = type === "virtual-office" ? [...virtualOfficeFaqs, ...existingFaqs] : 
+               (type === "coworking" || type === "coworking-space") ? coworkingFaqs : existingFaqs;
+
   return (
-    <div className="w-full bg-[#F4F7F5] border-t border-border/40 mt-12 py-16">
+    <div className="w-full bg-[#F4F7F5] border-t border-border/40 py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((faq) => ({
+              "@type": "Question",
+              name: faq.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.answer,
+              },
+            })),
+          }),
+        }}
+      />
       <div className="fs-container max-w-4xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#1a2b21] mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>Frequently Asked Questions about {typeName} in {city}</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#1a2b21] mb-8" style={{ fontFamily: "'Inter', sans-serif" }}>Frequently Asked Questions</h2>
         <div className="space-y-4">
           {faqs.map((faq, index) => (
             <div key={index} className="border border-border/60 rounded-xl overflow-hidden bg-white shadow-sm transition-all">
-              <button 
+              <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full px-6 py-4 flex items-center justify-between text-left focus:outline-none hover:bg-muted/30 transition-colors"
               >
@@ -293,6 +372,7 @@ const WorkspaceCard = ({
   onBusinessSetupBuy,
   zoomedCardId,
   onCardZoom,
+  onHover,
 }: {
   ws: UnifiedWorkspace;
   view: ViewMode;
@@ -300,11 +380,28 @@ const WorkspaceCard = ({
   onBusinessSetupBuy?: (workspace: UnifiedWorkspace) => void;
   zoomedCardId?: string;
   onCardZoom?: (cardId: string) => void;
+  onHover?: (id: string | null) => void;
 }) => {
   const { toast } = useToast();
   const [liked, setLiked] = useState(false);
   const [carted, setCarted] = useState(false);
   const [imgIndex, setImgIndex] = useState(0);
+
+  const renderPrice = (priceStr: string) => {
+    const adjustedPrice = (type === 'coworking-space' || type === 'coworking') ? priceStr.replace('/mo', '/seat/mo') : priceStr;
+    const parts = adjustedPrice.split('/');
+    if (parts.length > 1) {
+      const amount = parts[0];
+      const suffix = '/' + parts.slice(1).join('/');
+      return (
+        <>
+          <span className="font-semibold">{amount}</span>
+          <span className="font-normal">{suffix}</span>
+        </>
+      );
+    }
+    return <span className="font-semibold">{adjustedPrice}</span>;
+  };
 
   const navigate = useNavigate();
   const handleNavigate = () => {
@@ -458,11 +555,13 @@ const WorkspaceCard = ({
   }
 
   if (view === "list") {
-      return (
-        <div
-          onClick={type !== "business-setup" ? handleNavigate : undefined}
-          className={`flex gap-6 sm:gap-8 group bg-card rounded-2xl border border-border/60 p-4 shadow-soft transition-all duration-200 w-full ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
-        >
+    return (
+      <div
+        onClick={type !== "business-setup" ? handleNavigate : undefined}
+        onMouseEnter={() => onHover && onHover(ws.id)}
+        onMouseLeave={() => onHover && onHover(null)}
+        className={`flex gap-6 sm:gap-8 group bg-card rounded-2xl border border-border/60 p-4 shadow-soft transition-all duration-200 w-full ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
+      >
         {/* Image — fixed size, never shrinks */}
         <div className="relative w-1/3 h-36 sm:h-44 flex-shrink-0 rounded-xl overflow-hidden">
           <img
@@ -497,7 +596,7 @@ const WorkspaceCard = ({
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1" style={{ fontFamily: "'Inter', sans-serif" }}>
               {ws.spaceId || ws.name}
-              {ws.address && ` at ${getShortAddress(ws.address)}`}
+              {ws.address && ` at ${getShortAddress(ws.address, ws.spaceId)}`}
             </h3>
             <div className="flex items-center gap-2 flex-shrink-0">
 
@@ -556,7 +655,7 @@ const WorkspaceCard = ({
                   {plan.label}
                 </span>
                 <span className="text-xs font-normal text-foreground text-right">
-                  {plan.price}
+                  {renderPrice(plan.price)}
                 </span>
               </div>
             ))}
@@ -585,11 +684,10 @@ const WorkspaceCard = ({
                     window.location.href = "tel:+919888687898";
                   }
                 }}
-                className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                  type === "business-setup" 
-                    ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm" 
+                className={`flex-1 py-2.5 px-4 text-xs font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${type === "business-setup"
+                    ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm"
                     : "bg-transparent text-[#36503F] hover:bg-[#36503F]/5"
-                }`}
+                  }`}
               >
                 {type === "business-setup" ? <ShoppingCart className="w-3.5 h-3.5" /> : <Phone className="w-3.5 h-3.5" />}
                 {type === "business-setup" ? "Buy Now" : "Contact Sales"}
@@ -618,6 +716,8 @@ const WorkspaceCard = ({
   return (
     <div
       onClick={type !== "business-setup" ? handleNavigate : undefined}
+      onMouseEnter={() => onHover && onHover(ws.id)}
+      onMouseLeave={() => onHover && onHover(null)}
       className={`group bg-card rounded-2xl border border-border/60 shadow-soft transition-all duration-200 overflow-hidden flex flex-col ${type !== "business-setup" ? "cursor-pointer hover:shadow-soft-lg" : "cursor-default"}`}
     >
       {/* Image Section */}
@@ -696,7 +796,7 @@ const WorkspaceCard = ({
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-semibold text-[15px] text-foreground leading-snug tracking-[1px] truncate px-1" style={{ fontFamily: "'Inter', sans-serif" }}>
             {ws.spaceId || ws.name}
-            {ws.address && ` at ${getShortAddress(ws.address)}`}
+            {ws.address && ` at ${getShortAddress(ws.address, ws.spaceId)}`}
           </h3>
           {type !== "business-setup" && (
             <div className="flex items-center gap-1 flex-shrink-0 bg-muted/60 rounded-full px-2 py-0.5">
@@ -736,7 +836,7 @@ const WorkspaceCard = ({
                 {plan.label}
               </span>
               <span className="text-[13px] font-normal text-foreground">
-                {plan.price}
+                {renderPrice(plan.price)}
               </span>
             </div>
           ))}
@@ -765,11 +865,10 @@ const WorkspaceCard = ({
                   window.location.href = "tel:+919888687898";
                 }
               }}
-              className={`flex-1 py-2.5 px-2 text-[12px] font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${
-                type === "business-setup" 
-                  ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm" 
+              className={`flex-1 py-2.5 px-2 text-[12px] font-semibold rounded-[12px] border border-[#36503F] transition-all duration-200 flex items-center justify-center gap-1.5 whitespace-nowrap ${type === "business-setup"
+                  ? "bg-[#36503F] text-[#FEF8C5] hover:bg-[#1F2E26] shadow-sm"
                   : "bg-transparent text-[#36503F] hover:bg-[#36503F]/5"
-              }`}
+                }`}
             >
               {type === "business-setup" ? <ShoppingCart className="w-3.5 h-3.5" /> : <Phone className="w-3.5 h-3.5" />}
               <span>{type === "business-setup" ? "Buy Now" : "Contact Sales"}</span>
@@ -801,9 +900,15 @@ const GetWorkspacesV2 = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { city: urlCity } = useParams<{ city?: string }>();
   const { user, isAuthenticated } = useAuth();
   const searchParams = new URLSearchParams(location.search);
-  const initialCity = searchParams.get("city") || "Delhi";
+
+  const formattedUrlCity = urlCity
+    ? urlCity.charAt(0).toUpperCase() + urlCity.slice(1).toLowerCase()
+    : null;
+
+  const initialCity = formattedUrlCity || searchParams.get("city") || "Delhi";
   const checkoutReturnTo = `${location.pathname}${location.search}${location.hash}`;
 
   const getInitialType = () => {
@@ -824,6 +929,7 @@ const GetWorkspacesV2 = () => {
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [showExpandMapBtn, setShowExpandMapBtn] = useState(false);
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -921,15 +1027,15 @@ const GetWorkspacesV2 = () => {
 
     let couponDiscount = 0;
     if (appliedCoupon && basePrice > 0) {
-        if (appliedCoupon.discountType === 'percentage') {
-            couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
-            if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
-                couponDiscount = appliedCoupon.maxDiscount;
-            }
-        } else {
-            couponDiscount = appliedCoupon.discountValue;
+      if (appliedCoupon.discountType === 'percentage') {
+        couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
+        if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
+          couponDiscount = appliedCoupon.maxDiscount;
         }
-        couponDiscount = Math.round(couponDiscount);
+      } else {
+        couponDiscount = appliedCoupon.discountValue;
+      }
+      couponDiscount = Math.round(couponDiscount);
     }
 
     const taxableAmount = Math.max(basePrice - couponDiscount, 0);
@@ -1017,15 +1123,15 @@ const GetWorkspacesV2 = () => {
 
     let couponDiscount = 0;
     if (appliedCoupon && basePrice > 0) {
-        if (appliedCoupon.discountType === 'percentage') {
-            couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
-            if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
-                couponDiscount = appliedCoupon.maxDiscount;
-            }
-        } else {
-            couponDiscount = appliedCoupon.discountValue;
+      if (appliedCoupon.discountType === 'percentage') {
+        couponDiscount = (basePrice * appliedCoupon.discountValue) / 100;
+        if (appliedCoupon.maxDiscount && couponDiscount > appliedCoupon.maxDiscount) {
+          couponDiscount = appliedCoupon.maxDiscount;
         }
-        couponDiscount = Math.round(couponDiscount);
+      } else {
+        couponDiscount = appliedCoupon.discountValue;
+      }
+      couponDiscount = Math.round(couponDiscount);
     }
 
     const taxableAmount = Math.max(basePrice - couponDiscount, 0);
@@ -1053,32 +1159,32 @@ const GetWorkspacesV2 = () => {
   };
 
   const handleApplyCoupon = async () => {
-      if (!couponCode.trim()) return;
-      if (!isAuthenticated || !user) {
-          hotToast.error('Please log in to apply a coupon.');
-          return;
+    if (!couponCode.trim()) return;
+    if (!isAuthenticated || !user) {
+      hotToast.error('Please log in to apply a coupon.');
+      return;
+    }
+    setCouponLoading(true);
+    try {
+      const result = await validateCoupon(couponCode.trim().toUpperCase(), selectedBusinessSetup?.name);
+      if (result.success && result.data) {
+        setAppliedCoupon(result.data);
+        hotToast.success('Coupon applied successfully!');
+      } else {
+        setAppliedCoupon(null);
+        hotToast.error(result.message || 'Invalid or expired coupon');
       }
-      setCouponLoading(true);
-      try {
-          const result = await validateCoupon(couponCode.trim().toUpperCase(), selectedBusinessSetup?.name);
-          if (result.success && result.data) {
-              setAppliedCoupon(result.data);
-              hotToast.success('Coupon applied successfully!');
-          } else {
-              setAppliedCoupon(null);
-              hotToast.error(result.message || 'Invalid or expired coupon');
-          }
-      } catch (error: any) {
-          setAppliedCoupon(null);
-          hotToast.error(error.message || 'Failed to validate coupon');
-      } finally {
-          setCouponLoading(false);
-      }
+    } catch (error: any) {
+      setAppliedCoupon(null);
+      hotToast.error(error.message || 'Failed to validate coupon');
+    } finally {
+      setCouponLoading(false);
+    }
   };
 
   const handleRemoveCoupon = () => {
-      setAppliedCoupon(null);
-      setCouponCode('');
+    setAppliedCoupon(null);
+    setCouponCode('');
   };
 
   useEffect(() => {
@@ -1106,27 +1212,28 @@ const GetWorkspacesV2 = () => {
     setWorkspaceType(value);
     const params = new URLSearchParams(location.search);
     const currentCity = params.get("city") || activeCity;
-    const searchStr = `?city=${encodeURIComponent(currentCity)}`;
+    const slug = currentCity.toLowerCase().replace(/\s+/g, '-');
 
     if (value === "coworking")
-      navigate(`/services/coworking-space${searchStr}`, { replace: true });
-    else if (value === "business-setup") navigate(`/services/business-setup${searchStr}`, { replace: true });
-    else navigate(`/services/virtual-office${searchStr}`, { replace: true });
+      navigate(`/services/coworking-space/${slug}`, { replace: true });
+    else if (value === "business-setup") navigate(`/services/business-setup`, { replace: true });
+    else navigate(`/services/virtual-office/${slug}`, { replace: true });
   };
 
   const handleCityChange = (city: string) => {
-    const params = new URLSearchParams(location.search);
-    params.set("city", city);
-    // Use replace to avoid cluttering history with filter changes
-    navigate({ search: params.toString() }, { replace: true });
-    // activeCity state will be updated by the useEffect listening to location.search
+    setActiveCity(city);
+    const slug = city.toLowerCase().replace(/\s+/g, '-');
+    if (workspaceType === "virtual-office") {
+      navigate(`/services/virtual-office/${slug}`, { replace: true });
+    } else if (workspaceType === "coworking" || (workspaceType === "coworking-space" || workspaceType === "coworking")) {
+      navigate(`/services/coworking-space/${slug}`, { replace: true });
+    } else {
+      const params = new URLSearchParams(location.search);
+      params.set("city", city);
+      navigate({ search: params.toString() }, { replace: true });
+    }
   };
-  const [searchLocation, setSearchLocation] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-
-  const handleSearch = () => {
-    setDebouncedSearch(searchLocation);
-  };
+  const [solutionFilter, setSolutionFilter] = useState("all");
   const [pricingFilter, setPricingFilter] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
@@ -1193,85 +1300,85 @@ const GetWorkspacesV2 = () => {
             "Accounting Services"
           ];
           const demoBusinessSetups = headings.map((heading, i) => {
-            let imgPath = `/home${i+1}.jpg`;
+            let imgPath = `/home${i + 1}.jpg`;
             let price = "4999";
             let description = "";
             let features: string[] = [];
             let timeline = "";
-            
-            if (heading === "GST Registration") { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
-               price = "₹2999 only"; 
-               description = "Get your GST number and start invoicing legally across India.";
-               features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"];
-               timeline = "1-2 days";
+
+            if (heading === "GST Registration") {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
+              price = "₹2999 only";
+              description = "Get your GST number and start invoicing legally across India.";
+              features = ["GSTIN Setup", "PAN & Aadhaar Verification", "Business Address Registration", "Digital Filing Support"];
+              timeline = "1-2 days";
             }
-            else if (heading.includes("Company Registration")) { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
-               price = "₹11999 only"; 
-               description = "Register your private limited company with end-to-end legal setup.";
-               features = ["Company Name Approval", "Incorporation Certificate", "PAN & TAN", "MOA & AOA Filing"];
-               timeline = "10-15 days";
+            else if (heading.includes("Company Registration")) {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
+              price = "₹11999 only";
+              description = "Register your private limited company with end-to-end legal setup.";
+              features = ["Company Name Approval", "Incorporation Certificate", "PAN & TAN", "MOA & AOA Filing"];
+              timeline = "10-15 days";
             }
-            else if (heading.includes("MSME")) { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
-               price = "₹1499 only"; 
-               description = "Unlock MSME benefits, subsidies, and government schemes.";
-               features = ["Udyam Registration", "MSME Certificate", "Loan Benefits", "Priority Lending Support"];
-               timeline = "1-2 days";
+            else if (heading.includes("MSME")) {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
+              price = "₹1499 only";
+              description = "Unlock MSME benefits, subsidies, and government schemes.";
+              features = ["Udyam Registration", "MSME Certificate", "Loan Benefits", "Priority Lending Support"];
+              timeline = "1-2 days";
             }
-            else if (heading === "Startup India Registration") { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
-               price = "₹1499 only"; 
-               description = "Get DPIIT recognition and startup tax benefits.";
-               features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification", "Investor Ready Setup"];
-               timeline = "5-7 days";
+            else if (heading === "Startup India Registration") {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
+              price = "₹1499 only";
+              description = "Get DPIIT recognition and startup tax benefits.";
+              features = ["DPIIT Recognition", "Tax Exemption Guidance", "Startup Certification", "Investor Ready Setup"];
+              timeline = "5-7 days";
             }
-            else if (heading === "FSSAI Registration") { 
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
-               price = "₹2999 only"; 
-               description = "Food business license and compliance support for restaurants & brands.";
-               features = ["Food License Support", "State/Central License", "Compliance Guidance", "Renewal Support"];
-               timeline = "20-30 days";
+            else if (heading === "FSSAI Registration") {
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
+              price = "₹2999 only";
+              description = "Food business license and compliance support for restaurants & brands.";
+              features = ["Food License Support", "State/Central License", "Compliance Guidance", "Renewal Support"];
+              timeline = "20-30 days";
             }
             else if (heading === "GST Filing") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
-               price = "Customized";
-               description = "Monthly and annual GST return filing handled by experts.";
-               features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"];
-               timeline = "Monthly / Quarterly";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035733/flashspace_homepage/ibfn2dufkh5ntzzhhxgs.png";
+              price = "Customized";
+              description = "Monthly and annual GST return filing handled by experts.";
+              features = ["GSTR-1 Filing", "GSTR-3B Filing", "Invoice Reconciliation", "Input Tax Credit"];
+              timeline = "Monthly / Quarterly";
             }
             else if (heading === "LLP Annual Compliance") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
-               price = "Customized";
-               description = "Stay compliant with annual LLP filing and legal requirements.";
-               features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
-               timeline = "Ongoing Annual Compliance";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035723/flashspace_homepage/mk0jvwt95cmpjfbzalqt.png";
+              price = "Customized";
+              description = "Stay compliant with annual LLP filing and legal requirements.";
+              features = ["Annual Filing", "Form 8 & 11", "ROC Compliance", "Partner Updates"];
+              timeline = "Ongoing Annual Compliance";
             }
             else if (heading === "MCA Annual Compliance") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
-               price = "Customized";
-               description = "Complete MCA compliance and ROC filing support for companies.";
-               features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
-               timeline = "Monthly / Annual";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035728/flashspace_homepage/ypwhl8p6jtneugh3tqvr.png";
+              price = "Customized";
+              description = "Complete MCA compliance and ROC filing support for companies.";
+              features = ["ROC Filing", "Board Resolution Support", "Director KYC", "Annual Returns"];
+              timeline = "Monthly / Annual";
             }
             else if (heading === "Section 8 Registration") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
-               price = "₹14999 only";
-               description = "Register your NGO or non-profit organization as a Section 8 company.";
-               features = ["NGO Registration", "80G & 12A Support", "MOA & AOA Filing", "PAN & TAN"];
-               timeline = "15-20 days";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035714/flashspace_homepage/q69yqywzvahoviaaauch.png";
+              price = "₹14999 only";
+              description = "Register your NGO or non-profit organization as a Section 8 company.";
+              features = ["NGO Registration", "80G & 12A Support", "MOA & AOA Filing", "PAN & TAN"];
+              timeline = "15-20 days";
             }
             else if (heading === "Accounting Services") {
-               imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
-               price = "Customized";
-               description = "Professional accounting and bookkeeping services for your business.";
-               features = ["Bookkeeping", "Financial Statements", "Payroll Processing", "Tax Advisory"];
-               timeline = "Monthly / Ongoing";
+              imgPath = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035719/flashspace_homepage/b4zvehnaldeo6cwtw6qg.png";
+              price = "Customized";
+              description = "Professional accounting and bookkeeping services for your business.";
+              features = ["Bookkeeping", "Financial Statements", "Payroll Processing", "Tax Advisory"];
+              timeline = "Monthly / Ongoing";
             }
-            
+
             return {
-              id: `bs-${i+1}`,
+              id: `bs-${i + 1}`,
               name: heading,
               location: activeCity,
               address: "",
@@ -1289,7 +1396,7 @@ const GetWorkspacesV2 = () => {
               negotiable: true,
               lat: 28.6139,
               lng: 77.209,
-              spaceId: `BS-2024-${i+1}`
+              spaceId: `BS-2024-${i + 1}`
             };
           });
           setWorkspaces(demoBusinessSetups);
@@ -1299,7 +1406,7 @@ const GetWorkspacesV2 = () => {
             activeCity,
             page,
             PAGE_SIZE,
-            debouncedSearch
+            ""
           );
           setPagination(pagination || null);
           fetchedData = offices.filter(isPubliclyVisibleWorkspace);
@@ -1342,16 +1449,16 @@ const GetWorkspacesV2 = () => {
               spaceId: vo.spaceId || vo.property?.spaceId || "",
             })),
           );
-          } else if (workspaceType === "coworking") {
-            const { spaces, pagination } = await getCoworkingSpacesByCity(
-              activeCity,
-              page,
-              PAGE_SIZE,
-              debouncedSearch
-            );
-            setPagination(pagination || null);
-            fetchedData = spaces.filter(isPubliclyVisibleWorkspace);
-            setWorkspaces(
+        } else if (workspaceType === "coworking") {
+          const { spaces, pagination } = await getCoworkingSpacesByCity(
+            activeCity,
+            page,
+            PAGE_SIZE,
+            ""
+          );
+          setPagination(pagination || null);
+          fetchedData = spaces.filter(isPubliclyVisibleWorkspace);
+          setWorkspaces(
             fetchedData.map((cw) => ({
               id: cw._id || "",
               name: cw.property?.name || cw.name || "Coworking Space",
@@ -1393,17 +1500,21 @@ const GetWorkspacesV2 = () => {
     };
 
     fetchWorkspaces();
-  }, [workspaceType, activeCity, page, debouncedSearch]);
+  }, [workspaceType, activeCity, page]);
 
   // Client-side filtering logic
   const filteredWorkspaces = useMemo(() => {
     return workspaces.filter((ws) => {
-      // Location search filter
-      const matchesSearch =
-        !debouncedSearch ||
-        ws.address.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        ws.location.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        ws.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+      // Solution filter
+      let matchesSolution = true;
+      if (workspaceType === "virtual-office" && solutionFilter !== "all") {
+        matchesSolution = ws.plans?.some((p) => {
+          if (solutionFilter === "gst") return p.label === "GST Plan";
+          if (solutionFilter === "mailing") return p.label === "Mailing Plan";
+          if (solutionFilter === "business") return p.label === "Business Reg";
+          return false;
+        }) ?? false;
+      }
 
       // Price filter
       let matchesPrice = true;
@@ -1427,9 +1538,22 @@ const GetWorkspacesV2 = () => {
         }
       }
 
-      return matchesSearch && matchesPrice;
+      return matchesSolution && matchesPrice;
+    }).map((ws) => {
+      if (workspaceType === "virtual-office" && solutionFilter !== "all" && ws.plans) {
+        return {
+          ...ws,
+          plans: ws.plans.filter((p) => {
+            if (solutionFilter === "gst") return p.label === "GST Plan";
+            if (solutionFilter === "mailing") return p.label === "Mailing Plan";
+            if (solutionFilter === "business") return p.label === "Business Reg";
+            return false;
+          }),
+        };
+      }
+      return ws;
     });
-  }, [workspaces, debouncedSearch, pricingFilter]);
+  }, [workspaces, solutionFilter, pricingFilter, workspaceType]);
 
   const sortedWorkspaces = useMemo(() => {
     const list = [...filteredWorkspaces];
@@ -1498,15 +1622,15 @@ const GetWorkspacesV2 = () => {
   // Coupon discount logic for render
   let renderCouponDiscount = 0;
   if (appliedCoupon && selectedBusinessBaseAmount > 0) {
-      if (appliedCoupon.discountType === 'percentage') {
-          renderCouponDiscount = (selectedBusinessBaseAmount * appliedCoupon.discountValue) / 100;
-          if (appliedCoupon.maxDiscount && renderCouponDiscount > appliedCoupon.maxDiscount) {
-              renderCouponDiscount = appliedCoupon.maxDiscount;
-          }
-      } else {
-          renderCouponDiscount = appliedCoupon.discountValue;
+    if (appliedCoupon.discountType === 'percentage') {
+      renderCouponDiscount = (selectedBusinessBaseAmount * appliedCoupon.discountValue) / 100;
+      if (appliedCoupon.maxDiscount && renderCouponDiscount > appliedCoupon.maxDiscount) {
+        renderCouponDiscount = appliedCoupon.maxDiscount;
       }
-      renderCouponDiscount = Math.round(renderCouponDiscount);
+    } else {
+      renderCouponDiscount = appliedCoupon.discountValue;
+    }
+    renderCouponDiscount = Math.round(renderCouponDiscount);
   }
 
   const renderTaxableAmount = Math.max(selectedBusinessBaseAmount - renderCouponDiscount, 0);
@@ -1530,10 +1654,12 @@ const GetWorkspacesV2 = () => {
           className={`bg-muted/20 transition-all duration-300 ease-in-out relative ${workspaceType === "business-setup" ? "w-full" : "w-[65%] border-r border-border/40"}`}
         >
           {/* Breadcrumb + Filters */}
-          <div className="border-b border-border/60 mb-5 bg-background rounded-bl-3xl">
-            <div className="py-4 pr-5 sm:pr-8 pl-0">
+          <div className="sticky top-14 md:top-16 z-40 mb-5 shadow-sm">
+            {/* Stretched blurred background to cover left margin during scroll */}
+            <div className="absolute inset-y-0 -left-[100vw] right-0 bg-white/90 backdrop-blur-md border-b border-border/60 -z-10 pointer-events-none" />
+            <div className="py-2 pr-5 sm:pr-8 pl-0">
               {/* Breadcrumb */}
-              <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
+              <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
                 <a href="/" className="hover:text-foreground transition-colors">
                   Home
                 </a>
@@ -1549,28 +1675,24 @@ const GetWorkspacesV2 = () => {
                 )}
               </nav>
 
-              {/* Filter bar */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 bg-muted/40 border border-border/60 rounded-2xl p-2.5 sm:p-3 relative z-[40]">
                 {/* Product */}
                 <div className="sm:w-[180px]">
-                  <Select
-                    value={workspaceType}
-                    onValueChange={handleWorkspaceTypeChange}
-                  >
-                    <SelectTrigger
-                      className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${workspaceType !== "virtual-office"
-                        ? "bg-muted/50 border-border text-foreground"
-                        : "border-border/60 hover:border-border hover:shadow-sm"
-                        }`}
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger
+                      className={`flex items-center justify-between border shadow-none rounded-xl h-10 text-sm font-medium px-4 w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 border-border/60 bg-transparent text-foreground hover:border-border hover:shadow-sm`}
                     >
-                      <SelectValue placeholder="Product" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="virtual-office">Virtual Office</SelectItem>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="coworking">Coworking Space</SelectItem>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="business-setup">Business Setup</SelectItem>
-                    </SelectContent>
-                  </Select>
+                      <span>
+                        {workspaceType === "virtual-office" ? "Virtual Office" : workspaceType === "coworking" || (workspaceType === "coworking-space" || workspaceType === "coworking") ? "Coworking Space" : "Business Setup"}
+                      </span>
+                      <ChevronDown className="w-4 h-4 opacity-50" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-[180px] rounded-xl border-border/60 shadow-lg font-medium p-1">
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${workspaceType === 'virtual-office' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => handleWorkspaceTypeChange("virtual-office")}>Virtual Office {workspaceType === 'virtual-office' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${workspaceType === 'coworking' || workspaceType === 'coworking-space' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => handleWorkspaceTypeChange("coworking")}>Coworking Space {(workspaceType === 'coworking' || workspaceType === 'coworking-space') && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${workspaceType === 'business-setup' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => handleWorkspaceTypeChange("business-setup")}>Business Setup {workspaceType === 'business-setup' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Divider */}
@@ -1585,70 +1707,92 @@ const GetWorkspacesV2 = () => {
                   disabled={workspaceType === "business-setup"}
                 />
 
-                {/* Search Location */}
-                <div className="relative flex-1 min-w-[140px]">
-                  <div className="flex items-center bg-card border border-border/60 rounded-xl h-10 overflow-hidden transition-all duration-200 focus-within:ring-[3px] focus-within:ring-[#36503F]/20 focus-within:border-[#36503F]">
-                    <MapPin className="w-4 h-4 text-muted-foreground ml-3 flex-shrink-0" />
-                    <Input
-                      value={searchLocation}
-                      onChange={(e) => setSearchLocation(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          handleSearch();
-                        }
-                      }}
-                      className="border-0 shadow-none h-full text-sm font-medium text-foreground focus-visible:ring-0 focus-visible:ring-offset-0 focus:outline-none bg-transparent px-3 placeholder:text-muted-foreground/40 min-w-0 flex-1"
-                      placeholder="Search location..."
-                    />
-                    <button
-                      onClick={handleSearch}
-                      className="px-3 h-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-muted transition-colors border-l border-border/60"
-                      title="Search"
-                    >
-                      <Search className="w-4 h-4" />
-                    </button>
+                {/* Solution */}
+                {(workspaceType === "coworking-space" || workspaceType === "coworking") && (
+                  <div className="sm:w-[180px]">
+                    <DropdownMenu modal={false}>
+                      <DropdownMenuTrigger
+                        className={`flex items-center justify-between border shadow-none rounded-xl h-10 text-sm font-medium px-4 w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${solutionFilter !== "all"
+                            ? "bg-muted/50 border-border text-foreground"
+                            : "border-border/60 bg-transparent text-foreground hover:border-border hover:shadow-sm"
+                            }`}
+                      >
+                        <span className="whitespace-nowrap">
+                          {solutionFilter === "all" ? "All Solutions" : solutionFilter === "gst" ? "GST Plan" : solutionFilter === "mailing" ? "Mailing Plan" : "Business Registration"}
+                        </span>
+                        <ChevronDown className="w-4 h-4 opacity-50" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-[180px] rounded-xl border-border/60 shadow-lg font-medium p-1">
+                        <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${solutionFilter === 'all' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setSolutionFilter("all")}>All Solutions {solutionFilter === 'all' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                        <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${solutionFilter === 'gst' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setSolutionFilter("gst")}>GST Plan {solutionFilter === 'gst' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                        <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${solutionFilter === 'mailing' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setSolutionFilter("mailing")}>Mailing Plan {solutionFilter === 'mailing' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                        <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${solutionFilter === 'business' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setSolutionFilter("business")}>Business Registration {solutionFilter === 'business' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                </div>
+                )}
 
                 {/* Pricing */}
                 <div className="sm:w-[160px]">
-                  <Select value={pricingFilter} onValueChange={setPricingFilter} disabled={workspaceType === "business-setup"}>
-                    <SelectTrigger
-                      className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${pricingFilter !== "all"
-                        ? "bg-muted/50 border-border text-foreground"
-                        : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                        }`}
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger
+                      disabled={workspaceType === "business-setup"}
+                      className={`flex items-center justify-between border shadow-none rounded-xl h-10 text-sm font-medium px-4 w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${pricingFilter !== "all"
+                          ? "bg-muted/50 border-border text-foreground"
+                          : "border-border/60 bg-transparent text-foreground hover:border-border hover:shadow-sm"
+                          } disabled:opacity-50`}
                     >
-                      <SelectValue placeholder="Pricing" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="all">All Pricing</SelectItem>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="low">Under ₹5,000</SelectItem>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="mid">₹5,000 – ₹15,000</SelectItem>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="high">Above ₹15,000</SelectItem>
-                    </SelectContent>
-                  </Select>
+                      <span>
+                        {pricingFilter === "all" ? "All Pricing" : pricingFilter === "low" ? "Under ₹5,000" : pricingFilter === "mid" ? "₹5,000 - ₹15,000" : "Above ₹15,000"}
+                      </span>
+                      <ChevronDown className="w-4 h-4 opacity-50" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-[160px] rounded-xl border-border/60 shadow-lg font-medium p-1">
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${pricingFilter === 'all' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setPricingFilter("all")}>All Pricing {pricingFilter === 'all' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${pricingFilter === 'low' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setPricingFilter("low")}>Under ₹5,000 {pricingFilter === 'low' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${pricingFilter === 'mid' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setPricingFilter("mid")}>₹5,000 - ₹15,000 {pricingFilter === 'mid' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${pricingFilter === 'high' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setPricingFilter("high")}>Above ₹15,000 {pricingFilter === 'high' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Sort by */}
                 <div className="sm:w-[180px]">
-                  <Select value={sortBy} onValueChange={setSortBy} disabled={workspaceType === "business-setup"}>
-                    <SelectTrigger
-                      className={`border shadow-none rounded-xl h-10 text-sm font-medium px-4 [&>svg]:ml-auto w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${sortBy !== "rating"
-                        ? "bg-muted/50 border-border text-foreground"
-                        : "border-border/60 text-foreground bg-card hover:border-border hover:shadow-sm"
-                        }`}
+                  <DropdownMenu modal={false}>
+                    <DropdownMenuTrigger
+                      disabled={workspaceType === "business-setup"}
+                      className={`flex items-center justify-between border shadow-none rounded-xl h-10 text-sm font-medium px-4 w-full transition-all duration-200 focus:outline-none focus:ring-[3px] focus:ring-[#36503F]/20 focus:border-[#36503F] focus:ring-offset-0 ${sortBy !== "rating"
+                          ? "bg-muted/50 border-border text-foreground"
+                          : "border-border/60 bg-transparent text-foreground hover:border-border hover:shadow-sm"
+                          } disabled:opacity-50`}
                     >
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="rating">Highest Rated</SelectItem>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="popular">Most Popular</SelectItem>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="price-low">Price: Low to High</SelectItem>
-                      <SelectItem className="focus:bg-[#FEF8CF] focus:text-[#1a2b21]" value="price-high">Price: High to Low</SelectItem>
-                    </SelectContent>
-                  </Select>
+                      <span>
+                        {sortBy === "rating" ? "Highest Rated" : sortBy === "popular" ? "Most Popular" : sortBy === "price-low" ? "Price: Low to High" : "Price: High to Low"}
+                      </span>
+                      <ChevronDown className="w-4 h-4 opacity-50" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-[180px] rounded-xl border-border/60 shadow-lg font-medium p-1">
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${sortBy === 'rating' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setSortBy("rating")}>Highest Rated {sortBy === 'rating' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${sortBy === 'popular' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setSortBy("popular")}>Most Popular {sortBy === 'popular' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${sortBy === 'price-low' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setSortBy("price-low")}>Price: Low to High {sortBy === 'price-low' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                      <DropdownMenuItem className={`focus:bg-[#FEF8CF] focus:text-[#1a2b21] rounded-lg cursor-pointer flex items-center justify-between ${sortBy === 'price-high' ? 'bg-[#FEF8CF] text-[#1a2b21] font-semibold' : ''}`} onClick={() => setSortBy("price-high")}>Price: High to Low {sortBy === 'price-high' && <Check className="w-4 h-4" />}</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
+
+                {/* Reset Filters */}
+                {(pricingFilter !== "all" || sortBy !== "rating" || solutionFilter !== "all") && (
+                  <button
+                    onClick={() => {
+                      setPricingFilter("all");
+                      setSortBy("rating");
+                      setSolutionFilter("all");
+                    }}
+                    className="flex-shrink-0 text-sm font-medium text-muted-foreground hover:text-[#36503F] transition-colors px-2 underline underline-offset-4"
+                  >
+                    Reset filters
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -1656,7 +1800,7 @@ const GetWorkspacesV2 = () => {
           <div className="py-5 pr-5 sm:pr-8 pl-0">
             {/* Results text */}
             {workspaceType !== "business-setup" && (
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                 <p className="text-sm text-muted-foreground">
                   Showing{" "}
                   <span className="font-semibold text-foreground">
@@ -1667,6 +1811,14 @@ const GetWorkspacesV2 = () => {
                     {activeCity}
                   </span>
                 </p>
+                {workspaceType !== "coworking" && workspaceType !== "coworking-space" && (
+                  <button
+                    onClick={() => setIsContactOpen(true)}
+                    className="text-[13px] font-bold bg-[#36503F] text-[#FEF8CF] px-4 py-2 rounded-xl hover:bg-[#2c4133] transition-colors shadow-sm"
+                  >
+                    New to {(typeLabel[workspaceType] || "Virtual Office").toLowerCase()}?
+                  </button>
+                )}
               </div>
             )}
             {loading ? (
@@ -1692,36 +1844,56 @@ const GetWorkspacesV2 = () => {
                 }
               >
                 {sortedWorkspaces.length > 0 ? (
-                  sortedWorkspaces.map((ws, index) => (
-                    <div key={ws.id} className="contents">
-                      {index === 1 && workspaceType !== "business-setup" && (
-                        <div className="col-span-full py-4 my-2 flex flex-col items-center">
-                          <h3 className="text-[17px] font-semibold text-gray-900 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
-                            5,000+ {workspaceType === "virtual-office" ? "Virtual Office" : "Coworking Space"} clients served
-                          </h3>
-                          <div className="flex justify-between items-center gap-x-2 gap-y-4 opacity-90 transition-all duration-300 border border-border/60 rounded-xl bg-white shadow-sm px-6 sm:px-10 py-5 w-full overflow-hidden">
-                            <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-8 sm:h-12 object-contain shrink-0" />
-                            <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-12 sm:h-16 object-contain shrink-0" />
-                            <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-5 sm:h-7 object-contain shrink-0" />
-                            <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 sm:h-12 object-contain shrink-0" />
-                            <img src="/newLogo/Adda247.png" alt="Adda247" className="h-8 sm:h-12 object-contain shrink-0" />
-                            <img src="/newLogo/growthschool.png" alt="GrowthSchool" className="h-6 sm:h-9 object-contain shrink-0" />
+                  <>
+                    {sortedWorkspaces.map((ws, index) => (
+                      <div key={ws.id} className="contents">
+                        {index === 1 && workspaceType !== "business-setup" && (
+                          <div className="col-span-full py-4 my-2 flex flex-col items-start w-full">
+                            <h3 className="text-[17px] font-semibold text-gray-900 mb-4 text-left" style={{ fontFamily: "'Inter', sans-serif" }}>
+                              5,000+ {workspaceType === "virtual-office" ? "Virtual Office" : "Coworking Space"} clients served
+                            </h3>
+                            <div className="flex justify-between items-center gap-x-2 gap-y-4 opacity-90 transition-all duration-300 border border-border/60 rounded-xl bg-white shadow-sm px-6 sm:px-10 py-5 w-full overflow-hidden">
+                              <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-8 sm:h-12 object-contain shrink-0" />
+                              <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-12 sm:h-16 object-contain shrink-0" />
+                              <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-5 sm:h-7 object-contain shrink-0" />
+                              <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 sm:h-12 object-contain shrink-0" />
+                              <img src="/newLogo/Adda247.png" alt="Adda247" className="h-8 sm:h-12 object-contain shrink-0" />
+                              <img src="/newLogo/growthschool.png" alt="GrowthSchool" className="h-6 sm:h-9 object-contain shrink-0" />
+                            </div>
                           </div>
-                        </div>
-                      )}
-                      <WorkspaceCard
-                        ws={ws}
-                        view="list"
-                        type={workspaceType}
-                        onBusinessSetupBuy={setSelectedBusinessSetup}
-                        zoomedCardId={zoomedCardId}
-                        onCardZoom={setZoomedCardId}
-                      />
-                      {index === 3 && workspaceType !== "business-setup" && (
+                        )}
+                        <WorkspaceCard
+                          ws={ws}
+                          view="list"
+                          type={workspaceType}
+                          onBusinessSetupBuy={setSelectedBusinessSetup}
+                          zoomedCardId={zoomedCardId}
+                          onCardZoom={setZoomedCardId}
+                          onHover={setHoveredCardId}
+                        />
+                        {index === 3 && workspaceType !== "business-setup" && (
+                          <>
+                            {((workspaceType === 'coworking' || workspaceType === 'coworking-space')) ? (
+                              <CoworkingExpertCard onClickCallback={() => setIsContactOpen(true)} />
+                            ) : (
+                              <GuaranteeCard onClickCallback={() => setIsContactOpen(true)} />
+                            )}
+                            <ReviewsCarousel />
+                          </>
+                        )}
+                      </div>
+                    ))}
+                    {sortedWorkspaces.length < 4 && workspaceType !== "business-setup" && (
+                      <div className="contents">
+                        {((workspaceType === 'coworking' || workspaceType === 'coworking-space')) ? (
+                          <CoworkingExpertCard onClickCallback={() => setIsContactOpen(true)} />
+                        ) : (
+                          <GuaranteeCard onClickCallback={() => setIsContactOpen(true)} />
+                        )}
                         <ReviewsCarousel />
-                      )}
-                    </div>
-                  ))
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="col-span-full py-16 text-center text-muted-foreground">
                     <p className="text-base font-medium">
@@ -1731,35 +1903,56 @@ const GetWorkspacesV2 = () => {
                 )}
               </div>
             )}
-            <DiscountBanner onClick={() => setIsContactOpen(true)} />
+          {/* Coworking Amenities Strip */}
+          {(workspaceType === "coworking" || (workspaceType === "coworking-space" || workspaceType === "coworking")) && (
+            <div className="mx-0 mt-2 mb-1 px-5 sm:px-8 py-6 bg-[#FAFAF7] rounded-xl border border-border/50">
+              <p className="text-[15px] sm:text-[16px] font-semibold text-[#1a2b21] mb-6 text-left" style={{ fontFamily: "'Inter', sans-serif" }}>
+                Premium amenities designed to elevate your work experience
+              </p>
+              <div className="flex flex-wrap items-center justify-start gap-x-8 gap-y-6 sm:gap-x-14">
+                {[
+                  { Icon: Coffee, label: "Beverages" },
+                  { Icon: Wifi, label: "High-Speed Internet" },
+                  { Icon: Printer, label: "Printing" },
+                  { Icon: Zap, label: "Power Backup" },
+                  { Icon: Users, label: "Meeting Rooms" },
+                ].map((amenity, i) => (
+                  <div key={i} className="flex flex-col items-center gap-2.5 min-w-[72px]">
+                    <amenity.Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[#2c3e33] stroke-[1.5]" />
+                    <span className="text-[12px] sm:text-[13px] text-[#2c3e33] font-medium text-center leading-tight">{amenity.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          <DiscountBanner onClick={() => setIsContactOpen(true)} />
           </div>
           <div className="flex items-center justify-center gap-1.5 border-t border-border/40 py-6 mt-2 bg-background">
             <button
-                onClick={goPrevPage}
-                disabled={!pagination?.hasPrevPage}
-                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+              onClick={goPrevPage}
+              disabled={!pagination?.hasPrevPage}
+              className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
             >
-                Previous
+              Previous
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
-                  currentPage === p
+                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${currentPage === p
                     ? "bg-[#36503F] text-white"
                     : "text-foreground hover:bg-muted"
-                }`}
+                  }`}
               >
                 {p}
               </button>
             ))}
             <button
-                onClick={goNextPage}
-                disabled={!pagination?.hasNextPage}
-                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+              onClick={goNextPage}
+              disabled={!pagination?.hasNextPage}
+              className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
             >
-                Next
+              Next
             </button>
           </div>
         </div>
@@ -1770,23 +1963,23 @@ const GetWorkspacesV2 = () => {
             <div
               className="transition-all duration-300 ease-in-out relative hidden lg:block w-[35%] opacity-100"
             >
-              <div className="sticky top-[88px] h-[calc(100vh-100px)] max-h-[800px] m-2 sm:m-4 flex flex-col gap-3">
+              <div className="sticky top-24 h-[calc(100vh-100px)] max-h-[800px] m-2 sm:m-4 flex flex-col gap-3">
                 {/* Map Controls */}
                 <div className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-border/50 shadow-sm shrink-0">
-                  <button 
-                    onClick={() => setMapCollapsed(false)} 
+                  <button
+                    onClick={() => setMapCollapsed(false)}
                     className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${!mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
                   >
                     Show Map
                   </button>
-                  <button 
-                    onClick={() => setMapCollapsed(true)} 
+                  <button
+                    onClick={() => setMapCollapsed(true)}
                     className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
                   >
                     Hide Map
                   </button>
-                  <button 
-                    onClick={() => setMapFullscreen(true)} 
+                  <button
+                    onClick={() => setMapFullscreen(true)}
                     className="flex-1 text-xs font-medium py-1.5 rounded-md text-gray-500 hover:bg-gray-50 transition-colors"
                   >
                     Full Map
@@ -1798,20 +1991,21 @@ const GetWorkspacesV2 = () => {
                   <MapLibreMap
                     center={mapCenter}
                     markers={mapMarkers}
+                    hoveredMarkerId={hoveredCardId}
                     height="100%"
                     mapStyle="retro"
                   />
                 </div>
 
                 {/* Consultant Card */}
-                <div className="bg-white rounded-xl p-4 border border-border shadow-[0_4px_20px_rgb(0,0,0,0.05)] flex flex-col overflow-y-auto custom-scrollbar shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div className="bg-[#FAFAF7] rounded-xl p-4 border border-border shadow-[0_4px_20px_rgb(0,0,0,0.05)] flex flex-col overflow-y-auto custom-scrollbar shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
                   <div>
                     <h3 className="text-[16px] font-bold text-gray-900 mb-4 leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
                       Get your Virtual Office in {activeCity} with Premjeet
                     </h3>
-                    
+
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 shrink-0">
+                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-white shrink-0">
                         <img src="/newLogo/premjeet.png" alt="Premjeet" className="w-full h-full object-cover object-top" />
                       </div>
                       <div className="flex-1">
@@ -1822,7 +2016,7 @@ const GetWorkspacesV2 = () => {
                             Contact Premjeet
                           </a>
                         </div>
-                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 text-[11px] font-bold text-gray-700">
+                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white text-[11px] font-bold text-gray-700">
                           <BadgeCheck className="w-3.5 h-3.5 text-[#36503F]" /> FlashSpace Consultant
                         </div>
                       </div>
@@ -1871,33 +2065,53 @@ const GetWorkspacesV2 = () => {
               }
             >
               {sortedWorkspaces.length > 0 ? (
-                sortedWorkspaces.map((ws, index) => (
-                  <div key={ws.id} className="contents">
-                    {index === 4 && workspaceType !== "business-setup" && (
-                      <div className="col-span-full py-4 my-2 flex flex-col items-center">
-                        <h3 className="text-[15px] font-semibold text-gray-900 mb-4 text-center" style={{ fontFamily: "'Inter', sans-serif" }}>
-                          5,000+ {workspaceType === "virtual-office" ? "Virtual Office" : "Coworking Space"} clients served
-                        </h3>
-                        <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-4 opacity-90 border border-border/60 rounded-xl bg-white shadow-sm px-4 py-4 w-full overflow-hidden">
-                          <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-6 object-contain shrink-0" />
-                          <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-10 object-contain shrink-0" />
-                          <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-5 object-contain shrink-0" />
-                          <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 object-contain shrink-0" />
-                          <img src="/newLogo/Adda247.png" alt="Adda247" className="h-8 object-contain shrink-0" />
+                <>
+                  {sortedWorkspaces.map((ws, index) => (
+                    <div key={ws.id} className="contents">
+                      {index === 4 && workspaceType !== "business-setup" && (
+                        <div className="col-span-full py-4 my-2 flex flex-col items-start w-full">
+                          <h3 className="text-[15px] font-semibold text-gray-900 mb-4 text-left" style={{ fontFamily: "'Inter', sans-serif" }}>
+                            5,000+ {workspaceType === "virtual-office" ? "Virtual Office" : "Coworking Space"} clients served
+                          </h3>
+                          <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-4 opacity-90 border border-border/60 rounded-xl bg-white shadow-sm px-4 py-4 w-full overflow-hidden">
+                            <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-6 object-contain shrink-0" />
+                            <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-10 object-contain shrink-0" />
+                            <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-5 object-contain shrink-0" />
+                            <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 object-contain shrink-0" />
+                            <img src="/newLogo/Adda247.png" alt="Adda247" className="h-8 object-contain shrink-0" />
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    <WorkspaceCard
-                      ws={ws}
-                      view={viewMode}
-                      type={workspaceType}
-                      onBusinessSetupBuy={setSelectedBusinessSetup}
-                    />
-                    {index === 5 && workspaceType !== "business-setup" && (
+                      )}
+                      <WorkspaceCard
+                        ws={ws}
+                        view={viewMode}
+                        type={workspaceType}
+                        onBusinessSetupBuy={setSelectedBusinessSetup}
+                        onHover={setHoveredCardId}
+                      />
+                      {index === 5 && workspaceType !== "business-setup" && (
+                        <>
+                          {((workspaceType === 'coworking' || workspaceType === 'coworking-space')) ? (
+                            <CoworkingExpertCard onClickCallback={() => setIsContactOpen(true)} />
+                          ) : (
+                            <GuaranteeCard onClickCallback={() => setIsContactOpen(true)} />
+                          )}
+                          <ReviewsCarousel />
+                        </>
+                      )}
+                    </div>
+                  ))}
+                  {sortedWorkspaces.length < 6 && workspaceType !== "business-setup" && (
+                    <div className="contents">
+                      {((workspaceType === 'coworking' || workspaceType === 'coworking-space')) ? (
+                        <CoworkingExpertCard onClickCallback={() => setIsContactOpen(true)} />
+                      ) : (
+                        <GuaranteeCard onClickCallback={() => setIsContactOpen(true)} />
+                      )}
                       <ReviewsCarousel />
-                    )}
-                  </div>
-                ))
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="col-span-2 py-16 text-center text-muted-foreground">
                   <p className="text-base font-medium">
@@ -1910,34 +2124,55 @@ const GetWorkspacesV2 = () => {
               )}
             </div>
           )}
+          {/* Coworking Amenities Strip */}
+          {(workspaceType === "coworking" || (workspaceType === "coworking-space" || workspaceType === "coworking")) && (
+            <div className="mx-0 mt-2 mb-1 px-5 sm:px-8 py-6 bg-[#FAFAF7] rounded-xl border border-border/50">
+              <p className="text-[15px] sm:text-[16px] font-semibold text-[#1a2b21] mb-6 text-left" style={{ fontFamily: "'Inter', sans-serif" }}>
+                Premium amenities designed to elevate your work experience
+              </p>
+              <div className="flex flex-wrap items-center justify-start gap-x-8 gap-y-6 sm:gap-x-14">
+                {[
+                  { Icon: Coffee, label: "Beverages" },
+                  { Icon: Wifi, label: "High-Speed Internet" },
+                  { Icon: Printer, label: "Printing" },
+                  { Icon: Zap, label: "Power Backup" },
+                  { Icon: Users, label: "Meeting Rooms" },
+                ].map((amenity, i) => (
+                  <div key={i} className="flex flex-col items-center gap-2.5 min-w-[72px]">
+                    <amenity.Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[#2c3e33] stroke-[1.5]" />
+                    <span className="text-[12px] sm:text-[13px] text-[#2c3e33] font-medium text-center leading-tight">{amenity.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <DiscountBanner onClick={() => setIsContactOpen(true)} />
-           <div className="flex items-center justify-center gap-1.5 border-t border-border/40 py-6 pb-10 bg-background">
+          <div className="flex items-center justify-center gap-1.5 border-t border-border/40 py-6 pb-10 bg-background">
             <button
-                onClick={goPrevPage}
-                disabled={!pagination?.hasPrevPage}
-                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+              onClick={goPrevPage}
+              disabled={!pagination?.hasPrevPage}
+              className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
             >
-                Previous
+              Previous
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors hidden sm:flex ${
-                  currentPage === p
+                className={`w-9 h-9 flex items-center justify-center rounded-lg text-sm font-medium transition-colors hidden sm:flex ${currentPage === p
                     ? "bg-[#36503F] text-white"
                     : "text-foreground hover:bg-muted"
-                }`}
+                  }`}
               >
                 {p}
               </button>
             ))}
             <button
-                onClick={goNextPage}
-                disabled={!pagination?.hasNextPage}
-                className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
+              onClick={goNextPage}
+              disabled={!pagination?.hasNextPage}
+              className="px-4 py-2 rounded-lg border border-border bg-card text-foreground text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition-all"
             >
-                Next
+              Next
             </button>
           </div>
         </div>
@@ -1979,7 +2214,7 @@ const GetWorkspacesV2 = () => {
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 p-3 flex items-center justify-between gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           <button
             onClick={() => setIsContactOpen(true)}
-            className="flex-1 bg-[#36503F] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 hover:bg-[#2c4133] transition-colors shadow-sm"
+            className="flex-1 bg-[#36503F] text-[#FEF8CF] font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 hover:bg-[#2c4133] transition-colors shadow-sm"
           >
             <Phone className="w-4.5 h-4.5" />
             Request Callback
@@ -2054,45 +2289,45 @@ const GetWorkspacesV2 = () => {
 
                 {/* Coupon Section */}
                 <div className="mb-5">
-                    {appliedCoupon ? (
-                        <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl p-3">
-                            <div className="flex items-center gap-2">
-                                <Bookmark className="w-4 h-4 text-green-600" />
-                                <div>
-                                    <p className="text-sm font-semibold text-green-700">'{appliedCoupon.code}' applied</p>
-                                    <p className="text-xs text-green-600 font-medium">You saved {formatInr(renderCouponDiscount)}!</p>
-                                </div>
-                            </div>
-                            <button 
-                                onClick={handleRemoveCoupon}
-                                className="text-sm font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
-                            >
-                                Remove
-                            </button>
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl p-3">
+                      <div className="flex items-center gap-2">
+                        <Bookmark className="w-4 h-4 text-green-600" />
+                        <div>
+                          <p className="text-sm font-semibold text-green-700">'{appliedCoupon.code}' applied</p>
+                          <p className="text-xs text-green-600 font-medium">You saved {formatInr(renderCouponDiscount)}!</p>
                         </div>
-                    ) : (
-                        <div className="flex items-center gap-2 relative">
-                            <div className="relative flex-1">
-                                <Bookmark className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <input 
-                                    type="text" 
-                                    placeholder="Enter coupon code" 
-                                    className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-[#D4E0D0] rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#36503F]/20 uppercase"
-                                    value={couponCode}
-                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                                    onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
-                                    disabled={couponLoading}
-                                />
-                            </div>
-                            <button 
-                                onClick={handleApplyCoupon}
-                                disabled={!couponCode.trim() || couponLoading}
-                                className="px-5 py-2.5 bg-[#36503F] text-[#FEF8C5] text-sm font-bold rounded-xl hover:bg-[#1F2E26] disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[80px]"
-                            >
-                                {couponLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Apply'}
-                            </button>
-                        </div>
-                    )}
+                      </div>
+                      <button
+                        onClick={handleRemoveCoupon}
+                        className="text-sm font-semibold text-red-500 hover:text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 relative">
+                      <div className="relative flex-1">
+                        <Bookmark className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder="Enter coupon code"
+                          className="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-[#D4E0D0] rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#36503F]/20 uppercase"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                          disabled={couponLoading}
+                        />
+                      </div>
+                      <button
+                        onClick={handleApplyCoupon}
+                        disabled={!couponCode.trim() || couponLoading}
+                        className="px-5 py-2.5 bg-[#36503F] text-[#FEF8C5] text-sm font-bold rounded-xl hover:bg-[#1F2E26] disabled:opacity-50 disabled:cursor-not-allowed transition-colors min-w-[80px]"
+                      >
+                        {couponLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Apply'}
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mb-5">
@@ -2156,19 +2391,261 @@ const GetWorkspacesV2 = () => {
           </div>
         </DialogContent>
       </Dialog>
-      
+
       {/* Footer Extras: Testimonials and FAQs */}
       {workspaceType !== "business-setup" && (
-        <div className="fs-container mb-16 mt-8">
+        <div className="w-full">
           <FounderTestimonial />
-          <div className="mt-12">
+          <div className="w-full">
             <WorkspacesFAQ city={activeCity} type={workspaceType} />
           </div>
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "delhi" && (
+            <div className="w-full">
+              <DelhiSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && (activeCity.toLowerCase() === "gurgaon" || activeCity.toLowerCase() === "gurugram") && (
+            <div className="w-full">
+              <GurgaonSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "noida" && (
+            <div className="w-full">
+              <NoidaSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "mumbai" && (
+            <div className="w-full">
+              <MumbaiSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && (activeCity.toLowerCase() === "bangalore" || activeCity.toLowerCase() === "bengaluru") && (
+            <div className="w-full">
+              <BangaloreSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "kolkata" && (
+            <div className="w-full">
+              <KolkataSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "ahmedabad" && (
+            <div className="w-full">
+              <AhmedabadSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "chennai" && (
+            <div className="w-full">
+              <ChennaiSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "chandigarh" && (
+            <div className="w-full">
+              <ChandigarhSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "chhattisgarh" && (
+            <div className="w-full">
+              <ChhattisgarhSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "himachal pradesh" && (
+            <div className="w-full">
+              <HimachalPradeshSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "hyderabad" && (
+            <div className="w-full">
+              <HyderabadSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "jaipur" && (
+            <div className="w-full">
+              <JaipurSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "jammu and kashmir" && (
+            <div className="w-full">
+              <JammuandKashmirSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "jharkhand" && (
+            <div className="w-full">
+              <JharkhandSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "jodhpur" && (
+            <div className="w-full">
+              <JodhpurSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "kochi" && (
+            <div className="w-full">
+              <KochiSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "madhya pradesh" && (
+            <div className="w-full">
+              <MadhyaPradeshSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "mysuru" && (
+            <div className="w-full">
+              <MysuruSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "patna" && (
+            <div className="w-full">
+              <PatnaSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "pune" && (
+            <div className="w-full">
+              <PuneSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "punjab" && (
+            <div className="w-full">
+              <PunjabSeoContent />
+            </div>
+          )}
+          {workspaceType === "virtual-office" && activeCity.toLowerCase() === "uttarakhand" && (
+            <div className="w-full">
+              <UttarakhandSeoContent />
+            </div>
+          )}
         </div>
       )}
 
       {/* Footer / Contact Modal */}
       <GetInTouchModal open={isContactOpen} onClose={() => setIsContactOpen(false)} />
+
+      <Footer />
+    </div>
+  );
+};
+
+const CoworkingExpertCard = ({ onClickCallback }: { onClickCallback: () => void }) => {
+  return (
+    <div className="bg-[#F8FAFC] rounded-[24px] border border-border/60 shadow-sm overflow-hidden flex flex-col h-full w-full col-span-full">
+      <div className="p-5 flex flex-col md:flex-row gap-6 flex-1">
+        <div className="flex-1 flex flex-col gap-4">
+          <h3 className="text-[17px] sm:text-[19px] font-bold text-[#1a2b21] leading-snug" style={{ fontFamily: "'Inter', sans-serif" }}>
+            Find your perfect coworking space with FlashSpace
+          </h3>
+          <ul className="space-y-2.5 flex-1 mt-2">
+            {[
+              { text: "Flexible plans - hourly, daily, or monthly" },
+              { text: "High-speed Wi-Fi & modern amenities" },
+              { text: "Private cabins, hot desks & dedicated desks" },
+              { text: "Meeting rooms & conference facilities" }
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-[13px] sm:text-[14px] text-[#425e4c] font-medium">
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#36503F] shrink-0 mt-0.5" />
+                <span>{item.text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <button
+            onClick={onClickCallback}
+            className="mt-2 w-max px-6 py-2.5 rounded-xl bg-[#36503F] text-[#FEF8CF] font-bold text-sm hover:bg-[#2a4032] transition-all shadow-sm"
+          >
+            Talk to an Expert
+          </button>
+        </div>
+
+        <div className="w-full md:w-[35%] lg:w-[40%] rounded-xl overflow-hidden shrink-0 min-h-[160px]">
+          <img
+            src="https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=800&q=80"
+            alt="Coworking Space"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+
+      <div className="bg-white border-t border-border/60 p-5 flex justify-center sm:justify-start">
+        <div className="flex flex-wrap gap-x-8 gap-y-4">
+          <div>
+            <div className="font-bold text-[16px] text-[#1a2b21]">5,000+</div>
+            <div className="text-[11px] text-muted-foreground font-medium leading-tight mt-0.5">Clients served</div>
+          </div>
+          <div>
+            <div className="font-bold text-[16px] text-[#1a2b21]">100+</div>
+            <div className="text-[11px] text-muted-foreground font-medium leading-tight mt-0.5">Partner spaces</div>
+          </div>
+          <div>
+            <div className="font-bold text-[16px] text-[#1a2b21]">20+</div>
+            <div className="text-[11px] text-muted-foreground font-medium leading-tight mt-0.5">Cities</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const GuaranteeCard = ({ onClickCallback }: { onClickCallback: () => void }) => {
+  return (
+    <div className="bg-[#F8FAFC] rounded-[24px] border border-border/60 shadow-sm overflow-hidden flex flex-col h-full w-full col-span-full">
+      <div className="p-5 flex flex-col md:flex-row gap-6 flex-1">
+        <div className="flex-1 flex flex-col gap-4">
+          <h3 className="text-[17px] sm:text-[19px] font-bold text-[#1a2b21] leading-snug" style={{ fontFamily: "'Inter', sans-serif" }}>
+            What does FlashSpace guarantee for your Virtual Office?
+          </h3>
+          <ul className="space-y-2.5 flex-1 mt-2">
+            {[
+              { text: "Unbeatable Price Guarantee" },
+              { text: "30-Day Money Back Guarantee" },
+              { text: "Express Document Turnaround Time" },
+              { text: "100% Digital KYC & Secure Agreement" }
+            ].map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-[13px] sm:text-[14px] text-[#425e4c] font-medium">
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#36503F] shrink-0 mt-0.5" />
+                <span>
+                  {item.text}
+                  {item.highlight && (
+                    <span className="text-[#36503F] font-bold ml-1.5 whitespace-nowrap text-[11px] sm:text-[12px] bg-[#E8F0EB] px-1.5 py-0.5 rounded-md">
+                      <Tag className="w-3 h-3 inline mr-1 mb-0.5" />{item.highlight}
+                    </span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <button
+            onClick={onClickCallback}
+            className="mt-2 w-max px-6 py-2.5 rounded-xl bg-[#36503F] text-[#FEF8CF] font-bold text-sm hover:bg-[#2a4032] transition-all shadow-sm"
+          >
+            Request Callback
+          </button>
+        </div>
+
+        <div className="w-full md:w-[35%] lg:w-[40%] rounded-xl overflow-hidden shrink-0 min-h-[160px] bg-transparent flex items-center justify-center p-4">
+          <img
+            src="/guarantee-vector-illustration.png"
+            alt="FlashSpace Guarantee"
+            className="w-full h-full object-contain mix-blend-multiply"
+          />
+        </div>
+      </div>
+
+      <div className="bg-white border-t border-border/60 p-5 flex justify-center sm:justify-start">
+        <div className="flex flex-wrap gap-x-8 gap-y-4">
+          <div>
+            <div className="font-bold text-[16px] text-[#1a2b21]">5,000+</div>
+            <div className="text-[11px] text-muted-foreground font-medium leading-tight mt-0.5">Clients served</div>
+          </div>
+          <div>
+            <div className="font-bold text-[16px] text-[#1a2b21]">100+</div>
+            <div className="text-[11px] text-muted-foreground font-medium leading-tight mt-0.5">Partner spaces</div>
+          </div>
+          <div>
+            <div className="font-bold text-[16px] text-[#1a2b21]">20+</div>
+            <div className="text-[11px] text-muted-foreground font-medium leading-tight mt-0.5">Cities</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

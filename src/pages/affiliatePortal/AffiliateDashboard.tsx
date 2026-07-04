@@ -348,7 +348,7 @@ const Dashboard = () => {
             <div className="max-w-7xl mx-auto space-y-8">
                 {/* 1. Page Header */}
                 <div className="space-y-1">
-                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold tracking-tight">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
                         <span className="text-[#1A1A1A]">Affiliate </span>
                         <span className="text-[#36503F] italic">Dashboard</span>
                     </h1>

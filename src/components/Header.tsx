@@ -21,13 +21,14 @@ interface HeaderProps {
   loginBlack?: boolean;
   openLogin?: boolean;
   openSignup?: boolean;
+  isAbsolute?: boolean;
 }
 
 
 const navData = [
   {
     label: "Solutions",
-    isMegaMenu: true,
+    isMegaMenu: true, 
     sections: [
       {
         title: "Workspaces",
@@ -143,7 +144,7 @@ const MegaMenuDropdown = ({ sections, closeMenu }: { sections: any[], closeMenu?
     </div>
   );
 };
-const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNode => {
+const Header = ({ openLogin = false, openSignup = false, isAbsolute = false }: HeaderProps): ReactNode => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuth();
@@ -357,8 +358,9 @@ const Header = ({ openLogin = false, openSignup = false }: HeaderProps): ReactNo
     <>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-[100] h-14 border-b border-transparent bg-[#FAFAF7] transition-[background-color,box-shadow,border-color,backdrop-filter] duration-500 ease-out md:h-16",
-          scrolled && "border-[#36503F]/10 bg-[#FAFAF7]/70 shadow-[0_12px_36px_rgba(54,80,63,0.12)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[#FAFAF7]/65"
+          isAbsolute ? "absolute inset-x-0 top-0 z-[100]" : "fixed inset-x-0 top-0 z-[100]",
+          "h-14 border-b border-transparent bg-[#FAFAF7] transition-[background-color,box-shadow,border-color,backdrop-filter] duration-500 ease-out md:h-16",
+          scrolled && !isAbsolute && "border-[#36503F]/10 bg-[#FAFAF7]/70 shadow-[0_12px_36px_rgba(54,80,63,0.12)] backdrop-blur-2xl supports-[backdrop-filter]:bg-[#FAFAF7]/65"
         )}
       >
         <div

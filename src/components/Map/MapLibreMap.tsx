@@ -116,6 +116,7 @@ interface MapLibreMapProps {
     position: { lat: number; lng: number };
   }>;
   visible?: boolean;
+  hoveredMarkerId?: string | null;
 }
 
 // MapLibre-compatible open source map styles - Colorful & Vibrant
@@ -194,6 +195,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
   bounds,
   focusMarkers = [],
   visible = true,
+  hoveredMarkerId = null,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
@@ -227,11 +229,15 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     const container = mapContainer.current;
 
     try {
+      // Validate center coordinates
+      const validLng = center && typeof center.lng === 'number' && !isNaN(center.lng) ? center.lng : 77.2090;
+      const validLat = center && typeof center.lat === 'number' && !isNaN(center.lat) ? center.lat : 28.6139;
+
       // Create map instance
       map.current = new maplibregl.Map({
         container: container,
         style: MAP_STYLES[currentStyle].url,
-        center: [center.lng, center.lat],
+        center: [validLng, validLat],
         zoom: zoom,
         minZoom: 4, // Never show whole world
         maxZoom: 20,
@@ -318,8 +324,11 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
   useEffect(() => {
     if (!map.current || !isLoaded) return;
 
+    const validLng = center && typeof center.lng === 'number' && !isNaN(center.lng) ? center.lng : 77.2090;
+    const validLat = center && typeof center.lat === 'number' && !isNaN(center.lat) ? center.lat : 28.6139;
+
     map.current.flyTo({
-      center: [center.lng, center.lat],
+      center: [validLng, validLat],
       zoom: zoom,
       essential: true,
     });
@@ -362,8 +371,17 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
     markers.forEach((markerData, index) => {
       if (!map.current) return;
 
+      const mLat = markerData.position?.lat;
+      const mLng = markerData.position?.lng;
+      if (typeof mLat !== 'number' || isNaN(mLat) || typeof mLng !== 'number' || isNaN(mLng)) {
+        return;
+      }
+
       const el = document.createElement('div');
       el.className = 'custom-marker';
+      if (markerData.id) {
+        el.setAttribute('data-marker-id', markerData.id);
+      }
 
       const primary = '#35503F';
 
@@ -379,6 +397,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           box-shadow: 0 4px 14px rgba(0,0,0,0.22);
           border: 1px solid rgba(0,0,0,0.1);
           cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         ">
           <span class="marker-icon" style="
             width: 32px;
@@ -389,6 +408,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
             align-items: center;
             justify-content: center;
             color: ${primary};
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           ">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
@@ -580,6 +600,7 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       markersRef.current.push(marker);
     });
 
+
     // ─── FIT BOUNDS (Production-safe) ────────────────────────────────────────
     // resize() pehle call karo, phir 200ms baad actual fitBounds
     // Yeh ensure karta hai ki production mein container height 0 na ho
@@ -587,13 +608,20 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
       if (bounds) {
         safeFitBounds(() => {
           map.current!.fitBounds(
-            [[bounds.sw.lng, bounds.sw.lat], [bounds.ne.lng, bounds.ne.lat]],
+            [
+              [bounds.sw?.lng ?? 77.2090, bounds.sw?.lat ?? 28.6139],
+              [bounds.ne?.lng ?? 77.2090, bounds.ne?.lat ?? 28.6139]
+            ],
             { padding: { top: 70, bottom: 50, left: 50, right: 50 }, maxZoom: 16.5, duration: 1200 }
           );
         });
       } else if (focusMarkers.length > 0) {
         const focusBounds = new maplibregl.LngLatBounds();
-        focusMarkers.forEach(m => focusBounds.extend([m.position.lng, m.position.lat]));
+        focusMarkers.forEach(m => {
+          if (m?.position?.lng != null && m?.position?.lat != null && !isNaN(m.position.lng) && !isNaN(m.position.lat)) {
+            focusBounds.extend([m.position.lng, m.position.lat]);
+          }
+        });
 
         safeFitBounds(() => {
           map.current!.fitBounds(focusBounds, {
@@ -604,7 +632,11 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
         });
       } else if (markers.length > 0 && markers.length < 50 && !bounds) {
         const markerBounds = new maplibregl.LngLatBounds();
-        markers.forEach(m => markerBounds.extend([m.position.lng, m.position.lat]));
+        markers.forEach(m => {
+          if (m?.position?.lng != null && m?.position?.lat != null && !isNaN(m.position.lng) && !isNaN(m.position.lat)) {
+            markerBounds.extend([m.position.lng, m.position.lat]);
+          }
+        });
 
         safeFitBounds(() => {
           map.current!.fitBounds(markerBounds, {
@@ -617,12 +649,59 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
           // focus back on the center point instead.
           const currentZoom = map.current?.getZoom() || 0;
           if (currentZoom < 6) {
-            map.current?.flyTo({ center: [center.lng, center.lat], zoom: 11, duration: 1000 });
+            const validLng = center && typeof center.lng === 'number' && !isNaN(center.lng) ? center.lng : 77.2090;
+            const validLat = center && typeof center.lat === 'number' && !isNaN(center.lat) ? center.lat : 28.6139;
+            map.current?.flyTo({ center: [validLng, validLat], zoom: 11, duration: 1000 });
           }
         });
       }
     }
   }, [markers, bounds, focusMarkers, isLoaded]);
+
+  // Handle hoveredMarkerId changes
+  useEffect(() => {
+    // First reset all markers
+    document.querySelectorAll('.custom-marker').forEach((marker) => {
+      const container = marker.querySelector('.marker-container') as HTMLElement;
+      if (container) {
+        container.style.transform = 'scale(1)';
+        container.style.boxShadow = '0 4px 14px rgba(0,0,0,0.22)';
+        container.style.backgroundColor = '#ffffff';
+        container.style.color = '#35503F';
+        
+        const icon = marker.querySelector('.marker-icon') as HTMLElement;
+        if (icon) {
+          icon.style.backgroundColor = '#35503F10';
+          icon.style.color = '#35503F';
+        }
+      }
+      (marker as HTMLElement).style.zIndex = '';
+      
+      // Dispatch mouseleave to close popups
+      marker.dispatchEvent(new MouseEvent('mouseleave'));
+    });
+
+    if (hoveredMarkerId) {
+      document.querySelectorAll(`[data-marker-id="${hoveredMarkerId}"]`).forEach((markerEl) => {
+        const container = markerEl.querySelector('.marker-container') as HTMLElement;
+        if (container) {
+          container.style.transform = 'scale(1.25)';
+          container.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
+          container.style.backgroundColor = '#35503F';
+          
+          const icon = markerEl.querySelector('.marker-icon') as HTMLElement;
+          if (icon) {
+            icon.style.backgroundColor = '#ffffff';
+            icon.style.color = '#35503F';
+          }
+        }
+        (markerEl as HTMLElement).style.zIndex = '1000';
+        
+        // Dispatch mouseenter to show popup
+        markerEl.dispatchEvent(new MouseEvent('mouseenter'));
+      });
+    }
+  }, [hoveredMarkerId]);
 
   const handleStyleChange = (style: MapStyle) => {
     setCurrentStyle(style);
@@ -651,8 +730,8 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
                 key={key}
                 onClick={() => handleStyleChange(key as MapStyle)}
                 className={`px-4 py-3 text-left transition-all duration-200 border-b border-gray-100 last:border-b-0 ${currentStyle === key
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-inner'
-                    : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-inner'
+                  : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50'
                   }`}
                 title={value.description}
               >

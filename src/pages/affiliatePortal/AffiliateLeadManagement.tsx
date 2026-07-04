@@ -74,7 +74,7 @@ const LeadManagementAffiliate = () => {
         <div className="mx-auto w-full p-6 lg:p-10 pb-2 lg:pb-4 space-y-8 animate-in fade-in duration-500">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl font-extrabold text-gray-900 tracking-tight">Lead Management</h1>
+                <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">Lead Management</h1>
 
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogTrigger asChild>

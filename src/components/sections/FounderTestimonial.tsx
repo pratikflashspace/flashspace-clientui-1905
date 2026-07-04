@@ -12,14 +12,26 @@ const testimonials = [
     quote:
       "We opened GST-ready addresses across India without chasing landlords or paperwork. The process felt clean, fast, and properly managed.",
     name: "Priya Nair",
-    role: "Founder, Bengaluru",
+    role: "Founder, TechStart Solutions",
   },
   {
     quote:
       "Our operations team can book desks, meeting rooms, and business addresses in minutes. FlashSpace understands how Indian teams actually work.",
     name: "Rohit Malhotra",
-    role: "Operations Head, Gurugram",
+    role: "Business Owner, RM Consulting",
   },
+  {
+    quote:
+      "Got my virtual office from Flashspace and didn't expect it to be this easy. The team was super responsive and guided me step by step. It felt smooth and professional from start to finish.",
+    name: "Ashutosh Mishra",
+    role: "Founders Office, Growth School",
+  },
+  {
+    quote:
+      "I've been using a virtual office from FlashSpace for four years. I strongly recommend them for your workspace requirements. They offer great spaces and a professional support team.",
+    name: "Manoj Gusain",
+    role: "Manager, Black Seas",
+  }
 ];
 
 export const FounderTestimonial = () => {
@@ -29,7 +41,7 @@ export const FounderTestimonial = () => {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % testimonials.length);
-    }, 4000);
+    }, 6000);
 
     return () => window.clearInterval(timer);
   }, []);

@@ -137,21 +137,21 @@ const WorkspaceDetail = ({ type }: WorkspaceDetailProps) => {
     fetchData();
   }, [id, type]);
 
-// Unified getters
-const getPhotos = () => {
-  if (!data) return [];
-  
-  const rawImages = [
-    ...(data.images || []),
-    data.image
-  ].filter(Boolean) as string[];
+  // Unified getters
+  const getPhotos = () => {
+    if (!data) return [];
 
-  const cleanImages = rawImages
-    .filter(img => !isInvalidImageUrl(img))
-    .map((img: string) => getSafeImageUrl(img));
+    const rawImages = [
+      ...(data.images || []),
+      data.image
+    ].filter(Boolean) as string[];
 
-  return cleanImages;
-};
+    const cleanImages = rawImages
+      .filter(img => !isInvalidImageUrl(img))
+      .map((img: string) => getSafeImageUrl(img));
+
+    return cleanImages;
+  };
 
   const getAmenityIcon = (name: string) => {
     const lower = name.toLowerCase();
@@ -196,11 +196,11 @@ const getPhotos = () => {
     const pricing = getVirtualOfficePricing(data);
     const plansResult = pricing
       ? Object.entries(pricing).map(([key, plan]: [string, any]) => ({
-          key,
-          label: plan.name,
-          yearPrice: `₹${plan.yearlyPrice}`,
-          features: plan.features,
-        }))
+        key,
+        label: plan.name,
+        yearPrice: `₹${plan.yearlyPrice}`,
+        features: plan.features,
+      }))
       : [];
 
     const currentPricing = pricing ? (pricing as any)[selectedPlan] : null;
@@ -236,11 +236,10 @@ const getPhotos = () => {
             <div
               key={plan.key}
               onClick={() => setSelectedPlan(plan.key)}
-              className={`cursor-pointer rounded-[10px] border p-3.5 transition-all ${
-                selectedPlan === plan.key
+              className={`cursor-pointer rounded-[10px] border p-3.5 transition-all ${selectedPlan === plan.key
                   ? "border-foreground bg-background shadow-sm"
                   : "border-border/60 bg-background hover:border-foreground/30"
-              }`}
+                }`}
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-foreground">
@@ -426,9 +425,9 @@ const getPhotos = () => {
         return;
       }
 
-      
 
-      
+
+
     };
 
     return (
@@ -565,12 +564,12 @@ const getPhotos = () => {
 
   const photos = getPhotos();
   const address = data.address || data.area || "";
-  
+
   // Extract coordinates correctly from flattened backend response
-  const lat = data.coordinates?.lat || 
-              (Array.isArray(data.location?.coordinates) ? data.location.coordinates[1] : 28.6139);
-  const lng = data.coordinates?.lng || 
-              (Array.isArray(data.location?.coordinates) ? data.location.coordinates[0] : 77.209);
+  const lat = data.coordinates?.lat ||
+    (Array.isArray(data.location?.coordinates) ? data.location.coordinates[1] : 28.6139);
+  const lng = data.coordinates?.lng ||
+    (Array.isArray(data.location?.coordinates) ? data.location.coordinates[0] : 77.209);
 
   const mapData = [
     {
@@ -624,11 +623,10 @@ const getPhotos = () => {
 
         {/* Gallery */}
         {photos.length > 0 ? (
-          <div className={`grid gap-1 md:gap-2 mb-8 md:mb-10 rounded-2xl overflow-hidden h-[260px] md:h-[420px] ${
-            photos.length === 1 ? "grid-cols-1" :
-            photos.length === 2 ? "grid-cols-2" :
-            photos.length === 3 ? "grid-cols-3" : "grid-cols-4 grid-rows-2"
-          }`}>
+          <div className={`grid gap-1 md:gap-2 mb-8 md:mb-10 rounded-2xl overflow-hidden h-[260px] md:h-[420px] ${photos.length === 1 ? "grid-cols-1" :
+              photos.length === 2 ? "grid-cols-2" :
+                photos.length === 3 ? "grid-cols-3" : "grid-cols-4 grid-rows-2"
+            }`}>
             {/* Main/First Image */}
             <div
               className={`${photos.length >= 4 ? "col-span-2 row-span-2" : "col-span-1 h-full"} cursor-pointer overflow-hidden relative group`}
@@ -684,9 +682,9 @@ const getPhotos = () => {
           </div>
         ) : (
           <div className="h-[420px] mb-10 rounded-2xl bg-muted flex items-center justify-center">
-            <img 
-              src="/hero-illustrated.jpg" 
-              alt="Workspace Placeholder" 
+            <img
+              src="/hero-illustrated.jpg"
+              alt="Workspace Placeholder"
               className="w-full h-full object-cover opacity-50"
             />
           </div>

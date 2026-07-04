@@ -301,7 +301,7 @@ const BookingManagement = () => {
 
             <div className="w-full space-y-8 animate-fade-in">
                 <div className="animate-fade-in-down mb-10">
-                    <h1 style={{ fontFamily: "'Inter', sans-serif" }} className="text-3xl md:text-3xl font-extrabold text-gray-900 tracking-tight">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-[#1A1A1A]">
                         Booking <span className="text-[#36503F] italic">Management</span>
                     </h1>
                     <p className="mt-2 text-[16px] font-medium text-[#6B7280] tracking-tight">
