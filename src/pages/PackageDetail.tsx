@@ -45,10 +45,10 @@ export default function PackageDetail() {
   const [reviewIndex, setReviewIndex] = useState(0);
 
   const REVIEWS_DATA = [
-    { text: "Nice space and well mannered staff, really happy 😊", author: "Vijay", avatar: "V", color: "bg-orange-600" },
-    { text: "Co-operative guys...go for them if u need a virtual office.", author: "asadullah jahangir", avatar: "A", color: "bg-blue-500" },
-    { text: "I strongly recommend Virtual Office in delhi for your workspace requirements.", author: "Manoj Gusain", avatar: "M", color: "bg-purple-600" },
-    { text: "It felt smooth and professional from start to finish.", author: "Ashutosh Mishra", avatar: "A", color: "bg-blue-600" }
+    { text: "Nice space and well mannered staff, really happy 😊", author: "Vijay", avatar: "V", color: "bg-[#36503F]" },
+    { text: "Co-operative guys...go for them if u need a virtual office.", author: "asadullah jahangir", avatar: "A", color: "bg-[#36503F]" },
+    { text: "I strongly recommend Virtual Office in delhi for your workspace requirements.", author: "Manoj Gusain", avatar: "M", color: "bg-[#36503F]" },
+    { text: "It felt smooth and professional from start to finish.", author: "Ashutosh Mishra", avatar: "A", color: "bg-[#36503F]" }
   ];
 
   useEffect(() => {
@@ -209,7 +209,7 @@ export default function PackageDetail() {
                   {/* City Cards Grid (Replacing Spaces) */}
                   <div className="grid sm:grid-cols-2 gap-6">
                     {[
-                      { city: "Delhi", price: "1025", image: "/to_cloudinary/delhi_city_1782458486025.png" },
+                      { city: "Delhi", price: "1025", image: "/to_cloudinary/delhi_city_1782458486025.webp" },
                       { city: "Gurgaon", price: "1158", image: "/newLogo/gurgaon.jpg" },
                       { city: "Noida", price: "1000", image: "/newLogo/noida.jpg" },
                       { city: "Bangalore", price: "1117", image: "/newLogo/banglore.jpg" }
@@ -382,7 +382,7 @@ export default function PackageDetail() {
                   </ul>
                 </div>
                 <div className="relative hidden lg:flex items-center justify-end">
-                  <img src="/onecrm2.png" alt="OneCRM Dashboard" className="w-[110%] max-w-none h-auto object-cover rounded-xl shadow-2xl border border-white/10" />
+                  <img src="/onecrm2.webp" alt="OneCRM Dashboard" className="w-[110%] max-w-none h-auto object-cover rounded-xl shadow-2xl border border-white/10" />
                 </div>
               </div>
             </div>
@@ -437,7 +437,7 @@ export default function PackageDetail() {
                     </ul>
                   </div>
                   <div className="relative rounded-xl overflow-hidden shadow-lg border border-gray-200 bg-white">
-                     <img src="/homewebsite.png" alt="Website Development" className="w-full h-auto object-cover" />
+                     <img src="/homewebsite.webp" alt="Website Development" className="w-full h-auto object-cover" />
                   </div>
                 </div>
               </div>

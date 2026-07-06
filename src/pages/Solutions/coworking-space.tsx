@@ -34,7 +34,7 @@ import { CTA } from "@/components/sections/CTA";
 const featureCoworking = "/home4.jpg";
 const featureDayPasses = "/home10.jpg";
 const featureMeetingRooms = "/coworking-meeting-room.jpg";
-const officeIllustrated = "/home9.png";
+const officeIllustrated = "/home9.webp";
 const videoTestimonial = "/business-setup-illustrated.jpg";
 
 const availableCities = [

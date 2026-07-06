@@ -2187,25 +2187,25 @@ const REVIEWS_DATA = [
     text: "Nice space and well mannered staff,really happy 😊",
     author: "Vijay",
     avatar: "V",
-    color: "bg-orange-600",
+    color: "bg-[#36503F]",
   },
   {
     text: "Co-operative guys...go for them if u need a virtual office.",
     author: "asadullah jahangir",
     avatar: "A",
-    color: "bg-blue-500",
+    color: "bg-[#36503F]",
   },
   {
     text: "I strongly recommend Virtual Office in delhi for your workspace requirements.",
     author: "Manoj Gusain",
     avatar: "M",
-    color: "bg-purple-600",
+    color: "bg-[#36503F]",
   },
   {
     text: "It felt smooth and professional from start to finish.",
     author: "Ashutosh Mishra",
     avatar: "A",
-    color: "bg-blue-600",
+    color: "bg-[#36503F]",
   }
 ];
 

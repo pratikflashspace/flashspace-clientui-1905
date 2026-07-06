@@ -53,15 +53,15 @@
       "logo": "https://flashspace.ai/logo.png",
       "contactPoint": {
         "@type": "ContactPoint",
-        "telephone": "+91-9876-543-210",
+        "telephone": "+91-8100888777",
         "contactType": "Customer Service",
         "areaServed": "IN",
         "availableLanguage": "English"
       },
       "sameAs": [
-        "https://facebook.com/flashspace",
-        "https://twitter.com/flashspace",
-        "https://linkedin.com/company/flashspace"
+        "https://www.linkedin.com/company/flash-space/",
+        "https://x.com/flashspaceai",
+        "https://www.instagram.com/flashspace.ai/"
       ]
     }
     </script>
@@ -108,7 +108,15 @@ fbq('track', 'PageView');
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=404896812139325&ev=PageView&noscript=1" /></noscript>
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
-  <script src="https://beta.leadconnectorhq.com/loader.js" data-resources-url="https://beta.leadconnectorhq.com/chat-widget/loader.js" data-widget-id="69bb8fb78c5d734a69170c95"></script>
+  <script>
+    if (!navigator.userAgent.includes("ReactSnap")) {
+      var script = document.createElement("script");
+      script.src = "https://beta.leadconnectorhq.com/loader.js";
+      script.setAttribute("data-resources-url", "https://beta.leadconnectorhq.com/chat-widget/loader.js");
+      script.setAttribute("data-widget-id", "69bb8fb78c5d734a69170c95");
+      document.body.appendChild(script);
+    }
+  </script>
 </body>
 
 </html>

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpRight, MonitorSmartphone, Bot, Rocket, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const featureImage = "/homewebsite.png";
+const featureImage = "/homewebsite.webp";
 
 const services = [
     { icon: MonitorSmartphone, title: "Responsive Design", desc: "Websites that look perfect on desktops, tablets, and smartphones alike." },

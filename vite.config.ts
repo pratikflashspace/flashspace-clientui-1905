@@ -39,8 +39,14 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        // Let Vite naturally handle chunks to avoid circular dependency and forwardRef bugs.
-        // Memory limits are now handled by NODE_OPTIONS in package.json
+        manualChunks: {
+          'map-vendor': ['maplibre-gl'],
+          'pdf-vendor': ['jspdf', 'jspdf-autotable'],
+          'chart-vendor': ['recharts'],
+          'three-vendor': ['three'],
+          'editor-vendor': ['@blocknote/core', '@blocknote/mantine', '@blocknote/react', '@mantine/core', '@mantine/hooks'],
+          'animation-vendor': ['framer-motion', 'motion']
+        }
       },
     },
   },

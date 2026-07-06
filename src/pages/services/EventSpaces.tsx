@@ -51,6 +51,10 @@ interface ServiceItem {
 }
 
 const EventSpaces = () => {
+  useEffect(() => {
+    document.title = "Event Spaces in India — Book Venues & Halls | FlashSpace";
+  }, []);
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [mapCollapsed, setMapCollapsed] = useState(false);

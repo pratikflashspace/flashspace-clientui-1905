@@ -1,4 +1,4 @@
-import { createRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import App from "./App.tsx";
 import "./index.css";
@@ -17,8 +17,7 @@ if (!GOOGLE_CLIENT_ID) {
   );
 }
 
-// Wrap your App with Google OAuth and ContactModal providers
-createRoot(document.getElementById("root")!).render(
+const app = (
   <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
     <ContactModalProvider>
       {/* Wrap up App by dark mode provider */}
@@ -26,5 +25,13 @@ createRoot(document.getElementById("root")!).render(
         <App />
       </DarkModeProvider>
     </ContactModalProvider>
-  </GoogleOAuthProvider>,
+  </GoogleOAuthProvider>
 );
+
+const rootElement = document.getElementById("root")!;
+
+if (rootElement.hasChildNodes()) {
+  hydrateRoot(rootElement, app);
+} else {
+  createRoot(rootElement).render(app);
+}

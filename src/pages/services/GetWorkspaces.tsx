@@ -820,7 +820,15 @@ const WorkspaceCard = ({
 
 const GetWorkspaces = () => {
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const path = window.location.pathname;
+      if (path.includes('on-demand')) {
+        document.title = "On Demand Workspaces in India | FlashSpace";
+      } else if (path.includes('business-setup')) {
+        document.title = "Business Setup Services in India | FlashSpace";
+      } else {
+        document.title = "Workspaces in India | FlashSpace";
+      }
+      window.scrollTo(0, 0);
   }, []);
 
   const location = useLocation();
@@ -2233,25 +2241,25 @@ const REVIEWS_DATA = [
     text: "Nice space and well mannered staff,really happy 😊",
     author: "Vijay",
     avatar: "V",
-    color: "bg-orange-600",
+    color: "bg-[#36503F]",
   },
   {
     text: "Co-operative guys...go for them if u need a virtual office.",
     author: "asadullah jahangir",
     avatar: "A",
-    color: "bg-blue-500",
+    color: "bg-[#36503F]",
   },
   {
     text: "I strongly recommend Virtual Office in delhi for your workspace requirements.",
     author: "Manoj Gusain",
     avatar: "M",
-    color: "bg-purple-600",
+    color: "bg-[#36503F]",
   },
   {
     text: "It felt smooth and professional from start to finish.",
     author: "Ashutosh Mishra",
     avatar: "A",
-    color: "bg-blue-600",
+    color: "bg-[#36503F]",
   }
 ];
 

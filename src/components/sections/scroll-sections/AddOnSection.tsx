@@ -22,7 +22,7 @@ export const AddOnSection = () => {
                     className="relative rounded-xl overflow-hidden shadow-sm border border-border"
                 >
                     <img
-                        src="/onecrm&website.png"
+                        src="/onecrm&website.webp"
                         alt="Add On Services"
                         className="w-full h-auto object-contain"
                     />

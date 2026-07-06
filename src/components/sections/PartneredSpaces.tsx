@@ -15,31 +15,31 @@ const panIndiaCities = [
     id: 2,
     title: "Bangalore",
     price: "1117",
-    image: "/to_cloudinary/bangalore_city_1782458444683.png",
+    image: "/to_cloudinary/bangalore_city_1782458444683.webp",
   },
   {
     id: 3,
     title: "Chennai",
     price: "1000",
-    image: "/to_cloudinary/chennai_city_1782458457106.png",
+    image: "/to_cloudinary/chennai_city_1782458457106.webp",
   },
   {
     id: 4,
     title: "Delhi",
     price: "1025",
-    image: "/to_cloudinary/delhi_city_1782458486025.png",
+    image: "/to_cloudinary/delhi_city_1782458486025.webp",
   },
   {
     id: 5,
     title: "Mumbai",
     price: "1500",
-    image: "/to_cloudinary/mumbai_city_1782458467763.png",
+    image: "/to_cloudinary/mumbai_city_1782458467763.webp",
   },
   {
     id: 6,
     title: "Pune",
     price: "1000",
-    image: "/to_cloudinary/pune_city_1782458497049.png",
+    image: "/to_cloudinary/pune_city_1782458497049.webp",
   }
 ];
 

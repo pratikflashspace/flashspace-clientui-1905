@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Users, TrendingUp, BarChart3, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const featureImage = "/onecrm.png";
+const featureImage = "/onecrm.webp";
 
 const services = [
     { icon: Users, title: "Lead Management", desc: "Capture, track, and nurture your leads from a single, intuitive dashboard." },

@@ -35,6 +35,10 @@ const faq = [
 ];
 
 export default function MeetingRoomsPage() {
+  useEffect(() => {
+    document.title = "Meeting Rooms & Boardrooms in India | FlashSpace";
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground" style={{ fontFamily: "'Inter Tight', sans-serif" }}>
       <Header forceWhiteBackground />

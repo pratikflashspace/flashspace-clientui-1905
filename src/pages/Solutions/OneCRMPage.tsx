@@ -271,7 +271,7 @@ const OneCRMPage = () => {
             >
               <div className="absolute inset-0 z-10 pointer-events-none rounded-xl sm:rounded-3xl" />
               <img 
-                src="/onecrm2.png" 
+                src="/onecrm2.webp" 
                 alt="One CRM Dashboard and Replaced Tools" 
                 className="w-full max-w-5xl h-auto rounded-xl sm:rounded-3xl shadow-lg sm:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] border border-border object-contain"
               />

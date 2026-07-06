@@ -1,4 +1,6 @@
 {
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://flashspace-web-server-2.onrender.com/api/:path*" },
     { "source": "/(.*)", "destination": "/" }

@@ -68,7 +68,7 @@ const additionalServices = [
 ];
 
 const experts = [
-  { name: "Rishi", role: "VO Expert", image: "/to_cloudinary/rishi.png" },
+  { name: "Rishi", role: "VO Expert", image: "/to_cloudinary/rishi.webp" },
   { name: "Premjeet", role: "VO Expert", image: "/to_cloudinary/premjeet.png" },
   { name: "Shubham", role: "VO Expert", image: "/to_cloudinary/shubham.png" },
 ];
