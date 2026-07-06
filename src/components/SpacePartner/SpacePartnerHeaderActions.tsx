@@ -2,7 +2,7 @@ import { useState } from "react";
 import { User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUploadedFileUrl } from "@/utils/fileUrl";
-import PartnerNotificationBell from "./PartnerNotificationBell";
+import { PartnerNotificationBell } from "./PartnerNotificationBell";
 import SpacePortalProfile from "@/pages/spacePortal/Profile";
 
 export function SpacePartnerHeaderActions() {

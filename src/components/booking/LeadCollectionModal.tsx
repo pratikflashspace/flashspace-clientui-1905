@@ -64,7 +64,7 @@ export const LeadCollectionModal = ({
     try {
       const rawBase =
         import.meta.env.VITE_API_URL ||
-        (import.meta.env.DEV ? 'http://localhost:5000' : window.location.origin);
+        (import.meta.env.DEV ? 'http://localhost:5001' : window.location.origin);
       const base = rawBase.replace(/\/$/, '');
       const userName = user?.fullName || email.split('@')[0] || 'Booking Lead';
 

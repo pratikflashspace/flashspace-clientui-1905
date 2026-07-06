@@ -29,6 +29,7 @@ import {
 } from "@/services/spacePortal/spacePartner.service";
 import { Client } from "@/types/spacePortal/client";
 import { userDashboardService } from "@/services/userDashboard.service";
+import { SpacePartnerHeaderActions } from "@/components/SpacePartner/SpacePartnerHeaderActions";
 
 
 export default function Dashboard() {
