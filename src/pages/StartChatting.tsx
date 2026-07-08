@@ -9,7 +9,7 @@ import {
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, MessageCircle, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
   Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
-  LogOut, Lock, Check, Tag, Zap, Map, ChevronRight, ChevronLeft, PanelLeftClose, Shield, // [UPDATED] added Map and ChevronRight
+  LogOut, Lock, Check, Tag, Zap, Map, ChevronRight, ChevronLeft, PanelLeftClose, Shield, Key, // [UPDATED] added Map and ChevronRight
   UserIcon, Trash2
 } from 'lucide-react';
 import { createPortal } from "react-dom"; // [NEW] Added createPortal
@@ -988,6 +988,7 @@ const StartChatting = () => {
     { label: 'Your Bookings', icon: Calendar, onClick: () => handleNavigation('/bookings') },
     { label: 'Flash Tribe', icon: Users, onClick: () => handleNavigation('/community') },
     { label: 'Updates', icon: Bell, onClick: () => setShowUpdates(prev => !prev) }, // [NEW] Wire up the button
+    { label: 'API Keys', icon: Key, onClick: () => handleNavigation('/settings') },
     { label: 'Settings', icon: Settings, onClick: () => handleNavigation('/settings') },
   ];
 

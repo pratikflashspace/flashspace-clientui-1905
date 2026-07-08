@@ -7,6 +7,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { validatePassword } from "@/utils/passwordValidation";
+import UserAIIntegrations from "@/components/profile/UserAIIntegrations";
+
 
 import {
   ArrowLeft,
@@ -574,6 +576,10 @@ export default function Settings() {
                 </button>
               ))}
             </CardContent>
+          </Card>
+
+          <Card className="border-primary/20 shadow-xl shadow-primary/5 rounded-3xl overflow-hidden bg-background mb-6">
+            <UserAIIntegrations />
           </Card>
 
           {/* Delete Account */}

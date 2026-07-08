@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   Loader2,
+  Key,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import React, { useEffect, useState, useMemo, Suspense } from "react";
@@ -38,6 +39,7 @@ const ChatSupport = React.lazy(() => import("./ChatSupport"));
 const Documents = React.lazy(() => import("./Documents"));
 const MailRecords = React.lazy(() => import("./MailRecords"));
 const VisitRecords = React.lazy(() => import("./VisitRecords"));
+const ApiKeys = React.lazy(() => import("./ApiKeys"));
 
 const LazyFallback = () => (
   <div className="min-h-[400px] flex items-center justify-center">
@@ -54,6 +56,7 @@ const menuItems = [
   { name: "Documents", icon: FileText, section: "main", path: "/dashboard/documents" },
   { name: "Ticket and Support", icon: MessageSquare, section: "main", path: "/dashboard/support" },
   { name: "Help Center", icon: HelpCircle, section: "main", path: "/dashboard/help" },
+  { name: "API Keys", icon: Key, section: "main", path: "/dashboard/mcp-keys" },
 ];
 
 export default function ClientDashboard() {
@@ -108,6 +111,8 @@ export default function ClientDashboard() {
         return <Notifications />;
       case "/dashboard/help":
         return <Support />;
+      case "/dashboard/mcp-keys":
+        return <ApiKeys />;
       case "/dashboard/profile":
         return <Profile />;
       case "/dashboard/logout":

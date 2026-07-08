@@ -31,6 +31,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import * as spacePartnerService from "@/services/spacePortal/spacePartner.service";
+import UserAIIntegrations from "@/components/profile/UserAIIntegrations";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -159,6 +160,9 @@ export default function Profile() {
           </TabsTrigger>
           <TabsTrigger value="bank" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm font-bold text-sm transition-all">
             Bank Details
+          </TabsTrigger>
+          <TabsTrigger value="api-keys" className="rounded-xl px-6 py-2.5 data-[state=active]:bg-background data-[state=active]:shadow-sm font-bold text-sm transition-all">
+            API Keys
           </TabsTrigger>
         </TabsList>
 
@@ -403,6 +407,19 @@ export default function Profile() {
               )}
             </CardContent>
           </Card>
+          </motion.div>
+        </TabsContent>
+
+        {/* --- API KEYS TAB --- */}
+        <TabsContent value="api-keys">
+          <motion.div
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <Card className="border border-primary/20 shadow-xl shadow-primary/5 rounded-3xl overflow-hidden bg-background">
+              <UserAIIntegrations />
+            </Card>
           </motion.div>
         </TabsContent>
       </Tabs>
