@@ -64,7 +64,8 @@ const CompleteBookingPage = () => {
     const [isDevMode] = useState(import.meta.env.DEV);
 
     // Tenure selection
-    const [selectedTenure, setSelectedTenure] = useState<1 | 2 | 3>(1);
+    const urlTenure = parseInt(searchParams.get('tenure') || '1', 10) as 1 | 2 | 3;
+    const [selectedTenure, setSelectedTenure] = useState<1 | 2 | 3>([1, 2, 3].includes(urlTenure) ? urlTenure : 1);
     const [tenureOptions, setTenureOptions] = useState<TenureOption[]>([]);
     const [planFeatures, setPlanFeatures] = useState<string[]>([]);
     const [planDisplayName, setPlanDisplayName] = useState('');
@@ -221,6 +222,7 @@ const CompleteBookingPage = () => {
         paymentType: spaceType === 'coworking' ? 'coworking_space' as const : 'virtual_office' as const,
         couponCode: appliedCoupon?.code || undefined,
         affiliateId: appliedCoupon?.affiliateId || undefined,
+        bookingId: searchParams.get('booking') || undefined,
     });
 
     // ─── STEP 1: Process Payment ─
