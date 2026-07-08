@@ -64,8 +64,10 @@ const CompleteBookingPage = () => {
     const [isDevMode] = useState(import.meta.env.DEV);
 
     // Tenure selection
-    const urlTenure = parseInt(searchParams.get('tenure') || '1', 10) as 1 | 2 | 3;
-    const [selectedTenure, setSelectedTenure] = useState<1 | 2 | 3>([1, 2, 3].includes(urlTenure) ? urlTenure : 1);
+    let urlTenure = parseInt(searchParams.get('tenure') || '1', 10);
+    if (urlTenure > 3) urlTenure = Math.round(urlTenure / 12);
+    const initialTenure = [1, 2, 3].includes(urlTenure) ? (urlTenure as 1 | 2 | 3) : 1;
+    const [selectedTenure, setSelectedTenure] = useState<1 | 2 | 3>(initialTenure);
     const [tenureOptions, setTenureOptions] = useState<TenureOption[]>([]);
     const [planFeatures, setPlanFeatures] = useState<string[]>([]);
     const [planDisplayName, setPlanDisplayName] = useState('');
