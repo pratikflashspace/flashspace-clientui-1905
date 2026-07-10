@@ -24,6 +24,7 @@ import {
   Sparkles,
   CalendarDays,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -510,6 +511,7 @@ const BookingPage = () => {
   const taxableAmount = Math.max(basePrice - couponDiscountAmount, 0);
   const gstAmount = Math.round(taxableAmount * 0.18);
   const finalPayableAmount = taxableAmount + gstAmount;
+  const originalFinalPayableAmount = basePrice + Math.round(basePrice * 0.18);
 
   const getPaymentType = () => {
     const type = searchParams.get("type");
@@ -1509,19 +1511,92 @@ const BookingPage = () => {
                   </div>
 
                   {/* Price Breakdown */}
-                  <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-white">
-                    <h3 className="font-bold text-sm uppercase tracking-wider mb-4 text-gray-300 flex items-center gap-2">
-                      <IndianRupee className="w-4 h-4 text-teal-400" /> Price
-                      Breakdown
-                    </h3>
+                  <motion.div 
+                    animate={appliedCoupon ? { 
+                        scale: [1, 1.02, 1], 
+                        boxShadow: ["0 0 0px rgba(34,197,94,0)", "0 0 20px rgba(34,197,94,0.4)", "0 0 0px rgba(34,197,94,0)"] 
+                    } : {}}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-white relative overflow-hidden"
+                  >
+                    {/* Full-box magic stars */}
+                    {appliedCoupon && (
+                        <div className="absolute inset-0 pointer-events-none z-0">
+                            {[
+                                { x: -80, y: -60, scale: 1.2, delay: 0 },
+                                { x: 100, y: -40, scale: 0.8, delay: 0.1 },
+                                { x: -50, y: 80, scale: 1.5, delay: 0.2 },
+                                { x: 90, y: 70, scale: 1, delay: 0.3 },
+                                { x: 0, y: -90, scale: 0.9, delay: 0.15 },
+                                { x: 30, y: 100, scale: 1.1, delay: 0.05 },
+                            ].map((star, i) => (
+                                <motion.div
+                                    key={`star-${i}-${finalPayableAmount}`}
+                                    initial={{ opacity: 0, scale: 0, x: 0, y: 0, rotate: 0 }}
+                                    animate={{ 
+                                        opacity: [0, 1, 1, 0], 
+                                        scale: [0, star.scale, 0], 
+                                        x: star.x, 
+                                        y: star.y,
+                                        rotate: 180
+                                    }}
+                                    transition={{ duration: 1.2, ease: "easeOut", delay: star.delay }}
+                                    className="absolute top-1/2 left-1/2 text-yellow-400"
+                                >
+                                    <Sparkles className="w-5 h-5 fill-yellow-400/50" />
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="h-6 mb-4 relative z-10">
+                      <AnimatePresence mode="wait">
+                        {appliedCoupon ? (
+                            <motion.div
+                                key="special-price"
+                                initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="flex items-center gap-2"
+                            >
+                                <Sparkles className="w-4 h-4 text-green-400 animate-pulse" />
+                                <h3 className="font-bold text-sm uppercase tracking-wider text-green-400">
+                                    Your New Special Price
+                                </h3>
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="price-breakdown"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex items-center gap-2"
+                            >
+                                <IndianRupee className="w-4 h-4 text-teal-400" />
+                                <h3 className="font-bold text-sm uppercase tracking-wider text-gray-300">
+                                    Price Breakdown
+                                </h3>
+                            </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                     <div className="space-y-3">
+                      {appliedCoupon && (
+                          <div className="flex justify-between text-sm pb-2 mb-2 border-b border-gray-700/50">
+                            <span className="text-gray-400">Actual Price (Excluding GST)</span>
+                            <span className="font-semibold text-gray-500 line-through decoration-red-500/50">
+                              ₹{basePrice.toLocaleString()}
+                            </span>
+                          </div>
+                      )}
+                      
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-400">
-                          {selectedPlanDetails.name}{" "}
-                          {isCoworking
-                            ? ""
-                            : `× ${selectedTenure} year${selectedTenure > 1 ? "s" : ""}`}
-                        </span>
+                        <span className="text-gray-400">Plan</span>
+                        <span className="font-semibold text-gray-200">{selectedPlanDetails.name}</span>
+                      </div>
+
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-400">Total Price</span>
                         <span className="font-semibold">
                           ₹
                           {(isCoworking && fixedAmount !== null
@@ -1530,6 +1605,15 @@ const BookingPage = () => {
                           ).toLocaleString()}
                         </span>
                       </div>
+
+                      {!isCoworking && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-400">Tenure</span>
+                            <span className="font-semibold text-gray-200">
+                              {selectedTenure} Year{selectedTenure > 1 ? "s" : ""}
+                            </span>
+                          </div>
+                      )}
                       {!isCoworking && selectedOption.savings > 0 && (
                         <div className="flex justify-between text-sm text-green-400">
                           <span>
@@ -1567,12 +1651,23 @@ const BookingPage = () => {
                         <span className="text-base font-bold">
                           Total Payable
                         </span>
-                        <span className="text-2xl font-extrabold text-teal-400">
-                          ₹{finalPayableAmount.toLocaleString()}
-                        </span>
+                        <div className="relative inline-block z-10">
+                            <AnimatePresence mode="wait">
+                                <motion.div 
+                                    key={finalPayableAmount}
+                                    initial={{ filter: "blur(12px)", opacity: 0, scale: 0.8 }}
+                                    animate={{ filter: "blur(0px)", opacity: 1, scale: 1 }}
+                                    exit={{ filter: "blur(12px)", opacity: 0, scale: 1.2 }}
+                                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                                    className={`text-2xl font-extrabold ${appliedCoupon ? 'text-green-400' : 'text-teal-400'}`}
+                                >
+                                  ₹{finalPayableAmount.toLocaleString()}
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               </div>
             )}

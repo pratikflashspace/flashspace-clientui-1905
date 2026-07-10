@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import {
     ArrowLeft, Check, Shield, Clock, Star, Loader2, Tag, X,
-    Building2, MapPin, IndianRupee, CheckCircle2, Package,
+    Building2, MapPin, IndianRupee, CheckCircle2, Package, Sparkles
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getVirtualOfficeById } from '@/services/virtualOffice.service';
@@ -166,6 +167,7 @@ const CompleteBookingPage = () => {
     const cgstAmount = Math.round(taxableAmount * 0.09);
     const sgstAmount = Math.round(taxableAmount * 0.09);
     const finalTotal = taxableAmount + cgstAmount + sgstAmount;
+    const originalFinalTotal = rawTotal + Math.round(rawTotal * 0.09) + Math.round(rawTotal * 0.09);
 
     // ─── COUPON HANDLER ───────────────────────
     const handleApplyCoupon = async () => {
@@ -500,17 +502,90 @@ const CompleteBookingPage = () => {
                             )}
 
                             <div className="p-5 space-y-4">
-                                {/* Order Summary */}
-                                <div>
-                                    <div className="flex items-center gap-2 mb-3">
-                                        <IndianRupee className="w-4 h-4 text-yellow-500" />
-                                        <h3 className="font-bold text-foreground">Order Summary</h3>
+                                <motion.div 
+                                    animate={appliedCoupon ? { 
+                                        scale: [1, 1.03, 1], 
+                                        boxShadow: ["0 0 0px rgba(34,197,94,0)", "0 0 20px rgba(34,197,94,0.3)", "0 0 0px rgba(34,197,94,0)"] 
+                                    } : {}}
+                                    transition={{ duration: 0.6, ease: "easeOut" }}
+                                    className="rounded-xl relative overflow-hidden"
+                                >
+                                    {/* Full-box magic stars */}
+                                    {appliedCoupon && (
+                                        <div className="absolute inset-0 pointer-events-none z-0">
+                                            {[
+                                                { x: -80, y: -60, scale: 1.2, delay: 0 },
+                                                { x: 100, y: -40, scale: 0.8, delay: 0.1 },
+                                                { x: -50, y: 80, scale: 1.5, delay: 0.2 },
+                                                { x: 90, y: 70, scale: 1, delay: 0.3 },
+                                                { x: 0, y: -90, scale: 0.9, delay: 0.15 },
+                                                { x: 30, y: 100, scale: 1.1, delay: 0.05 },
+                                            ].map((star, i) => (
+                                                <motion.div
+                                                    key={`star-${i}-${finalTotal}`}
+                                                    initial={{ opacity: 0, scale: 0, x: 0, y: 0, rotate: 0 }}
+                                                    animate={{ 
+                                                        opacity: [0, 1, 1, 0], 
+                                                        scale: [0, star.scale, 0], 
+                                                        x: star.x, 
+                                                        y: star.y,
+                                                        rotate: 180
+                                                    }}
+                                                    transition={{ duration: 1.2, ease: "easeOut", delay: star.delay }}
+                                                    className="absolute top-1/2 left-1/2 text-yellow-400"
+                                                >
+                                                    <Sparkles className="w-5 h-5 fill-yellow-400/50" />
+                                                </motion.div>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center gap-2 mb-3 h-6 relative z-10">
+                                        <AnimatePresence mode="wait">
+                                            {appliedCoupon ? (
+                                                <motion.div
+                                                    key="special-price"
+                                                    initial={{ opacity: 0, y: -10, scale: 0.9 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 10 }}
+                                                    className="flex items-center gap-2"
+                                                >
+                                                    <Sparkles className="w-4 h-4 text-green-500 animate-pulse" />
+                                                    <h3 className="font-bold text-green-600 dark:text-green-500">
+                                                        Your New Special Price
+                                                    </h3>
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    key="order-summary"
+                                                    initial={{ opacity: 0 }}
+                                                    animate={{ opacity: 1 }}
+                                                    exit={{ opacity: 0 }}
+                                                    className="flex items-center gap-2"
+                                                >
+                                                    <IndianRupee className="w-4 h-4 text-yellow-500" />
+                                                    <h3 className="font-bold text-foreground">Order Summary</h3>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
 
                                     <div className="space-y-2 text-sm">
+                                        {appliedCoupon && (
+                                            <div className="flex justify-between text-muted-foreground pb-2 mb-2 border-b border-border/40">
+                                                <span>Actual Price (Excluding GST)</span>
+                                                <span className="font-medium text-muted-foreground line-through decoration-red-500/50">
+                                                    {formatCurrency(rawTotal)}
+                                                </span>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between text-muted-foreground">
                                             <span>Plan</span>
                                             <span className="font-medium text-foreground">{planDisplayName}</span>
+                                        </div>
+                                        <div className="flex justify-between text-muted-foreground">
+                                            <span>Total Price</span>
+                                            <span className="font-medium text-foreground">{formatCurrency(rawTotal)}</span>
                                         </div>
                                         <div className="flex justify-between text-muted-foreground">
                                             <span>Tenure</span>
@@ -537,7 +612,7 @@ const CompleteBookingPage = () => {
                                             <span className="font-medium text-foreground">{formatCurrency(sgstAmount)}</span>
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
 
                                 {/* Coupon Input */}
                                 {!appliedCoupon ? (
@@ -577,7 +652,20 @@ const CompleteBookingPage = () => {
                                 <div className="flex items-end justify-between">
                                     <div>
                                         <p className="text-xs text-muted-foreground uppercase tracking-wide">Total Amount</p>
-                                        <p className="text-3xl font-bold text-foreground">{formatCurrency(finalTotal)}</p>
+                                        <div className="relative inline-block z-10">
+                                            <AnimatePresence mode="wait">
+                                                <motion.div 
+                                                    key={finalTotal}
+                                                    initial={{ filter: "blur(12px)", opacity: 0, scale: 0.8 }}
+                                                    animate={{ filter: "blur(0px)", opacity: 1, scale: 1 }}
+                                                    exit={{ filter: "blur(12px)", opacity: 0, scale: 1.2 }}
+                                                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                                                    className={`text-3xl font-bold ${appliedCoupon ? 'text-green-600' : 'text-foreground'}`}
+                                                >
+                                                    {formatCurrency(finalTotal)}
+                                                </motion.div>
+                                            </AnimatePresence>
+                                        </div>
                                         <p className="text-xs text-muted-foreground mt-0.5">for {selectedTenure} year{selectedTenure > 1 ? 's' : ''}</p>
                                     </div>
                                 </div>
