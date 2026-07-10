@@ -655,7 +655,7 @@ export default function Documents() {
                                             <tr key={idx} className="hover:bg-gray-50/50 transition-colors">
                                                 <td className="px-6 py-4">
                                                     <span className={cn(
-                                                        "px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest",
+                                                        "whitespace-nowrap px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-widest",
                                                         doc.ownerName === "Personal Docs" 
                                                             ? "bg-blue-50 text-blue-700 border border-blue-100" 
                                                             : doc.ownerName === "Business Docs"
@@ -674,7 +674,7 @@ export default function Documents() {
                                                 <td className="px-6 py-4 text-sm text-gray-500 capitalize">
                                                     {doc.type.replace('_', ' ')}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-gray-500">
+                                                <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                                                     {doc.uploadedAt ? format(new Date(doc.uploadedAt), "MMM dd, yyyy") : "N/A"}
                                                 </td>
                                                 <td className="px-6 py-4">

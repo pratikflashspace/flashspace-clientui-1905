@@ -862,7 +862,7 @@ const MyBookings: React.FC = () => {
                     key={booking._id}
                     type="button"
                     onClick={() => setSelectedBooking(booking)}
-                    className="text-left bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative flex flex-col"
+                    className="text-left bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative flex flex-col h-full"
                   >
                     <div className="flex items-start justify-between gap-3 mb-5">
                       <div className="min-w-0">
@@ -898,7 +898,7 @@ const MyBookings: React.FC = () => {
                       </ul>
                     </div>
 
-                    <div className="h-px bg-[#36503F]/10 my-5" />
+                    <div className="h-px bg-[#36503F]/10 my-5 mt-auto" />
 
                     <div className="flex items-end justify-between">
                       <div>
@@ -927,7 +927,7 @@ const MyBookings: React.FC = () => {
                     key={booking._id}
                     type="button"
                     onClick={() => setSelectedBooking(booking)}
-                    className="text-left bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative min-h-[250px] flex flex-col"
+                    className="text-left bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative min-h-[250px] flex flex-col h-full"
                   >
                     <div className="flex items-start justify-between gap-3 mb-5">
                       <div className="min-w-0">
@@ -968,7 +968,7 @@ const MyBookings: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="h-px bg-gray-100 my-4" />
+                    <div className="h-px bg-gray-100 my-4 mt-auto" />
 
                     <div>
                       <p className="text-xl font-black text-gray-900">
@@ -985,7 +985,7 @@ const MyBookings: React.FC = () => {
               return (
                 <div
                   key={booking._id}
-                  className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative"
+                  className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative flex flex-col h-full"
                 >
                   {/* Header: ID & Status */}
                   <div className="flex items-center justify-between mb-3">
@@ -1083,7 +1083,7 @@ const MyBookings: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="h-px bg-gray-200 my-3" />
+                  <div className="h-px bg-gray-200 my-3 mt-auto" />
 
                   {/* Footer: Price & Actions */}
                   <div className="flex items-center justify-between">
