@@ -321,7 +321,7 @@ const SpaceComponent = () => {
             <div className="border-b dark:border-white/10 pb-8 mb-8">
               <h2 className="text-xl font-semibold mb-4 font-geist text-black dark:text-white">About this space</h2>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                {spaceDetails.name} is a premium workspace located in {spaceDetails.area}, {spaceDetails.city}.
+                {spaceDetails.spaceId || spaceDetails.name} is a premium workspace located in {spaceDetails.area}, {spaceDetails.city}.
                 Perfect for startups, freelancers, and enterprises looking for a professional business address and workspace solutions.
               </p>
             </div>

@@ -747,7 +747,7 @@ const getPhotos = () => {
               </h2>
               <p className="text-muted-foreground leading-relaxed">
                 {data.description ||
-                  `${data.spaceId ? data.spaceId + " at " : ""}${data.name} is a premium workspace located in ${data.area || data.city}. Perfect for startups, freelancers, and enterprises looking for a professional business address and workspace solutions.`}
+                  `${data.spaceId || data.name} is a premium workspace located in ${data.area || data.city}. Perfect for startups, freelancers, and enterprises looking for a professional business address and workspace solutions.`}
               </p>
             </section>
 
