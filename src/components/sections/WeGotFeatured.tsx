@@ -10,12 +10,12 @@ interface LogoItem {
 
 const pressLogos: LogoItem[] = [
   { name: "BBC", src: "/newLogo/bbb.png", customImageClass: "h-14 sm:h-16" },
-  { name: "Hindustan Times", src: "/newLogo/Hindustan_Times_Logo.png", customImageClass: "h-4 sm:h-12 lg:h-10" },
+  { name: "Hindustan Times", src: "/newLogo/Hindustan_Times_Logo.png", customImageClass: "h-4 sm:h-12 lg:h-20" },
   { name: "BW Businessworld", src: "/newLogo/businessworld.png", customImageClass: "h-4 sm:h-18 lg:h-8" },
   { name: "Entrepreneur", styleClass: "font-sans font-medium text-sm md:text-xl tracking-widest uppercase" },
   { name: "Inc42", src: "/newLogo/inc42.png", customImageClass: "h-6 sm:h-16 lg:h-8" },
   { name: "The Guardian", src: "/newLogo/theGuardian.png" , customImageClass: "h-6 sm:h-6 lg:h-8"},
-  { name: "Times of India", styleClass: "font-serif font-bold text-base md:text-2xl" },
+  { name: "Times of India", src: "/newLogo/TOI.png", customImageClass: "h-14 sm:h-20 lg:h-16" },
   { name: "YourStory", styleClass: "font-sans font-bold text-lg md:text-3xl tracking-tighter", src: "/newLogo/YourStory-Logo.png", customImageClass: "h-10 sm:h-16" },
   { name: "Zee News", styleClass: "font-sans font-black text-lg md:text-3xl" , src:"/newLogo/zeeNews.jpg", customImageClass: "h-14 sm:h-16"},
   { name: "Business Standard", src: "/newLogo/business-standard-logo.png", customImageClass: "h-12 sm:h-12 lg:h-18" },
