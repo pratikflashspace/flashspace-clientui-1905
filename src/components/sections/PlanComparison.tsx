@@ -9,9 +9,9 @@ export const PlanComparison = () => {
       subtitle: "Everything you need\nto get started.",
       icon: <Leaf className="w-6 h-6" />,
       marketPrice: "₹50000",
-      ourPrice: "₹8999",
-      savings: "₹41000",
-      savingsPct: "82%",
+      ourPrice: "₹9999",
+      savings: "₹40000",
+      savingsPct: "80%",
       highlight: false,
     },
     {

@@ -40,13 +40,13 @@ const PackageCheckout = () => {
 
     // Pricing
     const prices: Record<string, number> = {
-        'basic': 8999,
+        'basic': 9999,
         'pro': 11999,
         'premium': 14999,
         'elite': 24999
     };
     
-    const basePrice = prices[planKey] || 8999;
+    const basePrice = prices[planKey] || 9999;
     const cgstAmount = Math.round(basePrice * 0.09);
     const sgstAmount = Math.round(basePrice * 0.09);
     const finalTotal = basePrice + cgstAmount + sgstAmount;

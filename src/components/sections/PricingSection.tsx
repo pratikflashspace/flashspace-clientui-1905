@@ -12,7 +12,7 @@ export const PricingSection = ({ highlightPlan, compact }: { highlightPlan?: str
     {
       name: "BASIC",
       description: "Everything you need\nto get started.",
-      price: "₹8999",
+      price: "₹9999",
       buttonText: "CHOOSE PLAN",
       highlight: highlightPlan ? highlightPlan.toLowerCase() === "basic" : false,
       icon: <Leaf className="w-6 h-6" />
