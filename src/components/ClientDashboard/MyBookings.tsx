@@ -985,7 +985,8 @@ const MyBookings: React.FC = () => {
               return (
                 <div
                   key={booking._id}
-                  className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative flex flex-col h-full"
+                  onClick={() => setSelectedBooking(booking)}
+                  className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-100 hover:border-[#35503F]/40 hover:shadow-md transition-all group relative flex flex-col h-full cursor-pointer"
                 >
                   {/* Header: ID & Status */}
                   <div className="flex items-center justify-between mb-3">

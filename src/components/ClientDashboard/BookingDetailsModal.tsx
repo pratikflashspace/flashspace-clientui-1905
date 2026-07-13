@@ -163,7 +163,7 @@ export default function BookingDetailsModal({
             activeProfile = bizProfs[0];
           }
 
-          setKycProfile(activeProfile || individualProf);
+          setKycProfile(activeProfile || individualProf || { kycType: 'individual', _id: 'new', isPartner: false, documents: [] } as any);
           setIndividualProfile(individualProf);
           setBusinessProfiles(bizProfs);
           setPartners(partnerProfs);
@@ -192,7 +192,10 @@ export default function BookingDetailsModal({
     const bookingId = (booking as any)._id || booking.id || booking.bookingNumber;
     const toastId = toast.loading(isUpdating ? "Updating booking request..." : "Sending booking request to space partner...");
     
-    const profileId = kycProfile?._id || (kycProfile as any)?.id;
+    let profileId = kycProfile?._id || (kycProfile as any)?.id;
+    if (profileId === 'new') {
+      profileId = undefined;
+    }
     console.log(`[BookingDetailsModal] Finishing with profileId: ${profileId}`, kycProfile);
     
     const response = await userDashboardService.submitBookingRequest(bookingId, selectedPartners, profileId);
@@ -211,6 +214,18 @@ export default function BookingDetailsModal({
     const toastId = toast.loading(`Uploading ${uploadingDoc.type.replace('_', ' ')}...`);
     try {
       const isBookingAgreement = uploadingDoc.type.includes("agreement");
+      let profileId = uploadingDoc.profileId;
+
+      if (!isBookingAgreement && profileId === "new") {
+        const createRes = await userDashboardService.updateBusinessInfo({ kycType: 'individual' });
+        if (createRes.success && createRes.data) {
+          profileId = createRes.data._id;
+        } else {
+          toast.error("Failed to create individual profile for upload.", { id: toastId });
+          return;
+        }
+      }
+
       const response = isBookingAgreement
         ? await userDashboardService.uploadBookingDocument(
             (booking as any)._id || booking.id || booking.bookingNumber,
@@ -220,7 +235,7 @@ export default function BookingDetailsModal({
         : await userDashboardService.uploadKYCDocument(
             uploadingDoc.type,
             file,
-            uploadingDoc.profileId
+            profileId
           );
       if (response.success) {
         toast.success("Document updated successfully", { id: toastId });
@@ -375,7 +390,11 @@ export default function BookingDetailsModal({
         <div className="bg-gray-50 p-1.5 rounded-xl border border-gray-200 flex gap-2">
           <button
             onClick={() => {
-              if (individualProfile) setKycProfile(individualProfile);
+              if (individualProfile) {
+                setKycProfile(individualProfile);
+              } else {
+                setKycProfile({ kycType: 'individual', _id: 'new', isPartner: false, documents: [] } as any);
+              }
             }}
             className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
               kycProfile?.kycType === 'individual' && !kycProfile?.isPartner
