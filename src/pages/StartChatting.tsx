@@ -1222,7 +1222,7 @@ const StartChatting = () => {
     // [NEW] Guest Chat Limit Check
     if (!isAuthenticated) {
       const currentCount = parseInt(localStorage.getItem('guest_chat_count') || '0');
-      if (currentCount >= 3) {
+      if (currentCount >= 6) {
         setIsLimitPopupOpen(true);
         // Optional: clear message to avoid confusion or keep it? Keeping it allows them to send after login
         return;
