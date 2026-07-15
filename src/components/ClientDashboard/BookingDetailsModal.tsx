@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Booking } from "@/types/services";
 import { 
   X, MapPin, FileText, Loader2, Download, Upload, Eye, CheckCircle, 
@@ -1116,9 +1117,17 @@ export default function BookingDetailsModal({
     );
   }
 
-  return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-2 md:p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-[20px] md:rounded-[24px] max-w-2xl w-full max-h-[92vh] md:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <div 
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[200] p-2 md:p-4 animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-[20px] md:rounded-[24px] max-w-2xl w-full max-h-[92vh] md:max-h-[90vh] flex flex-col shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Header Section */}
         <div className="relative shrink-0">
@@ -1221,6 +1230,7 @@ export default function BookingDetailsModal({
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
-}
+};
