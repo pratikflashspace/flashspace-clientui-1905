@@ -18,50 +18,9 @@ const API_BASE_URL = RAW_BASE_URL.endsWith("/api")
 
 // console.log('🌍 API Base URL:', API_BASE_URL);
 
-// Create axios instance with default configuration
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 30000,
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-    "x-flashspace-csrf": "true",
-  },
-});
+import { axiosInstance } from "@/lib/axios";
 
-// Add request interceptor for logging (optional)
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
-    return config;
-  },
-  (error) => {
-    console.error("Request error:", error);
-    return Promise.reject(error);
-  },
-);
-
-// Add response interceptor for error handling
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error: any) => {
-    // Log full error details for debugging
-    console.error("❌ API Error Details:", {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      message: error.response?.data?.message || error.message,
-      url: error.config?.url,
-      method: error.config?.method,
-      data: error.response?.data,
-    });
-
-    return Promise.reject(error);
-  },
-);
-
-/**
- * Generic error handler for API responses
- */
+// Export the generic error handlers
 export const handleApiError = (error: any): never => {
   let errorMessage = "An unexpected error occurred";
 

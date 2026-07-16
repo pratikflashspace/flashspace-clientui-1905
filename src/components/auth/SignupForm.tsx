@@ -36,7 +36,7 @@ export const SignupForm = ({
     const newErrors: Record<string, string> = {};
 
     if (!formData.phoneNumber) newErrors.phoneNumber = 'Phone number is required';
-    else if (!/^\+?[0-9]{10,15}$/.test(formData.phoneNumber)) newErrors.phoneNumber = 'Invalid phone number';
+    else if (!/^[0-9]{10}$/.test(formData.phoneNumber)) newErrors.phoneNumber = 'Please enter a valid 10-digit mobile number';
 
     if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
     if (!formData.email) newErrors.email = 'Email is required';
@@ -76,7 +76,16 @@ export const SignupForm = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Strict numeric check for phone number (max 10 digits)
+    if (name === 'phoneNumber') {
+      const numericValue = value.replace(/\D/g, '');
+      if (numericValue.length > 10) return;
+      setFormData((prev) => ({ ...prev, [name]: numericValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+    
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
@@ -96,15 +105,16 @@ export const SignupForm = ({
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 z-10">
               <Phone size={20} />
             </div>
-            <input
-              id="phoneNumber"
-              name="phoneNumber"
-              type="tel"
-              placeholder="+91 9876543210"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              className={inputClass()}
-            />
+              <input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="tel"
+                placeholder="9876543210"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                maxLength={10}
+                className={inputClass()}
+              />
           </div>
           {errors.phoneNumber && <p className="text-red-500 text-xs">{errors.phoneNumber}</p>}
         </div>

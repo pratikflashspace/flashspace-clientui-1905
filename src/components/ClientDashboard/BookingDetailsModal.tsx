@@ -294,9 +294,18 @@ export default function BookingDetailsModal({
     if (profileType === 'individual') profile = individualProfile || kycProfile;
     if (profileType === 'partner') profile = partners.find(p => p._id === (partnerId || selectedPartners[0]));
 
-    if (!profile?.documents) return null;
+    let docsToSearch: any[] = [];
+    if (profile?.documents) {
+      docsToSearch = [...profile.documents];
+    }
+    if (booking?.documents) {
+      docsToSearch = [...docsToSearch, ...booking.documents];
+    }
+
+    if (docsToSearch.length === 0) return null;
+
     // Normalize type and check
-    return profile.documents.find((d: any) => 
+    return docsToSearch.find((d: any) => 
       d.type?.toLowerCase() === type.toLowerCase() || 
       d.name?.toLowerCase().includes(type.toLowerCase())
     );
@@ -987,14 +996,26 @@ export default function BookingDetailsModal({
                     <span className={`text-sm font-medium ${doc && isApproved ? 'text-gray-900' : 'text-gray-500'}`}>{docType.label}</span>
                   </div>
                   {doc && isApproved ? (
-                    <a 
-                      href={getUploadedFileUrl(doc.fileUrl)} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="p-2 rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
-                    >
-                      <Download className="w-4 h-4" />
-                    </a>
+                    <div className="flex gap-2">
+                      <a 
+                        href={getUploadedFileUrl(doc.fileUrl)} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="p-2 rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
+                        title="View Document"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </a>
+                      <a 
+                        href={getUploadedFileUrl(doc.fileUrl)} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="p-2 rounded-lg bg-white border shadow-sm text-[#35503F] hover:bg-gray-50 transition-colors"
+                        title="Download Document"
+                      >
+                        <Download className="w-4 h-4" />
+                      </a>
+                    </div>
                   ) : (
                     <span className="text-xs font-medium text-gray-400 bg-gray-100 px-2.5 py-1 rounded-md">
                       {isApproved ? 'Pending Upload' : 'Locked'}
@@ -1144,9 +1165,9 @@ export default function BookingDetailsModal({
           
           <button
             onClick={onClose}
-            className="absolute top-3 md:top-4 right-3 md:right-4 w-7 h-7 md:w-8 md:h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/40 transition-colors"
+            className="absolute z-50 cursor-pointer top-3 md:top-4 right-3 md:right-4 w-7 h-7 md:w-8 md:h-8 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/40 transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 pointer-events-none" />
           </button>
           
           <div className="absolute bottom-3 md:bottom-4 left-4 md:left-6 right-4 md:right-6">
@@ -1173,7 +1194,7 @@ export default function BookingDetailsModal({
               </div>
               <div className="hidden sm:block text-right">
                 <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold shadow-sm ${getStatusConfig(booking).bg} ${getStatusConfig(booking).text}`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold shadow-sm whitespace-nowrap ${getStatusConfig(booking).bg} ${getStatusConfig(booking).text}`}
                 >
                   {getStatusConfig(booking).label}
                 </span>

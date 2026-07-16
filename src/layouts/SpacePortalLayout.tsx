@@ -336,6 +336,12 @@ export default function SpacePortalLayout() {
         hideTopBar: true,
         pageBg: "#f3f4f3",
       },
+      "/spaceportal/gst-management": {
+        title: makeTitle("GST", "Management"),
+        subtitle: "Review GST documents, verify NOCs, and raise queries.",
+        hideTopBar: true,
+        pageBg: "#f3f4f3",
+      },
       "/spaceportal/track-progress": {
         title: makeTitle("Track", "Progress"),
         subtitle: "Monitor the lifecycle progress of all your space bookings.",

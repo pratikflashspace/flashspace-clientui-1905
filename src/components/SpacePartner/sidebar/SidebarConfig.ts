@@ -24,6 +24,11 @@ export const sidebarConfig = [
     icon: LayoutDashboard,
   },
   {
+    label: "GST Management",
+    path: "/spaceportal/gst-management",
+    icon: ShieldCheck,
+  },
+  {
     label: "KYC Compliance",
     path: "/spaceportal/kyc-verification",
     icon: ShieldCheck,

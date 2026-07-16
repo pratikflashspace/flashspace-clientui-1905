@@ -705,7 +705,7 @@ export default function Dashboard() {
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
                               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                {getWorkspaceDisplayName(booking)}
+                                {booking.bookingNumber || "Booking ID"}
                               </span>
                               <span
                                 className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border ${booking.type === "VirtualOffice" ||
@@ -737,7 +737,7 @@ export default function Dashboard() {
                           {/* Main Content */}
                           <div className="mb-5">
                             <h3 style={{ fontFamily: "'Inter', sans-serif" }} className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#35503F] transition-colors line-clamp-1">
-                              {booking.bookingNumber || "Booking ID"}
+                              {getWorkspaceDisplayName(booking)}
                             </h3>
                             <div className="flex items-start gap-2 text-gray-500 text-xs mb-3 h-8">
                               <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-[#35503F]" />

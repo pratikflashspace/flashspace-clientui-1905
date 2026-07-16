@@ -227,6 +227,24 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  // Handle tab switching from custom event and URL query params
+  useEffect(() => {
+    const handleTabSwitch = (e: any) => {
+      if (e.detail?.tab) {
+        setActiveTab(e.detail.tab);
+      }
+    };
+    
+    const searchParams = new URLSearchParams(window.location.search);
+    const tabParam = searchParams.get('tab');
+    if (tabParam && (tabParam === 'kyc' || tabParam === 'personal' || tabParam === 'company')) {
+      setActiveTab(tabParam as any);
+    }
+
+    window.addEventListener("client-profile-drawer:open", handleTabSwitch);
+    return () => window.removeEventListener("client-profile-drawer:open", handleTabSwitch);
+  }, []);
+
   // Refresh profile picture/cover image on mount (staggered to avoid race)
   useEffect(() => {
     const t1 = setTimeout(() => {
@@ -474,7 +492,7 @@ const Profile: React.FC<ProfileProps> = ({ hideCompanyDetails = false, isCompact
 
   return (
  <div className={`min-h-screen bg-gray-50 ${drawerMode ? 'p-2 text-[12px] [&_button]:text-xs [&_input]:h-8 [&_input]:text-xs [&_label]:text-[11px] [&_p]:text-xs [&_select]:h-8 [&_select]:text-xs [&_textarea]:text-xs' : isCompact ? 'py-4 px-3' : 'p-4 md:p-6 lg:p-8'}`}> 
-      <div className={`mx-auto ${drawerMode ? 'max-w-none space-y-3' : isCompact ? 'max-w-3xl space-y-5' : 'max-w-4xl space-y-8'}`}>
+      <div className={`mx-auto ${drawerMode ? 'max-w-none space-y-3' : isCompact ? 'max-w-5xl space-y-5' : 'max-w-[1400px] space-y-8'}`}>
         {/* Image Preview Modal */}
         {imagePreview && (
           <div 

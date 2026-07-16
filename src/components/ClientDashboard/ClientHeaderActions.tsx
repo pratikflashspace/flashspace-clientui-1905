@@ -1,8 +1,10 @@
 import { NotificationBell } from "@/components/NotificationBell";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export function ClientHeaderActions() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const openProfileDrawer = () => {
     window.dispatchEvent(new Event("client-profile-drawer:open"));

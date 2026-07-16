@@ -183,6 +183,12 @@ export default function AdminLayout() {
       roles: ["admin", "super_admin", "partner"],
     },
     {
+      icon: FileCheck,
+      label: "GST Management",
+      path: "/admin/gst-management",
+      roles: ["admin", "super_admin", "partner"],
+    },
+    {
       icon: Building2,
       label: "Space Management",
       path: "/admin/spaces",

@@ -71,6 +71,7 @@ const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const AdminTeamManagement = lazy(() => import("./pages/admin/TeamManagement"));
 const Coupons = lazy(() => import("./pages/admin/Coupons"));
 const KYCRequests = lazy(() => import("./pages/admin/KYCRequests"));
+const AdminGSTManagement = lazy(() => import("./pages/admin/GSTManagement"));
 const KYCDetail = lazy(() => import("./pages/admin/KYCDetail"));
 const KYCPartnerRequests = lazy(() => import("./pages/admin/KYCPartnerRequests"));
 const SpacePartnerKycDetails = lazy(() => import("./pages/admin/SpacePartnerKycDetails"));
@@ -122,6 +123,7 @@ const SpacePortalTicketAndTasks = lazy(() => import("./pages/spacePortal/Tickets
 const Profile = lazy(() => import("./components/ClientDashboard/Profile"));
 const MailAndVisits = lazy(() => import("./pages/spacePortal/MailAndVisits"));
 const TeamManagement = lazy(() => import("./pages/spacePortal/TeamManagement.tsx"));
+const SpacePortalGSTManagement = lazy(() => import("./pages/spacePortal/GSTManagement"));
 
 // Affiliate Pages
 const AffiliateDashboard = lazy(() => import("./pages/affiliatePortal/Dashboard"));
@@ -394,6 +396,7 @@ const App = () => (
                           <Route path="users" element={<UserManagement />} />
                           <Route path="team" element={<AdminTeamManagement />} />
                           <Route path="kyc-requests" element={<KYCRequests />} />
+                          <Route path="gst-management" element={<AdminGSTManagement />} />
                           <Route
                             path="kyc-requests/:id"
                             element={<KYCDetail />}
@@ -571,6 +574,10 @@ const App = () => (
                           <Route
                             path="team-management"
                             element={<TeamManagement />}
+                          />
+                          <Route
+                            path="gst-management"
+                            element={<SpacePortalGSTManagement />}
                           />
                         </Route>
                       </Route>

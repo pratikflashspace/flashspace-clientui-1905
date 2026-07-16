@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSearchParams } from "react-router-dom";
 import {
   CheckCircle2,
@@ -180,8 +181,21 @@ export default function BookingRequests() {
     if (!silent) setLoading(true);
     try {
       const response = await fetchPartnerBookingRequests();
-      const rows = response?.success ? response.data || [] : [];
-      setRequests(rows);
+      const data = response;
+      if (data.success) {
+        console.log("Loaded Booking Requests from Backend:", data.data);
+        const mapped = data.data.map((r: any) => {
+          // Sync any personal documents tagged as agreement documents back into KYC docs
+          const extraDocs = r.agreement?.documents?.filter((d: any) => d.type === 'pan_card' || d.type === 'aadhaar') || [];
+          extraDocs.forEach((d: any) => {
+            if (!r.kyc.personalDocuments.some((pd: any) => pd.type === d.type)) {
+              r.kyc.personalDocuments.push({ ...d, isBookingDoc: true });
+            }
+          });
+          return r;
+        });
+        setRequests(mapped);
+      }
     } catch (err) {
       console.error("Failed to load booking requests:", err);
       setRequests([]);
@@ -303,14 +317,27 @@ export default function BookingRequests() {
     }
 
     const toastId = toast.loading(`${action === "approve" ? "Approving" : "Rejecting"} document...`);
-    const response = await reviewPartnerBookingKycDocument(booking.bookingId, {
-      profileModel,
-      profileId,
-      documentId: doc.id,
-      documentType: doc.type,
-      action,
-      rejectionReason,
-    });
+    let response;
+
+    // All KYC documents including pan_card and aadhaar must go through the KYC review endpoint
+    // Only actual booking documents (like draft_agreement, signed_agreement) go through the booking doc endpoint
+    if ((doc as any).isBookingDoc) {
+      response = await reviewPartnerBookingDocument(booking.bookingId, {
+        documentType: doc.type,
+        action,
+        rejectionReason,
+      });
+    } else {
+      response = await reviewPartnerBookingKycDocument(booking.bookingId, {
+        profileModel,
+        profileId,
+        documentId: doc.id,
+        documentType: doc.type,
+        action,
+        rejectionReason,
+      });
+    }
+
     if (response.success) {
       setRequests((current) =>
         current.map((request) => {
@@ -400,10 +427,10 @@ export default function BookingRequests() {
           <p className="text-xs text-[#607067] truncate">{doc.name}</p>
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase ${statusClass(doc.status)}`}>
+          <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold capitalize ${statusClass(doc.status)}`}>
             {adminStatusLabel(doc.status)}
           </span>
-          <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase ${statusClass(partnerStatus)}`}>
+          <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold capitalize ${statusClass(partnerStatus)}`}>
             {partnerStatusLabel(partnerStatus)}
           </span>
           {doc.fileUrl && (
@@ -557,7 +584,7 @@ export default function BookingRequests() {
                     </div>
                   </div>
                   <div className="mt-3 flex items-center justify-between">
-                    <span className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase ${statusClass(effectiveKycStatus)}`}>
+                    <span className={`rounded-full border px-2 py-1 text-[10px] font-bold capitalize ${statusClass(effectiveKycStatus)}`}>
                       {effectiveKycStatus}
                     </span>
                     <ChevronRight size={14} className="text-[#2D3F33]/40" />
@@ -602,7 +629,7 @@ export default function BookingRequests() {
         )}
       </div>
 
-        {selected && (
+        {selected && createPortal(
           (() => {
             const selectedKycStatus = getEffectiveKycStatus(selected);
             return (
@@ -621,9 +648,9 @@ export default function BookingRequests() {
                 <button
                   type="button"
                   onClick={() => setSelectedId("")}
-                  className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-black/25 text-white backdrop-blur-md transition hover:bg-black/45"
+                  className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-black/25 text-white backdrop-blur-md transition hover:bg-black/45 z-50 cursor-pointer"
                 >
-                  <X size={16} />
+                  <X size={16} className="pointer-events-none" />
                 </button>
                 <div className="absolute bottom-4 left-6 right-6">
                   <div className="flex items-end justify-between gap-4">
@@ -636,7 +663,7 @@ export default function BookingRequests() {
                         <MapPin size={14} /> {selected.space.address || selected.space.city || "Location"}
                       </p>
                     </div>
-                    <span className={`hidden rounded-full border px-3 py-1 text-sm font-bold uppercase shadow-sm sm:inline-flex ${statusClass(selectedKycStatus)}`}>
+                    <span className={`hidden rounded-full border px-3 py-1 text-sm font-bold capitalize shadow-sm sm:inline-flex whitespace-nowrap ${statusClass(selectedKycStatus)}`}>
                       {selectedKycStatus}
                     </span>
                   </div>
@@ -743,7 +770,7 @@ export default function BookingRequests() {
                         ["Registered Address", selected.client.registeredAddress],
                       ].filter(([, v]) => v && v !== "N/A").map(([label, value]) => (
                         <div key={label} className={label === "Registered Address" ? "sm:col-span-2" : ""}>
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-[#607067]">{label}</p>
+                          <p className="text-[10px] font-bold capitalize tracking-wider text-[#607067]">{label}</p>
                           <p className="mt-0.5 text-sm font-bold text-[#10251a]">{value}</p>
                         </div>
                       ))}
@@ -867,7 +894,8 @@ export default function BookingRequests() {
             </div>
           </div>
             );
-          })()
+          })(),
+          document.body
         )}
       </div>
     );
@@ -897,7 +925,11 @@ function AgreementCard({
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-[#12251b]">{doc.name || DOC_LABELS[doc.type]}</p>
-                <span className={`mt-2 inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${statusClass(doc.status)}`}>{doc.status || "available"}</span>
+                <span className={`mt-2 inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold capitalize ${
+                  doc.type === 'draft_agreement' ? statusClass("available") : statusClass(doc.partnerReviewStatus || doc.status)
+                }`}>
+                  {doc.type === 'draft_agreement' ? "Uploaded" : (doc.partnerReviewStatus || doc.status || "available")}
+                </span>
               </div>
               {doc.fileUrl && (
                 <div className="flex shrink-0 items-center gap-2">
@@ -924,20 +956,15 @@ function AgreementCard({
                 </div>
               )}
             </div>
-            {(onApprove || onReject) && (!doc.status || doc.status === "pending") && (
+            {(onApprove || onReject) && (!doc.partnerReviewStatus || doc.partnerReviewStatus === "pending") && (
               <div className="mt-3 flex gap-2">
                 <button onClick={onApprove} className="min-h-10 flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-bold text-white">Approve</button>
                 <button onClick={onReject} className="min-h-10 flex-1 rounded-lg border border-rose-200 px-3 py-2 text-sm font-bold text-rose-700">Reject</button>
               </div>
             )}
-            {(onApprove || onReject) && doc.status && doc.status !== "pending" && (
-              <div className="mt-3 p-2 rounded-lg bg-gray-50 border border-gray-100 text-center">
-                <p className={`text-xs font-bold uppercase ${doc.status === 'approved' ? 'text-emerald-700' : 'text-rose-700'}`}>
-                  Decision: {doc.status}
-                </p>
-                {doc.rejectionReason && (
-                   <p className="mt-1 text-[10px] text-rose-600 italic">Reason: {doc.rejectionReason}</p>
-                )}
+            {(onApprove || onReject) && doc.partnerReviewStatus === "rejected" && doc.partnerRejectionReason && (
+              <div className="mt-3 p-2 rounded-lg bg-rose-50 border border-rose-100 text-center">
+                <p className="text-[11px] text-rose-700 font-medium">Rejection Reason: {doc.partnerRejectionReason}</p>
               </div>
             )}
           </>

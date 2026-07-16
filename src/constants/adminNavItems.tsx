@@ -96,6 +96,11 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
     icon: <ShieldCheck className="w-5 h-5" />,
   },
   {
+    label: "GST Management",
+    href: "/admin/gst-management",
+    icon: <ShieldCheck className="w-5 h-5" />,
+  },
+  {
     label: "Space Management",
     href: "/admin/spaces",
     icon: <Building2 className="w-5 h-5" />,

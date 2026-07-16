@@ -227,7 +227,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         // 3. KYC / Profile
         if (message.includes("kyc") || message.includes("verified") || message.includes("approved") || title.includes("kyc")) {
-            navigate("/dashboard/profile");
+            if (window.location.pathname.startsWith('/dashboard')) {
+                window.dispatchEvent(new CustomEvent("client-profile-drawer:open", { detail: { tab: "kyc" } }));
+            } else {
+                navigate("/dashboard?openProfile=true&tab=kyc");
+            }
             return;
         }
 
