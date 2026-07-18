@@ -6,6 +6,7 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
   isTyping?: boolean;
+  spacesData?: any[];
 }
 
 export interface ChatSession {

@@ -853,47 +853,128 @@ const StartChatting = () => {
           } catch(e) {
             console.error("Failed to load business setup data", e);
           }
+        } else if (cityName === 'SALES_TEAM') {
+          // Special case for Sales Team / Negotiation requests
+          results = [{
+            position: center,
+            title: 'Talk to Premjeet',
+            address: 'Head of Sales & Deals',
+            image: '/to_cloudinary/premjeet.png',
+            price: 'Best Price Guaranteed',
+            rating: 5.0,
+            reviews: 500,
+            features: ['Custom Discounts', 'Immediate Response', 'Premium Support'],
+            serviceType: 'Sales Team',
+            originalData: { id: 'SALES_TEAM', isSalesTeam: true }
+          }];
         } else {
           // Normal workspace flow — fetch from API
-          const fetchVirtual = !serviceType || serviceType === 'virtual';
-          const fetchCoworking = !serviceType || serviceType === 'coworking';
+          if (cityName === 'PAN_INDIA' && (serviceType === 'virtual' || serviceType === 'coworking')) {
+            const citiesToFetch = ['Delhi', 'Gurgaon', 'Noida', 'Bangalore', 'Ahmedabad', 'Chennai'];
+            
+            const fetchFn = serviceType === 'virtual' ? getVirtualOfficesByCity : getCoworkingSpacesByCity;
+            const promises = citiesToFetch.map(c => fetchFn(c).catch(() => (serviceType === 'virtual' ? { offices: [] } : { spaces: [] })));
+            const responses = await Promise.all(promises);
+            
+            const cityData: Record<string, any[]> = {};
+            citiesToFetch.forEach((c, idx) => {
+              const res = responses[idx] as any;
+              const dataArray = serviceType === 'virtual' ? res.offices : res.spaces;
+              cityData[c] = dataArray || (Array.isArray(res) ? res : []);
+            });
 
-          const [virtualRes, coworkingRes] = await Promise.all([
-            fetchVirtual ? getVirtualOfficesByCity(cityName) : Promise.resolve({ offices: [] }),
-            fetchCoworking ? getCoworkingSpacesByCity(cityName) : Promise.resolve({ spaces: [] })
-          ]);
+            const panIndiaResults: any[] = [];
+            
+            // Delhi: 2 (FSDL01 and FSDL03 if possible, else first 2)
+            const delhiSpaces = cityData['Delhi'] || [];
+            let fsdl01 = delhiSpaces.find((s: any) => s.spaceId === 'FSDL01' || (s.id && s.id.includes('FSDL01')));
+            let fsdl03 = delhiSpaces.find((s: any) => s.spaceId === 'FSDL03' || (s.id && s.id.includes('FSDL03')));
+            
+            if (fsdl01) panIndiaResults.push(fsdl01);
+            if (fsdl03) panIndiaResults.push(fsdl03);
+            
+            // Fill up Delhi to 2 if missing
+            for (const s of delhiSpaces) {
+              if (panIndiaResults.length >= 2) break;
+              if (s !== fsdl01 && s !== fsdl03) panIndiaResults.push(s);
+            }
 
-          // Virtual office service returns { offices: [...], pagination: ... }
-          const virtualData = (virtualRes as any).offices || (Array.isArray(virtualRes) ? virtualRes : []);
-          const virtualMarkers = virtualData.map((item: any) => ({
-            position: item.coordinates || generateRandomCoordinates(center, 0),
-            title: item.name,
-            address: item.address,
-            image: item.image,
-            price: item.gstPlanPrice,
-            rating: item.rating,
-            reviews: item.reviews,
-            features: item.features || [],
-            serviceType: 'Virtual Office',
-            originalData: item
-          }));
+            // Gurgaon: 2
+            const gurgaonSpaces = cityData['Gurgaon'] || [];
+            panIndiaResults.push(...gurgaonSpaces.slice(0, 2));
 
-          // Coworking service returns array Directly
-          const coworkingData = Array.isArray(coworkingRes) ? coworkingRes : (coworkingRes as any).spaces || [];
-          let coworkingMarkers = coworkingData.map((item: any) => ({
-            position: item.coordinates || generateRandomCoordinates(center, 0),
-            title: item.name,
-            address: item.address,
-            image: item.image,
-            price: item.price,
-            rating: item.rating,
-            reviews: item.reviews,
-            features: item.features || [],
-            serviceType: 'Coworking Space',
-            originalData: item
-          }));
+            // Noida: 1
+            const noidaSpaces = cityData['Noida'] || [];
+            panIndiaResults.push(...noidaSpaces.slice(0, 1));
 
-          results = [...virtualMarkers, ...coworkingMarkers];
+            // Bangalore: 1
+            const blrSpaces = cityData['Bangalore'] || [];
+            panIndiaResults.push(...blrSpaces.slice(0, 1));
+
+            // Ahmedabad: 1
+            const ahmedabadSpaces = cityData['Ahmedabad'] || [];
+            panIndiaResults.push(...ahmedabadSpaces.slice(0, 1));
+
+            // Chennai: 1 (FSCHN01)
+            const chennaiSpaces = cityData['Chennai'] || [];
+            let fschn01 = chennaiSpaces.find((s: any) => s.spaceId === 'FSCHN01' || (s.id && s.id.includes('FSCHN01')));
+            if (fschn01) panIndiaResults.push(fschn01);
+            else if (chennaiSpaces.length > 0) panIndiaResults.push(chennaiSpaces[0]);
+
+            results = panIndiaResults.map((item: any) => ({
+              position: item.coordinates || generateRandomCoordinates(center, 0),
+              title: item.name,
+              address: item.address,
+              image: item.image,
+              price: serviceType === 'virtual' ? item.gstPlanPrice : (item.price || item.monthlyPrice || item.startingPrice),
+              rating: item.rating || 5.0,
+              reviews: item.reviews || 10,
+              features: item.features || [],
+              serviceType: serviceType === 'virtual' ? 'Virtual Office' : 'Coworking Space',
+              originalData: item
+            }));
+
+          } else {
+            const fetchVirtual = !serviceType || serviceType === 'virtual';
+            const fetchCoworking = !serviceType || serviceType === 'coworking';
+
+            const [virtualRes, coworkingRes] = await Promise.all([
+              fetchVirtual ? getVirtualOfficesByCity(cityName).catch(() => ({ offices: [] })) : Promise.resolve({ offices: [] }),
+              fetchCoworking ? getCoworkingSpacesByCity(cityName).catch(() => ({ spaces: [] })) : Promise.resolve({ spaces: [] })
+            ]);
+
+            // Virtual office service returns { offices: [...], pagination: ... }
+            const virtualData = (virtualRes as any).offices || (Array.isArray(virtualRes) ? virtualRes : []);
+            const virtualMarkers = virtualData.map((item: any) => ({
+              position: item.coordinates || generateRandomCoordinates(center, 0),
+              title: item.name,
+              address: item.address,
+              image: item.image,
+              price: item.gstPlanPrice,
+              rating: item.rating,
+              reviews: item.reviews,
+              features: item.features || [],
+              serviceType: 'Virtual Office',
+              originalData: item
+            }));
+
+            // Coworking service returns array Directly
+            const coworkingData = Array.isArray(coworkingRes) ? coworkingRes : (coworkingRes as any).spaces || [];
+            let coworkingMarkers = coworkingData.map((item: any) => ({
+              position: item.coordinates || generateRandomCoordinates(center, 0),
+              title: item.name,
+              address: item.address,
+              image: item.image,
+              price: item.price,
+              rating: item.rating,
+              reviews: item.reviews,
+              features: item.features || [],
+              serviceType: 'Coworking Space',
+              originalData: item
+            }));
+
+            results = [...virtualMarkers, ...coworkingMarkers];
+          }
 
           // [SMART CARD FILTER]
           // The absolute source of truth is the AI's text response.
@@ -903,7 +984,15 @@ const StartChatting = () => {
           
           if (aiMessageContent) {
             const lowerAIContent = aiMessageContent.toLowerCase();
-            const isSpaceMentioned = (spaceName: string): boolean => {
+            const isSpaceMentioned = (space: any): boolean => {
+              // 1. Prioritize Space ID matching (since AI is forbidden from using real names)
+              const spaceId = space.originalData?.spaceId || space.originalData?.id || space.id;
+              if (spaceId && lowerAIContent.includes(spaceId.toLowerCase())) {
+                return true;
+              }
+              
+              // 2. Fallback to name matching
+              const spaceName = space.title || space.originalData?.name;
               if (!spaceName) return false;
               const lowerName = spaceName.toLowerCase().trim();
               if (lowerAIContent.includes(lowerName)) return true;
@@ -915,7 +1004,7 @@ const StartChatting = () => {
               return false;
             };
             
-            aiMatchedResults = results.filter(r => isSpaceMentioned(r.title) || isSpaceMentioned(r.originalData?.name));
+            aiMatchedResults = results.filter(r => isSpaceMentioned(r));
           }
 
           if (aiMatchedResults.length > 0) {
@@ -1670,8 +1759,11 @@ const StartChatting = () => {
 
                   <div className="w-full max-w-3xl mt-8 mb-4">
                     {/* Embedded Input Bar for Empty State */}
-                    <div className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-full border border-[#edede6] dark:border-white/5 flex items-center p-1.5 sm:p-2 pr-1.5 sm:pr-2 gap-2 transition-all focus-within:border-[#35503F] focus-within:shadow-[0_0_15px_rgba(53,80,63,0.3)] dark:focus-within:border-[#35503F] dark:focus-within:shadow-[0_0_15px_rgba(53,80,63,0.5)]">
-                      <button className="p-1.5 sm:p-2 text-[#677e73] hover:text-[#1a2d1d] hover:bg-gray-50 dark:hover:bg-white/5 rounded-full transition-colors cursor-default">
+                    <form 
+                      onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} 
+                      className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-full border border-[#edede6] dark:border-white/5 flex items-center p-1.5 sm:p-2 pr-1.5 sm:pr-2 gap-2 transition-all focus-within:border-[#35503F] focus-within:shadow-[0_0_15px_rgba(53,80,63,0.3)] dark:focus-within:border-[#35503F] dark:focus-within:shadow-[0_0_15px_rgba(53,80,63,0.5)]"
+                    >
+                      <button type="button" className="p-1.5 sm:p-2 text-[#677e73] hover:text-[#1a2d1d] hover:bg-gray-50 dark:hover:bg-white/5 rounded-full transition-colors cursor-default">
                         <Search className="w-5 h-5 sm:w-5 sm:h-5" strokeWidth={1.5} />
                       </button>
                       <input
@@ -1684,8 +1776,9 @@ const StartChatting = () => {
                             handleSendMessage();
                           }
                         }}
+                        disabled={isLoading}
                         placeholder="Type your question..."
-                        className="flex-1 bg-transparent !border-0 focus:ring-0 focus:border-transparent !outline-none text-[#1a2d1d] dark:text-gray-100 placeholder-[#677e73] text-[15px] sm:text-[16px] font-normal font-sans h-full py-2 min-w-0"
+                        className="flex-1 bg-transparent !border-0 focus:ring-0 focus:border-transparent !outline-none text-[#1a2d1d] dark:text-gray-100 placeholder-[#677e73] text-[15px] sm:text-[16px] font-normal font-sans h-full py-2 min-w-0 disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{ outline: 'none', boxShadow: 'none', border: 'none', borderColor: 'transparent' }}
                       />
                       <button
@@ -1703,14 +1796,14 @@ const StartChatting = () => {
                       </button>
                       {message.trim() && (
                         <button
-                          onClick={() => handleSendMessage()}
+                          type="submit"
                           className="p-2 sm:p-2.5 bg-[#FEF8CF] text-[#1a2d1d] rounded-full shadow-sm hover:bg-[#f6eca1] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center"
                           disabled={isLoading}
                         >
                           <Send className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
                         </button>
                       )}
-                    </div>
+                    </form>
                   </div>
 
                   <div className="w-full max-w-3xl mt-4">
@@ -1745,30 +1838,33 @@ const StartChatting = () => {
                   {chatMessages.map((msg) => (
                     <div
                       key={msg.id}
-                      className={`flex gap-4 group ${msg.role === 'user' ? 'flex-row-reverse items-center' : 'flex-row items-start'}`}
+                      className={`flex gap-4 group w-full ${msg.role === 'user' ? 'flex-row-reverse items-center' : 'flex-row items-start'}`}
                     >
                       {/* Avatar removed as per user request */}
 
-                      {/* Message Bubble */}
-                      <div
-                        className={`max-w-[90%] sm:max-w-[85%] px-4 sm:px-5 shadow-sm ${msg.role === "user"
-                          ? "bg-gradient-to-br from-[#35503F] to-[#3d6b4f] text-white rounded-[24px] py-1.5 sm:py-2"
-                          : "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-[24px] py-3 sm:py-4"
-                          }`}
-                      >
-                        {msg.role === 'assistant' && msg.isTyping ? (
-                          <TypewriterEffect
-                            text={msg.content}
-                            onComplete={() => handleTypingComplete(msg.id)}
-                          />
-                        ) : (
-                          <div className={`text-[16px] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium font-sans ${msg.role === 'user' ? 'text-white leading-[1.5]' : 'text-gray-800 dark:text-gray-100 leading-[1.8]'
-                            }`}>
-                            {formatMessage(msg.content)}
-                          </div>
-                        )}
+                      <div className={`flex flex-col gap-3 w-full max-w-[90%] sm:max-w-[85%] ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                        {/* Message Bubble */}
+                        <div
+                          className={`px-4 sm:px-5 shadow-sm w-fit ${msg.role === "user"
+                            ? "bg-gradient-to-br from-[#35503F] to-[#3d6b4f] text-white rounded-[24px] py-1.5 sm:py-2"
+                            : "bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-[24px] py-3 sm:py-4"
+                            }`}
+                        >
+                          {msg.role === 'assistant' && msg.isTyping ? (
+                            <TypewriterEffect
+                              text={msg.content}
+                              onComplete={() => handleTypingComplete(msg.id)}
+                            />
+                          ) : (
+                            <div className={`text-[16px] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium font-sans ${msg.role === 'user' ? 'text-white leading-[1.5]' : 'text-gray-800 dark:text-gray-100 leading-[1.8]'
+                              }`}>
+                              {formatMessage(msg.content)}
+                            </div>
+                          )}
+                        </div>
+
                         {msg.role === 'assistant' && !msg.isTyping && msg.spacesData && msg.spacesData.length > 0 && (
-                          <div className="mt-4">
+                          <div className="w-full mt-1">
                             <SpacesInlineWidget 
                               spaces={msg.spacesData} 
                               onSpaceClick={(space) => {
@@ -1783,7 +1879,7 @@ const StartChatting = () => {
                       {msg.role === 'assistant' && !msg.isTyping && (
                         <button
                           onClick={() => handleSpeak(msg.content)}
-                          className="opacity-60 hover:opacity-100 transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-[#35503F]"
+                          className="opacity-60 hover:opacity-100 transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-[#35503F] shrink-0"
                           title="Read Aloud"
                           aria-label="Read message aloud"
                         >
@@ -1810,12 +1906,15 @@ const StartChatting = () => {
               )}
             </div>
 
-            {/* Chat Input */}
+             {/* Chat Input */}
             {chatMessages.length > 0 && (
               <div className="p-3 sm:p-4 lg:p-6 bg-transparent relative z-20">
                 <div className="max-w-4xl mx-auto relative group">
-                  <div className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-2xl sm:rounded-full border border-[#edede6] dark:border-white/5 flex items-center p-1.5 sm:p-2 pr-1.5 sm:pr-2 gap-2 transition-all focus-within:border-[#35503F] focus-within:shadow-[0_0_15px_rgba(53,80,63,0.3)] dark:focus-within:border-[#35503F] dark:focus-within:shadow-[0_0_15px_rgba(53,80,63,0.5)]">
-                  <button className="p-1.5 sm:p-2 text-[#677e73] hover:text-[#1a2d1d] hover:bg-gray-50 dark:hover:bg-white/5 rounded-full transition-colors cursor-default">
+                  <form 
+                    onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }}
+                    className="relative bg-white dark:bg-[#1E293B] shadow-lg rounded-2xl sm:rounded-full border border-[#edede6] dark:border-white/5 flex items-center p-1.5 sm:p-2 pr-1.5 sm:pr-2 gap-2 transition-all focus-within:border-[#35503F] focus-within:shadow-[0_0_15px_rgba(53,80,63,0.3)] dark:focus-within:border-[#35503F] dark:focus-within:shadow-[0_0_15px_rgba(53,80,63,0.5)]"
+                  >
+                  <button type="button" className="p-1.5 sm:p-2 text-[#677e73] hover:text-[#1a2d1d] hover:bg-gray-50 dark:hover:bg-white/5 rounded-full transition-colors cursor-default">
                     <Search className="w-5 h-5 sm:w-5 sm:h-5" strokeWidth={1.5} />
                   </button>
                   <input
@@ -1828,8 +1927,9 @@ const StartChatting = () => {
                         handleSendMessage();
                       }
                     }}
+                    disabled={isLoading}
                     placeholder="Type your question..."
-                    className="flex-1 bg-transparent !border-0 focus:ring-0 focus:border-transparent !outline-none text-[#1a2d1d] dark:text-gray-100 placeholder-[#677e73] text-[15px] sm:text-[16px] font-normal font-sans h-full py-2 min-w-0"
+                    className="flex-1 bg-transparent !border-0 focus:ring-0 focus:border-transparent !outline-none text-[#1a2d1d] dark:text-gray-100 placeholder-[#677e73] text-[15px] sm:text-[16px] font-normal font-sans h-full py-2 min-w-0 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ outline: 'none', boxShadow: 'none', border: 'none', borderColor: 'transparent' }}
                   />
                   <button
@@ -1847,14 +1947,14 @@ const StartChatting = () => {
                   </button>
                   {message.trim() && (
                     <button
-                      onClick={() => handleSendMessage()}
+                      type="submit"
                       className="p-2 sm:p-2.5 bg-[#FEF8CF] text-[#1a2d1d] rounded-full shadow-sm hover:bg-[#f6eca1] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center"
                       disabled={isLoading}
                     >
                       <Send className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
                     </button>
                   )}
-                </div>
+                </form>
               </div>
             </div>
             )}
