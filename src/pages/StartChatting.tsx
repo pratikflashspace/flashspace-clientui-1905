@@ -892,6 +892,20 @@ const StartChatting = () => {
             serviceType: 'Sales Team',
             originalData: { id: 'SALES_TEAM', isSalesTeam: true }
           }];
+        } else if (cityName === 'SUPPORT_TEAM') {
+          // Special case for Support Team
+          results = [{
+            position: center,
+            title: 'Customer Support',
+            address: 'FlashSpace Help Desk',
+            image: 'https://images.unsplash.com/photo-1556745912-6323a63b0185?w=800&q=80',
+            price: 'Free Support',
+            rating: 5.0,
+            reviews: 1200,
+            features: ['24/7 Assistance', 'Booking Issues', 'Ticket Resolution'],
+            serviceType: 'Support Team',
+            originalData: { id: 'SUPPORT_TEAM', isSupportTeam: true }
+          }];
         } else {
           // Normal workspace flow — fetch from API
           if (cityName === 'PAN_INDIA' && (serviceType === 'virtual' || serviceType === 'coworking')) {
@@ -1949,6 +1963,7 @@ const StartChatting = () => {
                     style={{ outline: 'none', boxShadow: 'none', border: 'none', borderColor: 'transparent' }}
                   />
                   <button
+                    type="button"
                     onClick={toggleVoiceInput}
                     className={`p-1.5 sm:p-2 rounded-full transition-all ${isListening
                       ? "text-red-500 bg-red-50 hover:bg-red-100 animate-pulse"
@@ -1963,7 +1978,8 @@ const StartChatting = () => {
                   </button>
                   {message.trim() && (
                     <button
-                      type="submit"
+                      type="button"
+                      onClick={(e) => { e.preventDefault(); handleSendMessage(); }}
                       className="p-2 sm:p-2.5 bg-[#FEF8CF] text-[#1a2d1d] rounded-full shadow-sm hover:bg-[#f6eca1] transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center"
                       disabled={isLoading}
                     >

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, MapPin, ShoppingCart, Briefcase, CheckCircle2, Sparkles, PhoneCall } from 'lucide-react';
+import { ArrowRight, MapPin, ShoppingCart, Briefcase, CheckCircle2, Sparkles, PhoneCall, LifeBuoy } from 'lucide-react';
 import { getSafeImageUrl } from '@/utils/imageUrl';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,54 +31,94 @@ const SpacesInlineWidget: React.FC<SpacesInlineWidgetProps> = ({ spaces, onSpace
           return (
             <div 
               key={index}
-              className="col-span-1 md:col-span-2 bg-[#fbfdfa] dark:bg-[#121212] rounded-2xl border border-[#e5ebe7] dark:border-white/10 p-5 shadow-sm"
+              onClick={() => window.location.href = 'tel:9888687898'}
+              className="flex flex-col bg-[#FEF8CF] dark:bg-[#1a1a1a] rounded-xl border border-[#35503F] dark:border-yellow-400/30 shadow-sm hover:shadow-md hover:border-[#35503F] dark:hover:border-yellow-400 transition-all p-3 gap-3 cursor-pointer"
             >
-              <h3 className="text-[#1a2b21] dark:text-white font-bold text-lg md:text-xl mb-4">
-                Get the best workspace deal with {space.title.replace('Talk to ', '')}
-              </h3>
-              
-              <div className="flex flex-col sm:flex-row gap-5 items-start sm:items-center mb-5">
-                <div className="flex gap-4 items-center flex-1">
-                  <img 
-                    src={image} 
-                    alt={space.title} 
-                    className="w-16 h-16 md:w-20 md:h-20 rounded-2xl object-cover border-2 border-white shadow-sm"
-                  />
-                  <div>
-                    <h4 className="text-[#1a2b21] dark:text-white font-bold text-lg">{space.title.replace('Talk to ', '')}</h4>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm mb-1.5">+91 81008 88777</p>
-                    <div className="flex items-center gap-1.5 bg-[#eff5f1] dark:bg-[#35503F]/30 text-[#2d4739] dark:text-yellow-400 px-2.5 py-1 rounded-full w-fit">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span className="text-[10px] md:text-xs font-semibold">FlashSpace Consultant</span>
-                    </div>
+              {/* Image Section */}
+              <div className="w-full h-32 shrink-0 relative">
+                <img 
+                  src={image} 
+                  alt="Premjeet" 
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              </div>
+
+              {/* Content Section */}
+              <div className="flex flex-col flex-grow">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-xs font-bold text-[#35503F]">
+                    {serviceType}
                   </div>
                 </div>
                 
-                <button 
-                  onClick={() => window.location.href = 'tel:8100888777'}
-                  className="w-full sm:w-auto bg-[#35503F] text-white dark:bg-yellow-400 dark:text-black px-6 py-2.5 rounded-lg font-bold text-sm hover:scale-[1.02] transition-transform shadow-md shrink-0 flex items-center justify-center gap-2"
-                >
-                  <PhoneCall className="w-4 h-4" />
-                  Contact {space.title.replace('Talk to ', '')}
-                </button>
-              </div>
+                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1.5">
+                  Having any query? Premjeet gets you!
+                </h3>
+                
+                <div className="flex items-start gap-1 text-gray-500 dark:text-gray-400 text-xs mb-3">
+                  <PhoneCall className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#35503F] dark:text-yellow-400" />
+                  <span className="line-clamp-2">Call directly: +91 98886 87898</span>
+                </div>
 
-              <div className="pt-4 border-t border-[#e5ebe7] dark:border-white/10">
-                <p className="text-[#1a2b21] dark:text-white font-bold text-sm mb-3">
-                  {space.title.replace('Talk to ', '')} will help you with:
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-4">
-                  {[
-                    "Compare Workspaces", 
-                    "Expert Price Negotiation", 
-                    "Seamless GST Setup", 
-                    "Tailored Documentation"
-                  ].map((feature, i) => (
-                    <div key={i} className="flex items-center gap-2 text-gray-600 dark:text-gray-300 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-[#35503F] dark:text-yellow-400 shrink-0" />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
+                <div className="mt-auto border-t border-gray-100 dark:border-white/5 pt-3 flex items-center justify-between">
+                  <div>
+                    <div className="text-base font-bold text-[#35503F] dark:text-white tracking-tight">{price || 'Best Price Guaranteed'}</div>
+                  </div>
+
+                  <button 
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#35503F] dark:border-yellow-400 bg-white dark:bg-transparent text-[#35503F] dark:text-yellow-400 hover:bg-[#35503F] hover:text-white dark:hover:bg-yellow-400 dark:hover:text-black transition-colors text-xs font-semibold"
+                  >
+                    Contact Premjeet
+                    <PhoneCall className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        if (space.originalData?.isSupportTeam) {
+          return (
+            <div 
+              key={index}
+              className="col-span-1 md:col-span-2 relative overflow-hidden bg-[#eff5f1] dark:bg-[#1a1a1a] rounded-2xl p-5 sm:p-6 shadow-sm border border-[#35503F]/20 dark:border-white/10"
+            >
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                <div className="p-4 bg-[#35503F] dark:bg-yellow-400 rounded-full shrink-0 shadow-md flex items-center justify-center">
+                  <LifeBuoy className="w-8 h-8 text-white dark:text-black" />
+                </div>
+                
+                <div className="flex-1 text-center sm:text-left">
+                  <h3 className="text-[#35503F] dark:text-white font-extrabold text-xl md:text-2xl tracking-tight mb-2">
+                    Need Help? We've got you covered.
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-[15px] leading-relaxed mb-4">
+                    For booking related issues, please go to your dashboard and navigate to <strong>My Bookings</strong> to raise a ticket directly. Alternatively, you can create a general request from the <strong>Tickets</strong> tab.
+                    <br />
+                    <span className="block mt-2 font-medium">Or speak to us directly: <strong className="text-[#35503F] dark:text-yellow-400">+91 98886 87898</strong></span>
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center sm:justify-start">
+                    <button 
+                      onClick={() => window.location.href = 'tel:9888687898'}
+                      className="bg-[#FEF8CF] text-[#35503F] border border-[#35503F]/20 px-6 py-2.5 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2"
+                    >
+                      <PhoneCall className="w-4 h-4" />
+                      Call Support
+                    </button>
+                    <button 
+                      onClick={() => navigate('/dashboard/my-bookings')}
+                      className="bg-[#35503F] text-white dark:bg-[#2a3f31] dark:text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2"
+                    >
+                      Go to My Bookings
+                    </button>
+                    <button 
+                      onClick={() => navigate('/dashboard/support')}
+                      className="bg-white text-[#35503F] dark:bg-[#252525] dark:text-white border border-[#35503F]/20 dark:border-white/20 px-6 py-2.5 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2"
+                    >
+                      Open Tickets Tab
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
