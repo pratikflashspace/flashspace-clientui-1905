@@ -1015,17 +1015,6 @@ const StartChatting = () => {
               if (spaceId && lowerAIContent.includes(spaceId.toLowerCase())) {
                 return true;
               }
-              
-              // 2. Fallback to name matching
-              const spaceName = space.title || space.originalData?.name;
-              if (!spaceName) return false;
-              const lowerName = spaceName.toLowerCase().trim();
-              if (lowerAIContent.includes(lowerName)) return true;
-              const words = lowerName.split(/\s+/).filter(w => w.length >= 3 && !['the', 'and', 'for', 'space', 'office', 'coworking'].includes(w));
-              if (words.length > 0) {
-                const matchedWords = words.filter(w => lowerAIContent.includes(w));
-                if (matchedWords.length >= Math.max(1, Math.ceil(words.length * 0.6))) return true;
-              }
               return false;
             };
             
