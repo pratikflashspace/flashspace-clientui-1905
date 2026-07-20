@@ -835,7 +835,32 @@ const StartChatting = () => {
         if (serviceType === 'business_setup') {
           // Business setup uses local JSON data, NOT API calls
           try {
-            const packages = (businessSetupData.servicesByCity && businessSetupData.servicesByCity[lowerCity]) || businessSetupData.features;
+            let packages = (businessSetupData.servicesByCity && businessSetupData.servicesByCity[lowerCity]) || businessSetupData.features;
+            
+            // Filter packages based on user intent ONLY (do not use aiMessageContent to avoid false positives)
+            const userQuery = (text || "").toLowerCase();
+            const matchedPackages = packages.filter((pkg: any) => {
+              const pkgName = (pkg.name || pkg.title || "").toLowerCase();
+              const coreName = pkgName.replace(/\b(registration|package|setup|bundle|compliance|protection|express|filing|formation)\b/g, '').trim();
+              
+              if (coreName.length < 2) return false;
+              
+              if (coreName === 'gst' && userQuery.includes('gst')) return true;
+              if (coreName === 'llp' && userQuery.includes('llp')) return true;
+              if (coreName === 'opc' && userQuery.includes('opc')) return true;
+              if (coreName === 'msme' && userQuery.includes('msme')) return true;
+              if (coreName === 'fssai' && userQuery.includes('fssai')) return true;
+              if (coreName === 'mca' && userQuery.includes('mca')) return true;
+              if (coreName === 'section 8' && userQuery.includes('section 8')) return true;
+              
+              if (userQuery.includes(coreName)) return true;
+              return false;
+            });
+
+            if (matchedPackages.length > 0) {
+              packages = matchedPackages;
+            }
+
             packages.forEach((pkg: any) => {
               results.push({
                 position: generateRandomCoordinates(center, 0.01),
@@ -923,7 +948,7 @@ const StartChatting = () => {
 
             results = panIndiaResults.map((item: any) => ({
               position: item.coordinates || generateRandomCoordinates(center, 0),
-              title: item.name,
+              title: item.spaceId ? "FlashSpace " + item.spaceId : "FlashSpace Center",
               address: item.address,
               image: item.image,
               price: serviceType === 'virtual' ? item.gstPlanPrice : (item.price || item.monthlyPrice || item.startingPrice),
@@ -947,7 +972,7 @@ const StartChatting = () => {
             const virtualData = (virtualRes as any).offices || (Array.isArray(virtualRes) ? virtualRes : []);
             const virtualMarkers = virtualData.map((item: any) => ({
               position: item.coordinates || generateRandomCoordinates(center, 0),
-              title: item.name,
+              title: item.spaceId ? "FlashSpace " + item.spaceId : "FlashSpace Center",
               address: item.address,
               image: item.image,
               price: item.gstPlanPrice,
@@ -962,7 +987,7 @@ const StartChatting = () => {
             const coworkingData = Array.isArray(coworkingRes) ? coworkingRes : (coworkingRes as any).spaces || [];
             let coworkingMarkers = coworkingData.map((item: any) => ({
               position: item.coordinates || generateRandomCoordinates(center, 0),
-              title: item.name,
+              title: item.spaceId ? "FlashSpace " + item.spaceId : "FlashSpace Center",
               address: item.address,
               image: item.image,
               price: item.price,
@@ -1273,7 +1298,8 @@ const StartChatting = () => {
   const generateChatTitleAsync = async (messageText: string, chatId: string) => {
     try {
       const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
-      const targetUrl = isAuthenticated ? BACKEND_CHAT_URL : GUEST_CHAT_URL;
+      const targetPath = isAuthenticated ? BACKEND_CHAT_URL : GUEST_CHAT_URL;
+      const targetUrl = `${API_CONFIG.BASE_URL}${targetPath}`;
       
       const prompt = `Summarize this text in 2 to 4 words for a chat title. Do not include quotes or any extra text. Text: "${messageText}"`;
       
@@ -1352,7 +1378,8 @@ const StartChatting = () => {
       const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
       const sessionId = getSessionId();
 
-      const targetUrl = isAuthenticated ? BACKEND_CHAT_URL : GUEST_CHAT_URL;
+      const targetPath = isAuthenticated ? BACKEND_CHAT_URL : GUEST_CHAT_URL;
+      const targetUrl = `${API_CONFIG.BASE_URL}${targetPath}`;
 
       // Call backend chat endpoint (backend calls AI backend internally)
       const response = await fetch(targetUrl, {
