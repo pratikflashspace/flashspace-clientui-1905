@@ -31,46 +31,56 @@ const SpacesInlineWidget: React.FC<SpacesInlineWidgetProps> = ({ spaces, onSpace
           return (
             <div 
               key={index}
-              onClick={() => window.location.href = 'tel:9888687898'}
-              className="flex flex-col bg-[#FEF8CF] dark:bg-[#1a1a1a] rounded-xl border border-[#35503F] dark:border-yellow-400/30 shadow-sm hover:shadow-md hover:border-[#35503F] dark:hover:border-yellow-400 transition-all p-3 gap-3 cursor-pointer"
+              className="col-span-1 md:col-span-2 max-w-[550px] bg-[#eff5f1] dark:bg-[#1a1a1a] rounded-2xl border border-[#35503F]/20 dark:border-white/10 p-5 shadow-sm font-sans"
             >
-              {/* Image Section */}
-              <div className="w-full h-32 shrink-0 relative">
-                <img 
-                  src={image} 
-                  alt="Premjeet" 
-                  className="w-full h-full object-cover rounded-lg"
-                />
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100">
+                    <img 
+                      src="/to_cloudinary/premjeet.png" 
+                      alt="Premjeet" 
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold text-gray-900 dark:text-white">Premjeet</div>
+                    <div className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-1.5">+91 98886 87898</div>
+                    <div className="inline-flex items-center gap-1 bg-[#eef3f0] dark:bg-[#2a3f31] text-[#35503F] dark:text-green-400 px-2.5 py-0.5 rounded-full text-xs font-semibold">
+                      <CheckCircle2 className="w-3 h-3" />
+                      FlashSpace Consultant
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => window.location.href = 'tel:9888687898'}
+                  className="w-full sm:w-auto bg-[#35503F] hover:bg-[#2a3f31] text-white px-6 py-2.5 rounded-xl font-bold text-[14px] transition-colors shadow-sm"
+                >
+                  Contact Premjeet
+                </button>
               </div>
 
-              {/* Content Section */}
-              <div className="flex flex-col flex-grow">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="text-xs font-bold text-[#35503F]">
-                    {serviceType}
-                  </div>
+              <div>
+                <div className="text-[14px] font-bold text-gray-900 dark:text-white mb-3">
+                  Premjeet will help you with:
                 </div>
-                
-                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1.5">
-                  Having any query? Premjeet gets you!
-                </h3>
-                
-                <div className="flex items-start gap-1 text-gray-500 dark:text-gray-400 text-xs mb-3">
-                  <PhoneCall className="w-3.5 h-3.5 shrink-0 mt-0.5 text-[#35503F] dark:text-yellow-400" />
-                  <span className="line-clamp-2">Call directly: +91 98886 87898</span>
-                </div>
-
-                <div className="mt-auto border-t border-gray-100 dark:border-white/5 pt-3 flex items-center justify-between">
-                  <div>
-                    <div className="text-base font-bold text-[#35503F] dark:text-white tracking-tight">{price || 'Best Price Guaranteed'}</div>
+                <div className="grid grid-cols-2 gap-y-2.5 gap-x-2">
+                  <div className="flex items-center gap-2 text-[13px] text-gray-600 dark:text-gray-300 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#35503F] dark:text-green-400 shrink-0" />
+                    <span>Compare Workspaces</span>
                   </div>
-
-                  <button 
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#35503F] dark:border-yellow-400 bg-white dark:bg-transparent text-[#35503F] dark:text-yellow-400 hover:bg-[#35503F] hover:text-white dark:hover:bg-yellow-400 dark:hover:text-black transition-colors text-xs font-semibold"
-                  >
-                    Contact Premjeet
-                    <PhoneCall className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-2 text-[13px] text-gray-600 dark:text-gray-300 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#35503F] dark:text-green-400 shrink-0" />
+                    <span>Price Negotiation</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[13px] text-gray-600 dark:text-gray-300 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#35503F] dark:text-green-400 shrink-0" />
+                    <span>Seamless GST Setup</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[13px] text-gray-600 dark:text-gray-300 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#35503F] dark:text-green-400 shrink-0" />
+                    <span>Documentation</span>
+                  </div>
                 </div>
               </div>
             </div>

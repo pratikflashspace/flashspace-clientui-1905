@@ -431,6 +431,20 @@ const StartChatting = () => {
 
   // [NEW] Track the city actively searched by the user to prevent AI focus stealing
   const lastTargetCity = useRef<string | null>(null);
+
+  // Hide WhatsApp widget on this page because it blocks the send button on desktop
+  useEffect(() => {
+    const waWidget = document.querySelector('.wa-tooltip-container') as HTMLElement;
+    if (waWidget) {
+      waWidget.style.display = 'none';
+    }
+    return () => {
+      if (waWidget) {
+        waWidget.style.display = '';
+      }
+    };
+  }, []);
+
   // Persist activeChatId to sessionStorage
   useEffect(() => {
     const fetchCities = async () => {
@@ -874,6 +888,20 @@ const StartChatting = () => {
                 serviceType: 'Business Setup',
                 originalData: pkg
               });
+            });
+
+            // Also show the Sales Team card alongside Business Setup packages
+            results.push({
+              position: center,
+              title: 'Talk to Premjeet',
+              address: 'Head of Sales & Deals',
+              image: '/to_cloudinary/premjeet.png',
+              price: 'Best Price Guaranteed',
+              rating: 5.0,
+              reviews: 500,
+              features: ['Custom Discounts', 'Immediate Response', 'Premium Support'],
+              serviceType: 'Sales Team',
+              originalData: { id: 'SALES_TEAM', isSalesTeam: true }
             });
           } catch(e) {
             console.error("Failed to load business setup data", e);
