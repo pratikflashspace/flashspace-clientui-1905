@@ -553,7 +553,7 @@ const getPhotos = () => {
             {error || "Workspace not found."}
           </p>
           <button
-            onClick={() => navigate("/get-workspaces")}
+            onClick={() => navigate("/services/virtual-office")}
             className="px-4 py-2 rounded-[8px] bg-[#36503F] text-[#FEF8C5] text-sm font-bold hover:bg-[#1F2E26] transition-colors"
           >
             Back to Spaces

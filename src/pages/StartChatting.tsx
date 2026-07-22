@@ -1445,12 +1445,15 @@ const StartChatting = () => {
 
       // Parse AI response for [SHOW_CARDS: city, type]
       let fetchedSpaces = undefined;
-      const showCardsMatch = aiResponseText.match(/\[SHOW_CARDS:\s*([^,\]]+)(?:,\s*([^\]]+))?\]/i);
+      const showCardsRegex = /\[SHOW_CARDS:\s*([^,\]]+)(?:,\s*([^\]]+))?\]/ig;
+      const matches = [...aiResponseText.matchAll(showCardsRegex)];
 
-      if (showCardsMatch) {
+      if (matches.length > 0) {
+        const showCardsMatch = matches[0];
         const aiCity = showCardsMatch[1].trim();
         const aiServiceType = showCardsMatch[2]?.trim() || userServiceType || 'coworking';
-        aiResponseText = aiResponseText.replace(showCardsMatch[0], '').trim();
+        // Strip all occurrences and any markdown wrappers around them
+        aiResponseText = aiResponseText.replace(/[\*`]*\[SHOW_CARDS:[^\]]+\][\*`]*/ig, '').trim();
         fetchedSpaces = await updateMapForQuery(userMessage.content, true, aiServiceType as any, aiCity, aiResponseText);
       }
 
