@@ -1078,14 +1078,18 @@ const StartChatting = () => {
           }
         }
 
-        // [NEW] Prioritize 'Stirring Minds' to always show at the top
+        // Prioritize FSDL01 (Stirring Minds) to always show at the top for Delhi
         results.sort((a, b) => {
-          const titleA = a.title || '';
-          const titleB = b.title || '';
-          const aIsStirring = titleA.toLowerCase().includes('stirring minds');
-          const bIsStirring = titleB.toLowerCase().includes('stirring minds');
-          if (aIsStirring && !bIsStirring) return -1;
-          if (!aIsStirring && bIsStirring) return 1;
+          const idA = (a.originalData?.spaceId || a.spaceId || a.title || '').toLowerCase();
+          const idB = (b.originalData?.spaceId || b.spaceId || b.title || '').toLowerCase();
+          const nameA = (a.originalData?.name || a.title || '').toLowerCase();
+          const nameB = (b.originalData?.name || b.title || '').toLowerCase();
+          
+          const aIsFSDL01 = idA.includes('fsdl01') || nameA.includes('stirring minds');
+          const bIsFSDL01 = idB.includes('fsdl01') || nameB.includes('stirring minds');
+          
+          if (aIsFSDL01 && !bIsFSDL01) return -1;
+          if (!aIsFSDL01 && bIsFSDL01) return 1;
           return 0;
         });
 
