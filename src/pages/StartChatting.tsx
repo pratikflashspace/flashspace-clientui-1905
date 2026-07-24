@@ -557,8 +557,10 @@ const StartChatting = () => {
       let title = currentSession?.title;
 
       if (!title || title === 'Chat session') {
-        title = firstUserMsg
-          ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '')
+        const rawContent = firstUserMsg ? firstUserMsg.content : '';
+        const cleanContent = rawContent.replace(/\[SHOW_CARDS:[^\]]+\]/ig, '').trim();
+        title = cleanContent
+          ? cleanContent.slice(0, 50) + (cleanContent.length > 50 ? '…' : '')
           : 'Chat session';
       }
 
@@ -600,8 +602,10 @@ const StartChatting = () => {
       if (!activeChatId) {
         // Unsaved chat - manually save it before clearing
         const firstUserMsg = chatMessages.find(m => m.role === 'user');
-        const title = firstUserMsg
-          ? firstUserMsg.content.slice(0, 50) + (firstUserMsg.content.length > 50 ? '…' : '')
+        const rawContent = firstUserMsg ? firstUserMsg.content : '';
+        const cleanContent = rawContent.replace(/\[SHOW_CARDS:[^\]]+\]/ig, '').trim();
+        const title = cleanContent
+          ? cleanContent.slice(0, 50) + (cleanContent.length > 50 ? '…' : '')
           : 'Chat session';
 
         const tempId = Date.now().toString();
@@ -1457,8 +1461,11 @@ const StartChatting = () => {
         const aiCity = showCardsMatch[1].trim();
         const aiServiceType = showCardsMatch[2]?.trim() || userServiceType || 'coworking';
         // Strip all occurrences and any markdown wrappers around them
-        aiResponseText = aiResponseText.replace(/[\*`]*\[SHOW_CARDS:[^\]]+\][\*`]*/ig, '').trim();
+        aiResponseText = aiResponseText.replace(/[\*`]*\[SHOW_CARDS:[^\]]*\]?[\*`]*/ig, '').replace(/\[SHOW_CARDS:[^\]]*/ig, '').trim();
         fetchedSpaces = await updateMapForQuery(userMessage.content, true, aiServiceType as any, aiCity, aiResponseText);
+      } else {
+        // Also strip any partial or unmatched SHOW_CARDS tags
+        aiResponseText = aiResponseText.replace(/\[SHOW_CARDS:[^\]]*\]?/ig, '').trim();
       }
 
       // Add AI response to chat
