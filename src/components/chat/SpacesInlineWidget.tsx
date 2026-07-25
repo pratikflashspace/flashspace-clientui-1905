@@ -105,12 +105,12 @@ const SpacesInlineWidget: React.FC<SpacesInlineWidgetProps> = ({ spaces, onSpace
                   <p className="text-gray-600 dark:text-gray-300 text-[15px] leading-relaxed mb-4">
                     For booking related issues, please go to your dashboard and navigate to <strong>My Bookings</strong> to raise a ticket directly. Alternatively, you can create a general request from the <strong>Tickets</strong> tab.
                     <br />
-                    <span className="block mt-2 font-medium">Or speak to us directly: <strong className="text-[#35503F] dark:text-yellow-400">+91 98886 87898</strong></span>
+                    <span className="block mt-2 font-medium">Or speak to us directly: <strong className="text-[#35503F] dark:text-yellow-400">+91 81008 88777</strong></span>
                   </p>
                   
                   <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center sm:justify-start">
                     <button 
-                      onClick={() => window.location.href = 'tel:9888687898'}
+                      onClick={() => window.location.href = 'tel:8100888777'}
                       className="bg-[#FEF8CF] text-[#35503F] border border-[#35503F]/20 px-6 py-2.5 rounded-xl font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2"
                     >
                       <PhoneCall className="w-4 h-4" />

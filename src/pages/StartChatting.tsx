@@ -1811,10 +1811,9 @@ const StartChatting = () => {
             {/* Chat Content */}
             <div
               ref={chatContainerRef}
-              className="chat-container custom-scrollbar flex-1 min-h-0 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth"
-              style={{ height: '100%' }}
-              data-lenis-prevent
-              tabIndex={0}
+              className="chat-container custom-scrollbar flex-1 min-h-0 p-4 sm:p-6 overflow-y-auto relative z-10 scroll-smooth outline-none focus:outline-none focus:ring-0"
+              style={{ height: '100%', outline: 'none' }}
+              tabIndex={-1}
               role="region"
               aria-label="Chat messages"
             >
