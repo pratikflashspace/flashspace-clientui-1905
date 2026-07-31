@@ -21,6 +21,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const VirtualOffice = lazy(() => import("./pages/services/VirtualOffice"));
 const OnDemand = lazy(() => import("./pages/services/OnDemand"));
 const GetWorkspaces = lazy(() => import("./pages/services/GetWorkspaces"));
+const GetWorkspacesV2 = lazy(() => import("./pages/services/GetWorkspacesV2"));
+const GetCoworkingSpacesV2 = lazy(() => import("./pages/services/GetCoworkingSpacesV2"));
 const EventSpaces = lazy(() => import("./pages/services/EventSpaces"));
 const BusinessSetup = lazy(() => import("./pages/services/BusinessSetup"));
 const StartChatting = lazy(() => import("./pages/StartChatting"));
@@ -222,10 +224,34 @@ const App = () => (
 
                       <Route
                         path="/services/virtual-office"
+                        element={<GetWorkspacesV2 />}
+                      />
+                      <Route
+                        path="/services/virtual-office/:city"
+                        element={<GetWorkspacesV2 />}
+                      />
+                      <Route
+                        path="/services/virtual-office/1"
+                        element={<GetWorkspaces />}
+                      />
+                      <Route
+                        path="/services/virtual-office/1/:city"
                         element={<GetWorkspaces />}
                       />
                       <Route
                         path="/services/coworking-space"
+                        element={<GetCoworkingSpacesV2 />}
+                      />
+                      <Route
+                        path="/services/coworking-space/:city"
+                        element={<GetCoworkingSpacesV2 />}
+                      />
+                      <Route
+                        path="/services/coworking-space/1"
+                        element={<GetWorkspaces />}
+                      />
+                      <Route
+                        path="/services/coworking-space/1/:city"
                         element={<GetWorkspaces />}
                       />
                       <Route
