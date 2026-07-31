@@ -1483,13 +1483,18 @@ const StartChatting = () => {
     } catch (error) {
       console.error('Error sending message to backend:', error);
 
-      // Add error message
+      // Add error message with Support Card
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'I apologize, but I\'m having trouble connecting right now. Please try again in a moment.',
+        content: 'I apologize, but I\'m having trouble connecting right now. Please try asking again or feel free to reach out to our support team:\n\n[SHOW_CARDS: SUPPORT_TEAM]',
         timestamp: new Date(),
-        isTyping: true
+        isTyping: true,
+        spacesData: [{
+          title: "FlashSpace Support Team",
+          serviceType: "SUPPORT_TEAM",
+          originalData: { id: 'SUPPORT_TEAM', isSupportTeam: true }
+        }]
       };
 
       setChatMessages(prev => [...prev, errorMessage]);

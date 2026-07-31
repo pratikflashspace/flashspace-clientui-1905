@@ -87,7 +87,7 @@ const SpacesInlineWidget: React.FC<SpacesInlineWidgetProps> = ({ spaces, onSpace
           );
         }
 
-        if (space.originalData?.isSupportTeam) {
+        if (space.originalData?.isSupportTeam || space.serviceType === 'SUPPORT_TEAM' || space.serviceType === 'Support Team') {
           return (
             <div 
               key={index}
