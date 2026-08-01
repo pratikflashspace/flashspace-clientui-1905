@@ -1794,7 +1794,7 @@ const GetWorkspaces = () => {
             <div
               className="transition-all duration-300 ease-in-out relative hidden lg:block w-[35%] opacity-100"
             >
-              <div className="sticky top-[88px] h-[calc(100vh-100px)] max-h-[800px] m-2 sm:m-4 flex flex-col gap-3">
+              <div className="sticky top-[88px] h-[calc(100vh-140px)] max-h-[760px] m-2 sm:m-4 flex flex-col gap-3">
                 {/* Map Controls */}
                 <div className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-border/50 shadow-sm shrink-0">
                   <button 

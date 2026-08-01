@@ -1237,7 +1237,7 @@ const GetWorkspacesV2 = () => {
   const [solutionFilter, setSolutionFilter] = useState("all");
   const [pricingFilter, setPricingFilter] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   const [showMap, setShowMap] = useState(false);
   const [mapCollapsed, setMapCollapsed] = useState(false);
@@ -1656,7 +1656,7 @@ const GetWorkspacesV2 = () => {
       <Header />
 
       {/* Desktop: split view — listings left, map right */}
-      <div className="hidden lg:flex flex-1 relative fs-container mt-20">
+      <div className="hidden lg:flex flex-1 relative fs-container mt-20 pb-16">
         {/* Left: Listings */}
         <div
           className={`bg-muted/20 transition-all duration-300 ease-in-out relative ${workspaceType === "business-setup" ? "w-full" : "w-[65%] border-r border-border/40"}`}
@@ -1821,14 +1821,40 @@ const GetWorkspacesV2 = () => {
                     {activeCity}
                   </span>
                 </p>
-                {workspaceType !== "coworking" && workspaceType !== "coworking-space" && (
-                  <button
-                    onClick={() => setIsContactOpen(true)}
-                    className="text-[13px] font-bold bg-[#36503F] text-[#FEF8CF] px-4 py-2 rounded-xl hover:bg-[#2c4133] transition-colors shadow-sm"
-                  >
-                    New to {(typeLabel[workspaceType] || "Virtual Office").toLowerCase()}?
-                  </button>
-                )}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
+                    <button
+                      onClick={() => setViewMode("list")}
+                      className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 ${
+                        viewMode === "list"
+                          ? "bg-card text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      title="List View"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode("grid")}
+                      className={`flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-all duration-200 ${
+                        viewMode === "grid"
+                          ? "bg-card text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                      title="Grid View"
+                    >
+                      <LayoutGrid className="w-4 h-4" />
+                    </button>
+                  </div>
+                  {workspaceType !== "coworking" && workspaceType !== "coworking-space" && (
+                    <button
+                      onClick={() => setIsContactOpen(true)}
+                      className="text-[13px] font-bold bg-[#36503F] text-[#FEF8CF] px-4 py-2 rounded-xl hover:bg-[#2c4133] transition-colors shadow-sm shrink-0"
+                    >
+                      New to {(typeLabel[workspaceType] || "Virtual Office").toLowerCase()}?
+                    </button>
+                  )}
+                </div>
               </div>
             )}
             {loading ? (
@@ -1857,7 +1883,7 @@ const GetWorkspacesV2 = () => {
                   <>
                     {sortedWorkspaces.map((ws, index) => (
                       <div key={ws.id} className="contents">
-                        {index === 1 && workspaceType !== "business-setup" && (
+                        {index === 2 && workspaceType !== "business-setup" && (
                           <div className="col-span-full py-4 my-2 flex flex-col items-start w-full">
                             <h3 className="text-[17px] font-semibold text-gray-900 mb-4 text-left" style={{ fontFamily: "'Inter', sans-serif" }}>
                               5,000+ {(workspaceType === "coworking-space" || workspaceType === "coworking") ? "Virtual Office" : "Coworking Space"} clients served
@@ -1874,7 +1900,7 @@ const GetWorkspacesV2 = () => {
                         )}
                         <WorkspaceCard
                           ws={ws}
-                          view="list"
+                          view={viewMode}
                           type={workspaceType}
                           onBusinessSetupBuy={setSelectedBusinessSetup}
                           zoomedCardId={zoomedCardId}
@@ -1961,86 +1987,82 @@ const GetWorkspacesV2 = () => {
 
         {/* Right: Map */}
         {workspaceType !== "business-setup" && (
-          <>
-            <div
-              className="transition-all duration-300 ease-in-out relative hidden lg:block w-[35%] opacity-100"
-            >
-              <div className="sticky top-24 h-[calc(100vh-100px)] max-h-[800px] m-2 sm:m-4 flex flex-col gap-3">
-                {/* Map Controls */}
-                <div className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-border/50 shadow-sm shrink-0">
-                  <button
-                    onClick={() => setMapCollapsed(false)}
-                    className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${!mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
-                  >
-                    Show Map
-                  </button>
-                  <button
-                    onClick={() => setMapCollapsed(true)}
-                    className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
-                  >
-                    Hide Map
-                  </button>
-                  <button
-                    onClick={() => setMapFullscreen(true)}
-                    className="flex-1 text-xs font-medium py-1.5 rounded-md text-gray-500 hover:bg-gray-50 transition-colors"
-                  >
-                    Full Map
-                  </button>
-                </div>
+          <div
+            className="transition-all duration-300 ease-in-out relative hidden lg:block w-[35%] opacity-100 shrink-0"
+          >
+            <div className="sticky top-24 max-h-[calc(100vh-140px)] m-2 sm:m-4 flex flex-col gap-3 overflow-y-auto custom-scrollbar">
+              {/* Map Controls */}
+              <div className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-border/50 shadow-sm shrink-0">
+                <button
+                  onClick={() => setMapCollapsed(false)}
+                  className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${!mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
+                >
+                  Show Map
+                </button>
+                <button
+                  onClick={() => setMapCollapsed(true)}
+                  className={`flex-1 text-xs font-medium py-1.5 rounded-md transition-colors ${mapCollapsed ? 'bg-gray-100 text-gray-900 shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}
+                >
+                  Hide Map
+                </button>
+                <button
+                  onClick={() => setMapFullscreen(true)}
+                  className="flex-1 text-xs font-medium py-1.5 rounded-md text-gray-500 hover:bg-gray-50 transition-colors"
+                >
+                  Full Map
+                </button>
+              </div>
 
-                {/* Map Section */}
-                <div className={`relative rounded-xl overflow-hidden shadow-sm border transition-all duration-300 ${mapCollapsed ? "h-0 opacity-0 min-h-0 border-transparent flex-none" : "flex-1 min-h-[300px] border-border/30"}`}>
-                  <MapLibreMap
-                    center={mapCenter}
-                    markers={mapMarkers}
-                    hoveredMarkerId={hoveredCardId}
-                    mapStyle="retro"
-                  />
-                </div>
+              {/* Map Section */}
+              <div className={`relative rounded-xl overflow-hidden shadow-sm border transition-all duration-300 ${mapCollapsed ? "h-0 opacity-0 min-h-0 border-transparent flex-none" : "h-[250px] min-h-[250px] border-border/30 shrink-0"}`}>
+                <MapLibreMap
+                  center={mapCenter}
+                  markers={mapMarkers}
+                  hoveredMarkerId={hoveredCardId}
+                  mapStyle="retro"
+                />
+              </div>
 
-                {/* Consultant Card */}
-                <div className="bg-[#FAFAF7] rounded-xl p-4 border border-border shadow-[0_4px_20px_rgb(0,0,0,0.05)] flex flex-col overflow-y-auto custom-scrollbar shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
-                  <div>
-                    <h3 className="text-[16px] font-bold text-gray-900 mb-4 leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
-                      Get your Coworking Space in {activeCity} with Premjeet
-                    </h3>
+              {/* Consultant Card */}
+              <div className="bg-[#FAFAF7] rounded-xl p-4 border border-border shadow-[0_4px_20px_rgb(0,0,0,0.05)] flex flex-col shrink-0" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div>
+                  <h3 className="text-[16px] font-bold text-gray-900 mb-4 leading-tight" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    Get your Coworking Space in {activeCity} with Premjeet
+                  </h3>
 
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-white shrink-0">
-                        <img src="/to_cloudinary/premjeet.png" alt="Premjeet" className="w-full h-full object-cover object-top" />
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-white shrink-0">
+                      <img src="/to_cloudinary/premjeet.png" alt="Premjeet" className="w-full h-full object-cover object-top" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-gray-900 text-[15px] leading-tight mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>Premjeet</h4>
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <p className="text-gray-500 text-[13px]">+91 98886 87898</p>
+                        <a href="tel:+919888687898" className="inline-flex items-center justify-center bg-[#36503F] text-white px-3 py-1 rounded-sm text-[11px] font-bold hover:bg-[#2c4133] transition-colors shadow-sm">
+                          Contact Premjeet
+                        </a>
                       </div>
-                      <div className="flex-1">
-                        <h4 className="font-bold text-gray-900 text-[15px] leading-tight mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>Premjeet</h4>
-                        <div className="flex items-center justify-between gap-2 mb-1.5">
-                          <p className="text-gray-500 text-[13px]">+91 98886 87898</p>
-                          <a href="tel:+919888687898" className="inline-flex items-center justify-center bg-[#36503F] text-white px-3 py-1 rounded-sm text-[11px] font-bold hover:bg-[#2c4133] transition-colors shadow-sm">
-                            Contact Premjeet
-                          </a>
-                        </div>
-                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white text-[11px] font-bold text-gray-700">
-                          <BadgeCheck className="w-3.5 h-3.5 text-[#36503F]" /> FlashSpace Consultant
-                        </div>
+                      <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white text-[11px] font-bold text-gray-700">
+                        <BadgeCheck className="w-3.5 h-3.5 text-[#36503F]" /> FlashSpace Consultant
                       </div>
                     </div>
+                  </div>
 
-                    <div className="mb-2">
-                      <h5 className="font-bold text-gray-900 text-[13px] mb-2">Premjeet will help you with:</h5>
-                      <div className="grid grid-cols-2 gap-y-2 gap-x-2">
-                        {["Compare Workspaces", "Expert Price Negotiation", "Seamless GST Setup", "Tailored Documentation"].map(item => (
-                          <div key={item} className="flex items-start gap-1.5 text-[11px] sm:text-[12px] text-gray-700 font-medium">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-[#36503F] shrink-0 mt-0.5" />
-                            <span className="leading-tight">{item}</span>
-                          </div>
-                        ))}
-                      </div>
+                  <div className="mb-2">
+                    <h5 className="font-bold text-gray-900 text-[13px] mb-2">Premjeet will help you with:</h5>
+                    <div className="grid grid-cols-2 gap-y-2 gap-x-2">
+                      {["Compare Workspaces", "Expert Price Negotiation", "Seamless GST Setup", "Tailored Documentation"].map(item => (
+                        <div key={item} className="flex items-start gap-1.5 text-[11px] sm:text-[12px] text-gray-700 font-medium">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#36503F] shrink-0 mt-0.5" />
+                          <span className="leading-tight">{item}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-
-          </>
+          </div>
         )}
       </div>
 
