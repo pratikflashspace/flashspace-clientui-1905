@@ -47,7 +47,7 @@ const CityListing = () => {
               We're working on bringing you the best workspaces in {city}.
             </p>
             <div className="flex gap-4 justify-center">
-              <Link to="/services">
+              <Link to="/services/virtual-office">
                 <Button>Browse Services</Button>
               </Link>
               <Link to="/">

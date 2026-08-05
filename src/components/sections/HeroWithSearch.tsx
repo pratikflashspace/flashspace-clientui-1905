@@ -31,7 +31,8 @@ export const HeroWithSearch = () => {
     if (isBusinessSetup) {
       navigate("/services/business-setup");
     } else {
-      navigate(`/services/${activeTab}?city=${encodeURIComponent(option)}`);
+      const slug = option.toLowerCase().replace(/\s+/g, '-');
+      navigate(`/services/${activeTab}/${slug}`);
     }
   };
 

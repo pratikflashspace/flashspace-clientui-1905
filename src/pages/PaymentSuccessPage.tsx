@@ -11,6 +11,7 @@ interface PaymentDetails {
   orderId: string;
   status: string;
   amount: number;
+  spaceId?: string;
   spaceName: string;
   planName: string;
   tenure: number;
@@ -112,10 +113,10 @@ const PaymentSuccessPage = () => {
               </div>
             ) : paymentDetails ? (
               <div className="space-y-3 text-sm">
-                {!paymentDetails.spaceName.toLowerCase().includes('package') && (
+                {!paymentDetails.spaceName?.toLowerCase().includes('package') && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Space</span>
-                    <span className="font-medium text-foreground">{paymentDetails.spaceName}</span>
+                    <span className="font-medium text-foreground">{paymentDetails.spaceId || paymentDetails.spaceName}</span>
                   </div>
                 )}
                 <div className="flex justify-between">

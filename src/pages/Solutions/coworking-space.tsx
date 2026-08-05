@@ -154,7 +154,10 @@ const CoworkingSpace = () => {
             <div ref={searchRef} className="relative">
               <div className="flex items-center h-12 rounded-xl border border-[#D4E0D0] bg-white overflow-hidden shadow-lg" style={{ width: 400, maxWidth: "90vw" }}>
                 <button
-                  onClick={() => navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`)}
+                  onClick={() => {
+                    const slug = (cityQuery || "Delhi").toLowerCase().replace(/\s+/g, '-');
+                    navigate(`/services/coworking-space/${slug}`);
+                  }}
                   className="p-4 text-muted-foreground hover:text-foreground transition-colors shrink-0"
                 >
                   <Search className="w-4 h-4" />
@@ -169,7 +172,8 @@ const CoworkingSpace = () => {
                   }}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`);
+                      const slug = (cityQuery || "Delhi").toLowerCase().replace(/\s+/g, '-');
+                      navigate(`/services/coworking-space/${slug}`);
                       setShowSuggestions(false);
                     }
                   }}
@@ -185,7 +189,8 @@ const CoworkingSpace = () => {
                       onClick={() => {
                         setCityQuery(city);
                         setShowSuggestions(false);
-                        navigate(`/services/coworking-space?city=${encodeURIComponent(city)}`);
+                        const slug = city.toLowerCase().replace(/\s+/g, '-');
+                        navigate(`/services/coworking-space/${slug}`);
                       }}
                       className="w-full text-left px-4 py-2.5 text-sm text-foreground hover:bg-foreground/5 transition-colors"
                     >
@@ -199,7 +204,10 @@ const CoworkingSpace = () => {
               size="lg"
               variant="outline"
               className="font-semibold px-8 h-12 rounded-xl border-[#36503F]/30 text-[#36503F] hover:bg-[#F0F4EE] hover:border-[#36503F]/40 bg-transparent"
-              onClick={() => navigate(`/services/coworking-space?city=${encodeURIComponent(cityQuery || "Delhi")}`)}
+              onClick={() => {
+                const slug = (cityQuery || "Delhi").toLowerCase().replace(/\s+/g, '-');
+                navigate(`/services/coworking-space/${slug}`);
+              }}
             >
               Explore Spaces <ArrowRight className="w-4 h-4 ml-1" />
             </Button>

@@ -220,7 +220,7 @@ export const DashboardLayout = ({
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 min-h-0 overflow-y-auto relative custom-scrollbar p-4 md:p-6 lg:p-8 [&_*]:![font-family:'Inter',sans-serif]" data-lenis-prevent>
+        <main className="flex-1 min-h-0 overflow-y-auto relative custom-scrollbar p-4 md:p-6 lg:p-8 overscroll-contain scroll-smooth [transform:translateZ(0)] [&_*]:![font-family:'Inter',sans-serif]" data-lenis-prevent>
           {children}
         </main>
       </div>

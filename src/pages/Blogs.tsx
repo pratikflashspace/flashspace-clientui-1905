@@ -6,10 +6,18 @@ import { Flame } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+const getImageUrl = (url?: string) => {
+  if (!url) return "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5001";
+  return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
+};
+
 const Blogs = () => {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [visibleCount, setVisibleCount] = useState(6);
 
   const categories = ["All", "Coworking", "Virtual Office", "Artificial Intelligence"];
 
@@ -18,6 +26,7 @@ const Blogs = () => {
   }, []);
 
   useEffect(() => {
+    setVisibleCount(6);
     fetchBlogs();
   }, [activeCategory]);
 
@@ -35,6 +44,10 @@ const Blogs = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 6);
   };
 
   return (
@@ -99,55 +112,60 @@ const Blogs = () => {
             No blogs found in this category.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogs.map((blog, index) => (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-                key={blog._id}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 flex flex-col h-full group"
-              >
-                <Link to={`/blogs/${blog.slug}`} className="block relative overflow-hidden h-56">
-                  <img
-                    src={blog.coverImage || "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"}
-                    alt={blog.title}
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-                  />
-                </Link>
-                
-                <div className="p-6 flex flex-col flex-grow">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="bg-[#334d3d] text-[#FEF8C3] text-xs font-bold px-3 py-1.5 rounded-full">
-                      {blog.category}
-                    </span>
-                    <span className="text-sm text-gray-500 font-medium">
-                      {format(new Date(blog.createdAt), "MMM dd, yyyy")}
-                    </span>
-                  </div>
-                  
-                  <Link to={`/blogs/${blog.slug}`}>
-                    <h3 className="text-xl font-bold text-[#1a2d1d] mb-3 line-clamp-2 hover:text-[#334d3d] transition-colors">
-                      {blog.title}
-                    </h3>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogs.slice(0, visibleCount).map((blog, index) => (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  key={blog._id}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 flex flex-col h-full group"
+                >
+                  <Link to={`/blogs/${blog.slug}`} className="block relative overflow-hidden h-56">
+                    <img
+                      src={getImageUrl(blog.coverImage)}
+                      alt={blog.title}
+                      className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
+                    />
                   </Link>
                   
-                  <p className="text-gray-600 text-sm line-clamp-3 mb-6 flex-grow">
-                    {blog.excerpt || blog.content.substring(0, 150) + "..."}
-                  </p>
-                  
-                  <div className="mt-auto border-t border-gray-100 pt-4 flex items-center justify-end">
-                    <Link 
-                      to={`/blogs/${blog.slug}`}
-                      className="text-sm font-bold text-[#334d3d] hover:underline"
-                    >
-                      Read More →
+                  <div className="p-6 flex flex-col flex-grow">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="bg-[#334d3d] text-[#FEF8C3] text-xs font-bold px-3 py-1.5 rounded-full">
+                        {blog.category}
+                      </span>
+                      <span className="text-sm text-gray-500 font-medium">
+                        {format(new Date(blog.createdAt), "MMM dd, yyyy")}
+                      </span>
+                    </div>
+                    
+                    <Link to={`/blogs/${blog.slug}`}>
+                      <h3 className="text-xl font-bold text-[#1a2d1d] mb-3 line-clamp-2 hover:text-[#334d3d] transition-colors font-['Inter']">
+                        {blog.title}
+                      </h3>
                     </Link>
+                    
+                    <p className="text-gray-600 text-sm line-clamp-3 flex-grow">
+                      {blog.excerpt || blog.content.substring(0, 150) + "..."}
+                    </p>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {visibleCount < blogs.length && (
+              <div className="mt-12 text-center">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-8 py-3.5 bg-[#334d3d] text-[#FEF8C3] hover:bg-[#1a2d1d] font-bold text-sm rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95"
+                >
+                  Load More Blogs
+                </button>
+              </div>
+            )}
+          </>
         )}
 
         {/* Trending Blogs Section */}
@@ -173,13 +191,13 @@ const Blogs = () => {
                 >
                   <Link to={`/blogs/${blog.slug}`} className="block relative overflow-hidden h-48">
                     <img
-                      src={blog.coverImage || "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"}
+                      src={getImageUrl(blog.coverImage)}
                       alt={blog.title}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
                     />
                     {/* Trending Tag */}
-                    <div className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1 shadow-md uppercase tracking-wider">
-                      <Flame size={12} fill="currentColor" /> Trending
+                    <div className="absolute top-3 left-3 bg-[#FEF8C3] text-[#334d3d] text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1 shadow-md uppercase tracking-wider">
+                      <Flame size={12} fill="#334d3d" className="text-[#334d3d]" /> Trending
                     </div>
                   </Link>
                   
@@ -194,7 +212,7 @@ const Blogs = () => {
                     </div>
                     
                     <Link to={`/blogs/${blog.slug}`}>
-                      <h3 className="text-lg font-bold text-[#1a2d1d] mb-2 line-clamp-2 hover:text-[#334d3d] transition-colors leading-tight">
+                      <h3 className="text-lg font-bold text-[#1a2d1d] mb-2 line-clamp-2 hover:text-[#334d3d] transition-colors leading-tight font-['Inter']">
                         {blog.title}
                       </h3>
                     </Link>

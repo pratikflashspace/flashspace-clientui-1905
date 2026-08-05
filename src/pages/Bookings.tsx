@@ -35,7 +35,7 @@ const Bookings = () => {
             <p className="text-muted-foreground mb-6">
               You haven't made any bookings. Start exploring our workspaces.
             </p>
-            <Link to="/services">
+            <Link to="/services/virtual-office">
               <Button>Browse Workspaces</Button>
             </Link>
           </div>

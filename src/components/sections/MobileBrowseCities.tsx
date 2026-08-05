@@ -11,9 +11,8 @@ export const MobileBrowseCities = () => {
   const allCitiesList = [...popularCities, ...otherCities];
 
   const navigateToOption = (city: string) => {
-    // Navigate to Coworking Space by default, or Virtual Office.
-    // The previous component relied on `activeTab`. We can just default to coworking-space or virtual-office
-    navigate(`/services/virtual-office?city=${encodeURIComponent(city)}`);
+    const slug = city.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/services/virtual-office/${slug}`);
   };
 
   return (

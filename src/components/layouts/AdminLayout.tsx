@@ -208,6 +208,12 @@ export default function AdminLayout() {
         "affiliate_manager",
       ],
     },
+    {
+      icon: FileText,
+      label: "Post Blog",
+      path: "/admin/post-blog",
+      roles: ["admin", "super_admin"],
+    },
   ];
 
   const navItems = allNavItems.filter(

@@ -1106,14 +1106,14 @@ const GetWorkspaces = () => {
 
   const handleWorkspaceTypeChange = (value: string) => {
     setWorkspaceType(value);
-    const params = new URLSearchParams(location.search);
-    const currentCity = params.get("city") || activeCity;
-    const searchStr = `?city=${encodeURIComponent(currentCity)}`;
+    const slug = activeCity.toLowerCase().replace(/\s+/g, '-');
 
-    if (value === "coworking")
-      navigate(`/services/coworking-space${searchStr}`, { replace: true });
-    else if (value === "business-setup") navigate(`/services/business-setup${searchStr}`, { replace: true });
-    else navigate(`/services/virtual-office${searchStr}`, { replace: true });
+    if (value === "coworking" || value === "coworking-space")
+      navigate(`/services/coworking-space/${slug}`, { replace: true });
+    else if (value === "business-setup")
+      navigate(`/services/business-setup`, { replace: true });
+    else
+      navigate(`/services/virtual-office/${slug}`, { replace: true });
   };
 
   const handleCityChange = (city: string) => {

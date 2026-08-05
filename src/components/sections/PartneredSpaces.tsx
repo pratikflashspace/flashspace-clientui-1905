@@ -286,7 +286,7 @@ export const PartneredSpaces = () => {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1, duration: 0.4 }}
-                  onClick={() => window.location.href = `/services/virtual-office?city=${city.title}`}
+                  onClick={() => window.location.href = `/services/virtual-office/${city.title.toLowerCase().replace(/\s+/g, '-')}`}
                   className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-[0_10px_30px_rgba(54,80,63,0.2)] cursor-pointer transition-all group shrink-0 w-[280px] sm:w-[300px] snap-start flex flex-col"
                 >
                   <div className="relative h-44 overflow-hidden">

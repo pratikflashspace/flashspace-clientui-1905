@@ -405,7 +405,7 @@ const CompleteBookingPage = () => {
                 <h1 className="text-3xl font-bold text-foreground mb-1">Complete Your Booking</h1>
                 <p className="text-muted-foreground mb-8 text-sm">
                     Choose your preferred tenure for <span className="font-medium text-foreground">{planDisplayName}</span> at{' '}
-                    <span className="font-medium text-foreground">{spaceDetails?.name}</span>
+                    <span className="font-medium text-foreground">{spaceDetails?.spaceId || spaceDetails?.id || spaceDetails?._id || spaceDetails?.name}</span>
                 </p>
 
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
