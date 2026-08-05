@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { ArrowLeft, User, Calendar, Tag } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { API_BASE_URL } from "@/config/api.config";
 import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/core/fonts/inter.css";
@@ -12,7 +13,7 @@ import "@blocknote/react/style.css";
 const getImageUrl = (url?: string) => {
   if (!url) return "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5001";
+  const baseUrl = API_BASE_URL.replace(/\/api$/, "").replace(/\/$/, "");
   return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
@@ -28,7 +29,7 @@ const BlogDetail = () => {
 
   const fetchBlog = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/blogs/${slug}`);
+      const response = await fetch(`${API_BASE_URL}/api/blogs/${slug}`);
       const data = await response.json();
       if (data.success) {
         setBlog(data.data);

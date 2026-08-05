@@ -29,7 +29,12 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { ADMIN_NAV_ITEMS } from "@/constants/adminNavItems";
 
 const DRAFT_KEY = "postBlogDraft";
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL.replace(/\/$/, "");
+  if (import.meta.env.DEV) return "http://localhost:5001";
+  return typeof window !== "undefined" ? window.location.origin : "http://localhost:5001";
+};
+const API_BASE_URL = getApiBaseUrl();
 
 interface BlogItem {
   _id: string;

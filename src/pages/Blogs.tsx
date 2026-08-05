@@ -5,11 +5,12 @@ import { format } from "date-fns";
 import { Flame } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { API_BASE_URL } from "@/config/api.config";
 
 const getImageUrl = (url?: string) => {
   if (!url) return "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:5001";
+  const baseUrl = API_BASE_URL.replace(/\/api$/, "").replace(/\/$/, "");
   return `${baseUrl}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
@@ -34,7 +35,7 @@ const Blogs = () => {
     setLoading(true);
     try {
       const categoryQuery = activeCategory !== "All" ? `?category=${activeCategory}` : "";
-      const response = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/blogs${categoryQuery}`);
+      const response = await fetch(`${API_BASE_URL}/api/blogs${categoryQuery}`);
       const data = await response.json();
       if (data.success) {
         setBlogs(data.data);
