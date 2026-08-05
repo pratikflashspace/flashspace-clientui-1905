@@ -765,35 +765,26 @@ const PostBlog = () => {
       portalDescription="Complete platform management"
       navItems={ADMIN_NAV_ITEMS}
     >
-      <div className="p-4 sm:p-8 max-w-7xl mx-auto font-sans text-gray-900">
+      <div className="px-0 sm:px-2 py-1 -mt-3 w-full font-sans text-gray-900">
         
         {/* Top Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 bg-white p-4 sm:p-5 rounded-2xl border border-gray-200/80 shadow-sm">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-0.5">
               <Sparkles className="w-5 h-5 text-[#36503F]" />
-              <h1 className="text-2xl font-bold text-gray-900">AI Blog Manager & Automation</h1>
+              <h1 className="text-xl font-bold text-gray-900">AI Blog Manager & Automation</h1>
             </div>
-            <p className="text-sm text-gray-500">
-              Daily 5 AI-generated blogs created at <strong>10:00 AM IST</strong> with SEO scoring & 1-Click Publishing.
+            <p className="text-xs sm:text-sm text-gray-500">
+              Daily 5 AI-generated blogs pre-built at <strong>9:30 AM IST</strong> and published automatically at <strong>10:00 AM IST</strong>.
             </p>
           </div>
-
-          <Button
-            onClick={handleGenerateFiveDraftsNow}
-            disabled={isGenerating}
-            className="bg-[#36503F] hover:bg-[#2c4133] text-[#FEF8CF] font-semibold px-5 py-2.5 rounded-xl shadow-sm flex items-center gap-2 transition-all shrink-0"
-          >
-            <RefreshCw className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`} />
-            {isGenerating ? "Generating 5 AI Drafts..." : "Generate 5 AI Drafts Now"}
-          </Button>
         </div>
 
         {/* Tab Selector */}
-        <div className="flex items-center gap-2 border-b border-gray-200 mb-8 overflow-x-auto">
+        <div className="flex items-center gap-2 border-b border-gray-200 mb-4 overflow-x-auto">
           <button
             onClick={() => setActiveTab("drafts")}
-            className={`pb-3.5 px-4 font-semibold text-sm transition-all relative flex items-center gap-2 shrink-0 ${
+            className={`pb-2.5 px-3 font-semibold text-xs sm:text-sm transition-all relative flex items-center gap-2 shrink-0 ${
               activeTab === "drafts"
                 ? "text-[#36503F] border-b-2 border-[#36503F]"
                 : "text-gray-500 hover:text-gray-900"
@@ -817,7 +808,7 @@ const PostBlog = () => {
               setBannerPreviewUrl(null);
               setActiveTab("editor");
             }}
-            className={`pb-3.5 px-4 font-semibold text-sm transition-all relative flex items-center gap-2 shrink-0 ${
+            className={`pb-2.5 px-3 font-semibold text-xs sm:text-sm transition-all relative flex items-center gap-2 shrink-0 ${
               activeTab === "editor"
                 ? "text-[#36503F] border-b-2 border-[#36503F]"
                 : "text-gray-500 hover:text-gray-900"
@@ -829,7 +820,7 @@ const PostBlog = () => {
 
           <button
             onClick={() => setActiveTab("published")}
-            className={`pb-3.5 px-4 font-semibold text-sm transition-all relative flex items-center gap-2 shrink-0 ${
+            className={`pb-2.5 px-3 font-semibold text-xs sm:text-sm transition-all relative flex items-center gap-2 shrink-0 ${
               activeTab === "published"
                 ? "text-[#36503F] border-b-2 border-[#36503F]"
                 : "text-gray-500 hover:text-gray-900"
@@ -851,17 +842,10 @@ const PostBlog = () => {
             ) : drafts.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-gray-300 p-8">
                 <Sparkles className="w-12 h-12 text-[#36503F] mx-auto mb-4 opacity-80" />
-                <h3 className="text-lg font-bold text-gray-900 mb-1">No AI Drafts in Queue</h3>
-                <p className="text-sm text-gray-500 max-w-md mx-auto mb-6">
-                  The automated 10:00 AM cron job runs daily. Click below to generate 5 fresh high-SEO drafts right now.
+                <h3 className="text-lg font-bold text-gray-900 mb-1">No AI Drafts Pending</h3>
+                <p className="text-sm text-gray-500 max-w-md mx-auto">
+                  The automated pipeline builds 5 fresh AI blogs at 9:30 AM and publishes them live at 10:00 AM IST daily.
                 </p>
-                <Button
-                  onClick={handleGenerateFiveDraftsNow}
-                  disabled={isGenerating}
-                  className="bg-[#36503F] text-[#FEF8CF] font-bold px-6 py-2.5 rounded-xl hover:bg-[#2c4133]"
-                >
-                  {isGenerating ? "Generating..." : "Generate 5 AI Drafts Now"}
-                </Button>
               </div>
             ) : (
               <>

@@ -511,6 +511,8 @@ const App = () => (
                               </DashboardLayout>
                             }
                           />
+                          <Route path="post-blog" element={<PostBlog />} />
+                          <Route path="blogs" element={<PostBlog />} />
                           <Route path="*" element={<AdminDashboard />} />
                         </Route>
                       </Route>
