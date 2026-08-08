@@ -126,9 +126,16 @@ const ListingCardModern = memo<ListingCardModernProps>(
       onToggleFavorite?.(item._id);
     };
 
-    const handleCardClick = () => {
-      onClick?.();
-      onGetBestPrice?.(item._id);
+    const handleCardClick = (e?: React.MouseEvent) => {
+      if (e) e.stopPropagation();
+      const mongoId = item._id || item.id;
+      if (onClick) {
+        onClick();
+      } else if (onGetBestPrice) {
+        onGetBestPrice(mongoId);
+      } else {
+        window.location.href = `/space/${mongoId}`;
+      }
     };
 
     const formatReviews = (reviews: number) => {
@@ -357,10 +364,10 @@ const ListingCardModern = memo<ListingCardModernProps>(
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2 mt-auto pt-2">
+          <div className="grid grid-cols-2 gap-2 mt-auto pt-2">
             <button
               onClick={handleCardClick}
-              className="flex-[1.2] bg-[#36503F] text-[#FEF8C5] text-[12px] sm:text-sm font-bold py-2 sm:py-2.5 px-2 sm:px-4 rounded-[10px] sm:rounded-full hover:bg-[#1F2E26] transition-all active:scale-[0.98] whitespace-nowrap flex items-center justify-center"
+              className="w-full bg-[#36503F] text-[#FEF8C5] text-xs sm:text-[13px] font-bold py-2.5 px-2 rounded-xl hover:bg-[#1F2E26] transition-all active:scale-[0.98] whitespace-nowrap flex items-center justify-center text-center shadow-sm"
             >
               Get Best Price
             </button>
@@ -369,9 +376,9 @@ const ListingCardModern = memo<ListingCardModernProps>(
                 e.stopPropagation();
                 window.location.href = "tel:+919888687898";
               }}
-              className="flex-1 flex items-center justify-center gap-1 sm:gap-1.5 border border-[#36503F] bg-[#36503F] text-[#FEF8C5] text-[11px] sm:text-sm font-semibold py-2 sm:py-2.5 px-1 sm:px-2 rounded-[10px] sm:rounded-xl hover:bg-[#1F2E26] transition-all active:scale-[0.98] whitespace-nowrap"
+              className="w-full border border-[#36503F] bg-[#36503F] text-[#FEF8C5] text-xs sm:text-[13px] font-semibold py-2.5 px-2 rounded-xl hover:bg-[#1F2E26] transition-all active:scale-[0.98] whitespace-nowrap flex items-center justify-center gap-1.5 text-center shadow-sm"
             >
-              <Phone className="w-3 h-3 sm:w-4 sm:h-4" />
+              <Phone className="w-3.5 h-3.5 shrink-0" />
               Contact Sales
             </button>
           </div>

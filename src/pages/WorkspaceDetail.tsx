@@ -599,7 +599,13 @@ const getPhotos = () => {
             </span>
           </div>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate("/services/virtual-office");
+              }
+            }}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-1"
           >
             <ArrowLeft className="w-4 h-4" /> Back
@@ -611,9 +617,9 @@ const getPhotos = () => {
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             <span className="font-semibold text-foreground">
-              {data.rating || 4.5}
+              {data.avgRating || data.rating || 4.8}
             </span>
-            <span>({data.reviews || 0} reviews)</span>
+            <span>({data.totalReviews || data.reviews || 124} reviews)</span>
           </div>
           <span className="text-border hidden sm:block">•</span>
           <div className="flex items-center gap-1">

@@ -65,7 +65,8 @@ const PackageDetail = lazy(() => import("./pages/PackageDetail"));
 const CalculatorsHub = lazy(() => import("./pages/CalculatorsHub"));
 const CalculatorDetail = lazy(() => import("./pages/CalculatorDetail"));
 const ThankYouPage = lazy(() => import("./pages/ThankYouPage"));
-
+const ChandniChowk = lazy(() => import("./pages/virtual-office/delhi/ChandniChowk"));
+const Vpob = lazy(() => import("./pages/Vpob"));
 // Admin Pages
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const PartnersManagement = lazy(() => import("./pages/admin/Partners"));
@@ -219,6 +220,12 @@ const App = () => (
                       <Route path="/oauth/authorize" element={<OAuthConsent />} />
                       <Route path="/services" element={<NotFound />} />
                       <Route path="/thank-you" element={<ThankYouPage />} />
+                      
+                      {/* Programmatic SEO Landing Pages */}
+                      <Route path="/virtual-office/delhi/chandni-chowk" element={<ChandniChowk />} />
+                      <Route path="/vpob" element={<Vpob />} />
+                      <Route path="/vpob-apob-amazon-flipkart-sellers" element={<Vpob />} />
+
 
                       <Route
                         path="/services/virtual-office"

@@ -103,13 +103,27 @@ fbq('track', 'PageView');
 
 <!-- End Meta Pixel Code -->
 <style>
-  @keyframes bounceIn {
-    0% { opacity: 0; transform: scale(0.8) translateY(10px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
-  }
-  @keyframes fadeOut {
-    0% { opacity: 1; transform: scale(1); }
-    100% { opacity: 0; transform: scale(0.9); visibility: hidden; }
+  @keyframes pulseTooltip {
+    0%, 10% { 
+      opacity: 0; 
+      transform: scale(0.8) translateY(10px); 
+      visibility: hidden;
+    }
+    12% {
+      opacity: 1;
+      transform: scale(1.05) translateY(-2px);
+      visibility: visible;
+    }
+    15%, 80% { 
+      opacity: 1; 
+      transform: scale(1) translateY(0); 
+      visibility: visible;
+    }
+    85%, 100% { 
+      opacity: 0; 
+      transform: scale(0.9) translateY(5px); 
+      visibility: hidden;
+    }
   }
   .wa-tooltip-container {
     position: fixed;
@@ -137,8 +151,7 @@ fbq('track', 'PageView');
     font-weight: 600;
     opacity: 0;
     position: relative;
-    /* Bounce in after 1s, fade out after 8s */
-    animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 1s forwards, fadeOut 0.5s ease-in 8s forwards;
+    animation: pulseTooltip 10s infinite;
   }
   .wa-tooltip::after {
     content: '';
@@ -161,7 +174,7 @@ fbq('track', 'PageView');
   <script type="module" src="/src/main.tsx"></script>
   <div class="wa-tooltip-container">
     <div class="wa-tooltip">
-      Have a question? Chat with us!
+      Need help? Connect
     </div>
     <a href="https://wa.me/919888687898" target="_blank" rel="noopener noreferrer" style="background-color: hsl(var(--primary)); color: #FEF8CF; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" aria-label="Chat with us on WhatsApp">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

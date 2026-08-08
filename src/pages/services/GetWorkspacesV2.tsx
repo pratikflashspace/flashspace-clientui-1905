@@ -1192,11 +1192,11 @@ const GetWorkspacesV2 = () => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const city = params.get("city") || "Delhi";
-    if (city !== activeCity) {
+    const city = formattedUrlCity || params.get("city");
+    if (city && city !== activeCity) {
       setActiveCity(city);
     }
-  }, [location.search]);
+  }, [location.search, formattedUrlCity]);
 
   // Sync workspaceType with URL changes (e.g., back/forward navigation)
   useEffect(() => {
