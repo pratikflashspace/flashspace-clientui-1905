@@ -223,11 +223,11 @@ export const PackageWorkspaces = ({
                       <h3 className="text-[13px] font-bold text-gray-500 mb-3 uppercase tracking-wider text-center">Trusted by 5000+ businesses</h3>
                       <div className="bg-[#F0F4EE]/50 rounded-2xl p-6 border border-[#D4E0D0] shadow-sm text-center overflow-hidden">
                         <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10">
-                          <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/agrizy_vpn5mj.png" alt="Agrizy" className="h-12 md:h-14 object-contain mix-blend-multiply" />
-                          <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/Adda247_bbmaft.png" alt="Adda247" className="h-9 md:h-11 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/agrizy.png" alt="Agrizy" className="h-12 md:h-14 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/Adda247.png" alt="Adda247" className="h-9 md:h-11 object-contain mix-blend-multiply" />
                           <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-10 md:h-12 object-contain mix-blend-multiply" />
-                          <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/growthschool_-_Copy_iip2zr.png" alt="Growth School" className="h-6 md:h-7 object-contain mix-blend-multiply" />
-                          <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/plum_logo_lstdop.png" alt="Plum" className="h-9 md:h-11 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/growthschool.png" alt="Growth School" className="h-6 md:h-7 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-9 md:h-11 object-contain mix-blend-multiply" />
                           <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-10 md:h-12 object-contain mix-blend-multiply" />
                         </div>
                       </div>

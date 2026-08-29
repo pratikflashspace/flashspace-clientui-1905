@@ -10,12 +10,12 @@ interface LogoItem {
 const clientLogos: LogoItem[] = [
   {
     name: "Agrizy",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/agrizy_vpn5mj.png",
+    src: "/newLogo/agrizy.png",
     className: "h-32 sm:h-24",
   },
   {
     name: "Adda247",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/Adda247_bbmaft.png",
+    src: "/newLogo/Adda247.png",
     className: "h-36 sm:h-16",
   },
   {
@@ -25,22 +25,22 @@ const clientLogos: LogoItem[] = [
   },
   {
     name: "Growth School",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/growthschool_-_Copy_iip2zr.png",
+    src: "/newLogo/growthschool.png",
     className: "h-28 sm:h-12",
   },
   {
     name: "Plum",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/plum_logo_lstdop.png",
+    src: "/newLogo/plum%20logo.png",
     className: "h-28 sm:h-14",
   },
   {
     name: "Study IQ",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/study_iq_xdxdkd.png",
+    src: "/newLogo/study%20iq.png",
     className: "h-24 sm:h-16 translate-x-2 sm:translate-x-4",
   },
   {
     name: "Truly Madly",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/truly_madly_b78smk.png",
+    src: "/newLogo/truly%20madly.png",
     className: "h-36 sm:h-20",
   },
 ];

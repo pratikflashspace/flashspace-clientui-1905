@@ -10,12 +10,12 @@ interface LogoItem {
 const clientLogos: LogoItem[] = [
   {
     name: "Agrizy",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/agrizy_vpn5mj.png",
+    src: "/newLogo/agrizy.png",
     className: "h-[72px] sm:h-[64px]", // Increased heights for mobile
   },
   {
     name: "Adda247",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/Adda247_bbmaft.png",
+    src: "/newLogo/Adda247.png",
     className: "h-[64px] sm:h-[72px]",
   },
   {
@@ -25,22 +25,22 @@ const clientLogos: LogoItem[] = [
   },
   {
     name: "Growth School",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/growthschool_-_Copy_iip2zr.png",
+    src: "/newLogo/growthschool.png",
     className: "h-[40px] sm:h-[48px]",
   },
   {
     name: "Plum",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/plum_logo_lstdop.png",
+    src: "/newLogo/plum%20logo.png",
     className: "h-[48px] sm:h-[56px]",
   },
   {
     name: "Study IQ",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/study_iq_xdxdkd.png",
+    src: "/newLogo/study%20iq.png",
     className: "h-[56px] sm:h-[56px] translate-x-2 sm:translate-x-4",
   },
   {
     name: "Truly Madly",
-    src: "https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/truly_madly_b78smk.png",
+    src: "/newLogo/truly%20madly.png",
     className: "h-[64px] sm:h-[64px]",
   },
 ];
