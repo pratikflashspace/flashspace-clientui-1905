@@ -340,12 +340,12 @@ export default function PackageDetail() {
                 <div className="py-2 px-2 overflow-hidden">
                   <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
                     <img src="/newLogo/agrizy.png" alt="Agrizy" className="h-20 object-contain hover:scale-105 transition-all" />
-                    <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/plum_logo_lstdop.png" alt="Plum" className="h-14 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-14 object-contain hover:scale-105 transition-all" />
                     <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-20 object-contain hover:scale-105 transition-all" />
-                    <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/truly_madly_b78smk.png" alt="Truly Madly" className="h-16 object-contain hover:scale-105 transition-all" />
-                    <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/study_iq_xdxdkd.png" alt="Study IQ" className="h-16 object-contain hover:scale-105 transition-all" />
-                    <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528434/Adda247_bbmaft.png" alt="Adda247" className="h-12 object-contain hover:scale-105 transition-all" />
-                    <img src="https://res.cloudinary.com/dpowv0tmd/image/upload/v1774528435/growthschool_-_Copy_iip2zr.png" alt="Growth School" className="h-10 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/truly%20madly.png" alt="Truly Madly" className="h-16 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/study%20iq.png" alt="Study IQ" className="h-16 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/Adda247.png" alt="Adda247" className="h-12 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/growthschool.png" alt="Growth School" className="h-10 object-contain hover:scale-105 transition-all" />
                   </div>
                 </div>
               </div>
