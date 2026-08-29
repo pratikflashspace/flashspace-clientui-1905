@@ -1,0 +1,32 @@
+# FlashSpace
+
+> Virtual offices, coworking spaces, and business setup & compliance services across
+> 23 cities and states in India. Virtual office plans start at Rs.800/month and include
+> the NOC, rent agreement and utility bill required for GST and company registration.
+
+## What FlashSpace does
+
+- **Virtual Offices** — Premium business addresses for GST registration, company
+  incorporation (ROC), and mail handling. Documentation is provided for GST/MCA
+  verification. Live within 24 hours.
+- **Coworking Spaces** — Hot desks, dedicated desks, private cabins and meeting rooms
+  on daily, monthly and annual terms.
+- **Business Setup & Compliance** — Company registration, GST filing, trade licences,
+  annual compliance, bookkeeping, and US LLC formation.
+
+## Key facts
+
+- Entry price: Rs.800/month for a virtual office
+- Coverage: 23 cities and states across India
+- Support: support@flashspace.ai
+- Virtual offices are legal in India for GST registration and company incorporation,
+  provided the NOC, rent agreement and utility bill are in order.
+
+## Core pages
+
+- [Virtual Office](https://www.flashspace.ai/services/virtual-office): Addresses for GST and company registration
+- [Coworking Space](https://www.flashspace.ai/services/coworking-space): Flexible workspace across India
+- [OneCRM](https://www.flashspace.ai/solutions/one-crm): Lead management and sales pipeline
+- [GST Calculator](https://www.flashspace.ai/calculators/gst)
+- [Income Tax Calculator](https://www.flashspace.ai/calculators/income-tax)
+- [About](https://www.flashspace.ai/about)

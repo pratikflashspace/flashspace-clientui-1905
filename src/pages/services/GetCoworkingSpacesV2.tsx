@@ -4,6 +4,9 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { slugToCity, cityToSlug } from "@/lib/seo/cities";
+import { coworkingCityMeta, coworkingIndexMeta } from "@/lib/seo/metadata";
+import useSeo from "@/hooks/useSeo";
 import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
 import {
@@ -896,8 +899,7 @@ const WorkspaceCard = ({
 
 const GetWorkspacesV2 = () => {
   useEffect(() => {
-    document.title = "Coworking Space in India — Book Hot Desks & Private Cabins | FlashSpace";
-      window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
   }, []);
 
   const location = useLocation();
@@ -906,11 +908,22 @@ const GetWorkspacesV2 = () => {
   const { user, isAuthenticated } = useAuth();
   const searchParams = new URLSearchParams(location.search);
 
-  const formattedUrlCity = urlCity
-    ? urlCity.charAt(0).toUpperCase() + urlCity.slice(1).toLowerCase()
-    : null;
+  // Resolve the slug against the canonical city list. The previous
+  // charAt(0).toUpperCase() approach turned "himachal-pradesh" into
+  // "Himachal-pradesh", which matched no city, so every multi-word city
+  // silently rendered the generic fallback page.
+  const formattedUrlCity = slugToCity(urlCity, "coworking");
 
   const initialCity = formattedUrlCity || searchParams.get("city") || "Delhi";
+
+  // Per-city title, description, canonical and OG tags. Previously every city
+  // page shared one title that said "in India".
+  const seoCity = formattedUrlCity ?? slugToCity(searchParams.get("city") ?? undefined, "coworking");
+  useSeo(
+    seoCity
+      ? coworkingCityMeta(seoCity, cityToSlug(seoCity))
+      : coworkingIndexMeta()
+  );
   const checkoutReturnTo = `${location.pathname}${location.search}${location.hash}`;
 
   const getInitialType = () => {
