@@ -3,9 +3,16 @@
 User-agent: *
 Allow: /
 
-# Block the duplicate query-parameter form of the city pages.
-# Canonical form is /services/{service}/{city}
-Disallow: /*?city=
+# Search Console shows these indexed; they should not be.
+Disallow: /admin
+Disallow: /login
+Disallow: /coming-soon
+Disallow: /spacePortal
+
+# The ?city= form is deliberately left crawlable. Those URLs hold all of the
+# site's current city-page impressions, and they now carry a canonical pointing
+# at /services/{service}/{city}. Blocking them here would stop Googlebot from
+# reading that canonical and consolidating the signals onto the path form.
 
 # AI crawlers — explicitly allowed
 User-agent: GPTBot
