@@ -203,7 +203,11 @@ import { useChat, ChatMessage } from "@/contexts/ChatContext";
 
 // Backend chat endpoint (backend calls AI backend internally)
 const BACKEND_CHAT_URL = "/api/chat/send";
-const GUEST_CHAT_URL = "/api/chat/guest";
+// Guest chat: served by the FlashSpace AI Stack on Render
+// (web server's guest AI upstream is down; this stack runs the same FlashSpace-AI app
+//  with a JWT-minting guest gateway. Logged-in users still go through the web server.)
+const GUEST_AI_STACK_URL = "https://flashspace-ai-stack.onrender.com/guest/chat";
+const GUEST_CHAT_URL = GUEST_AI_STACK_URL;
     
 interface SidebarMenuItem {
   label: string;
@@ -1338,7 +1342,8 @@ const StartChatting = () => {
     try {
       const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
       const targetPath = isAuthenticated ? BACKEND_CHAT_URL : GUEST_CHAT_URL;
-      const targetUrl = `${API_CONFIG.BASE_URL}${targetPath}`;
+      // GUEST_CHAT_URL is absolute (AI stack on Render); only prefix BASE_URL for relative web-server paths.
+      const targetUrl = targetPath.startsWith('http') ? targetPath : `${API_CONFIG.BASE_URL}${targetPath}`;
       
       const prompt = `Summarize this text in 2 to 4 words for a chat title. Do not include quotes or any extra text. Text: "${messageText}"`;
       
@@ -1347,7 +1352,7 @@ const StartChatting = () => {
         headers: {
           'Content-Type': 'application/json',
           'x-flashspace-csrf': 'true',
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          ...(accessToken && !targetPath.startsWith('http') ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
           message: prompt,
@@ -1418,16 +1423,19 @@ const StartChatting = () => {
       const sessionId = getSessionId();
 
       const targetPath = isAuthenticated ? BACKEND_CHAT_URL : GUEST_CHAT_URL;
-      const targetUrl = `${API_CONFIG.BASE_URL}${targetPath}`;
+      // GUEST_CHAT_URL is absolute (AI stack on Render); only prefix BASE_URL for relative web-server paths.
+      const targetUrl = targetPath.startsWith('http') ? targetPath : `${API_CONFIG.BASE_URL}${targetPath}`;
 
       // Call backend chat endpoint (backend calls AI backend internally)
+      // credentials/auth-header only apply to the same-origin web-server path; the guest
+      // AI stack on Render is cross-origin and needs no cookies or bearer token.
       const response = await fetch(targetUrl, {
         method: 'POST',
-        credentials: 'include',
+        ...(targetPath.startsWith('http') ? {} : { credentials: 'include' as RequestCredentials }),
         headers: {
           'Content-Type': 'application/json',
           'x-flashspace-csrf': 'true',
-          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          ...(accessToken && !targetPath.startsWith('http') ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
           message: userMessage.content,
