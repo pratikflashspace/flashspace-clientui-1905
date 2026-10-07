@@ -8,7 +8,7 @@ const sections = [
     title: "Legal Compliance & Digital Record",
     body: [
       "This document is an electronic record under the Information Technology Act, 2000 and its applicable rules. Being computer-generated, it does not require physical or digital signatures. It is published in compliance with Rule 3 (1) of the IT (Intermediaries Guidelines) Rules, 2011.",
-      'The domain www.flashspace.ai is owned by Stirring Minds Private Limited, incorporated under the Companies Act, 1956, with its head office at Kundan Mansion, 2-A/3, Asaf Ali Rd, Turkman Gate, Chandni Chowk, New Delhi, Delhi, 110002.',
+      'The domain www.flashspace.ai is owned by Elivo LLP.',
     ],
   },
   {
@@ -17,7 +17,7 @@ const sections = [
     body: [
       "By using this Website, you enter into a binding contract with FlashSpace. Your usage is governed by these Terms of Use and all incorporated policies.",
       '"You" or "User": Any person or entity using the platform.',
-      '"We", "Us", or "Our": FlashSpace Realtech Private Limited.',
+      '"We", "Us", or "Our": Elivo LLP.',
       "We reserve the right to modify these terms at any time without prior notice. It is your responsibility to check for updates; continued use signifies your acceptance of any changes.",
     ],
   },
