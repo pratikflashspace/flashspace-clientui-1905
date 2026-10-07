@@ -201,12 +201,12 @@ interface ContactForm {
 // ChatMessage now comes from ChatContext
 import { useChat, ChatMessage } from "@/contexts/ChatContext";
 
-// Backend chat endpoint (backend calls AI backend internally)
-const BACKEND_CHAT_URL = "/api/chat/send";
-// Guest chat: served by the FlashSpace AI Stack on Render
-// (web server's guest AI upstream is down; this stack runs the same FlashSpace-AI app
-//  with a JWT-minting guest gateway. Logged-in users still go through the web server.)
+// Chat endpoint: FlashSpace AI Stack on Render (web server's AI upstream on the VPS
+// is dead -> 502 for both guest and logged-in sends). The stack runs the same
+// FlashSpace-AI app with a JWT-minting gateway; chat-history persistence still goes
+// through the web server (chatService.saveSession -> POST /api/chat) with cookies.
 const GUEST_AI_STACK_URL = "https://flashspace-ai-stack.onrender.com/guest/chat";
+const BACKEND_CHAT_URL = GUEST_AI_STACK_URL;
 const GUEST_CHAT_URL = GUEST_AI_STACK_URL;
     
 interface SidebarMenuItem {
