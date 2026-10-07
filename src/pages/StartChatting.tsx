@@ -91,11 +91,11 @@ const MessageMarkdown: React.FC<{ text: string }> = ({ text }) => {
         const bodyRows = content.slice(1).map(parse);
         out.push(
           <div key={`tbl-${key++}`} className="my-3 overflow-x-auto">
-            <table className="w-full text-[13px] sm:text-[14px] border-collapse">
+            <table className="w-full text-[13px] sm:text-[14px] border border-gray-200 dark:border-gray-700 border-collapse rounded-lg overflow-hidden">
               <thead>
                 <tr className="bg-[#35503F]/10 dark:bg-emerald-900/30">
                   {header.map((h, hi) => (
-                    <th key={hi} className="px-3 py-2 text-left font-semibold text-[#35503F] dark:text-emerald-300 border-b-2 border-[#35503F]/30 whitespace-nowrap">
+                    <th key={hi} className="px-3 py-2 text-left font-semibold text-[#1A2D1D] dark:text-emerald-200 bg-[#E8EFE9] dark:bg-emerald-900/50 border border-gray-200 dark:border-gray-700 whitespace-nowrap">
                       {renderInline(h, `th-${key}-${hi}`)}
                     </th>
                   ))}
@@ -103,9 +103,9 @@ const MessageMarkdown: React.FC<{ text: string }> = ({ text }) => {
               </thead>
               <tbody>
                 {bodyRows.map((r, ri) => (
-                  <tr key={ri} className={ri % 2 === 0 ? "bg-transparent" : "bg-gray-50/60 dark:bg-gray-800/40"}>
+                  <tr key={ri} className="bg-white dark:bg-gray-800/30 hover:bg-[#F3F7F4] dark:hover:bg-emerald-900/20 transition-colors">
                     {r.map((c, ci) => (
-                      <td key={ci} className="px-3 py-2 border-b border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-200 whitespace-nowrap">
+                      <td key={ci} className="px-3 py-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 whitespace-nowrap">
                         {renderInline(c, `td-${key}-${ri}-${ci}`)}
                       </td>
                     ))}
