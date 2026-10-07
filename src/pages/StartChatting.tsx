@@ -40,6 +40,101 @@ import SpaceDetailsModal from '@/components/chat/SpaceDetailsModal';
 import { SpaceDetailsSidebar } from '@/components/Map/SpaceDetailsSidebar';
 
 // [NEW] Custom Text Formatter to handle bold text, URLs, Images, and PDFs
+// Renders AI markdown neatly: tables, headings, bullets, bold, links.
+const renderInline = (text: string, keyPrefix: string) => {
+  const urlRegex = /(https?:\/\/[^\s)]+)/g;
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    const key = `${keyPrefix}-${i}`;
+    if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+      return <strong key={key}>{part.slice(2, -2)}</strong>;
+    }
+    const sub = part.split(urlRegex);
+    return (
+      <span key={key}>
+        {sub.map((s, j) =>
+          urlRegex.test(s) ? (
+            <a key={`${key}-${j}`} href={s} target="_blank" rel="noopener noreferrer" className="text-[#35503F] dark:text-emerald-400 underline underline-offset-2">{s}</a>
+          ) : (
+            <span key={`${key}-${j}`}>{s}</span>
+          )
+        )}
+      </span>
+    );
+  });
+};
+
+const MessageMarkdown: React.FC<{ text: string }> = ({ text }) => {
+  if (!text) return null;
+  // Split into table blocks and regular text
+  const blocks = text.split(/(\n)?((?:^\|[^\n]+\|\s*\n)+\|[-\s|:]+\|(?:\n\|[^\n]+\|)*)/gm);
+  const out: React.ReactNode[] = [];
+  let bi = 0;
+  for (let idx = 0; idx < blocks.length; idx++) {
+    const block = blocks[idx];
+    if (!block) continue;
+    if (block.trim().startsWith('|')) {
+      // parse table
+      const rows = block.trim().split('\n').map(r => r.trim()).filter(Boolean);
+      const parse = (r: string) => r.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+      const header = parse(rows[0]);
+      const bodyRows = rows.slice(2).map(parse);
+      out.push(
+        <div key={`tbl-${bi++}`} className="my-3 overflow-x-auto">
+          <table className="w-full text-[13px] sm:text-[14px] border-collapse">
+            <thead>
+              <tr className="bg-[#35503F]/10 dark:bg-emerald-900/30">
+                {header.map((h, hi) => (
+                  <th key={hi} className="px-3 py-2 text-left font-semibold text-[#35503F] dark:text-emerald-300 border-b-2 border-[#35503F]/30">{renderInline(h, `th-${hi}`)}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {bodyRows.map((r, ri) => (
+                <tr key={ri} className={ri % 2 === 0 ? 'bg-transparent' : 'bg-gray-50/60 dark:bg-gray-800/40'}>
+                  {r.map((c, ci) => (
+                    <td key={ci} className="px-3 py-2 border-b border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-200">{renderInline(c, `td-${ri}-${ci}`)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    } else {
+      // text block: handle headings and bullets line-by-line
+      const lines = block.split('\n');
+      lines.forEach((line, li) => {
+        const trimmed = line.trim();
+        if (!trimmed) { out.push(<div key={`sp-${bi}-${li}`} className="h-1.5" />); return; }
+        const headingMatch = trimmed.match(/^(#{1,4})\s+(.*)$/);
+        if (headingMatch) {
+          const level = headingMatch[1].length;
+          out.push(
+            <div key={`h-${bi}-${li}`} className={`${level <= 2 ? 'text-[17px] sm:text-[18px]' : 'text-[15.5px] sm:text-[16px]'} font-bold mt-3 mb-1 text-[#35503F] dark:text-emerald-300`}>
+              {renderInline(headingMatch[2], `hd-${bi}-${li}`)}
+            </div>
+          );
+          return;
+        }
+        const bulletMatch = trimmed.match(/^[-*•]\s+(.*)$/);
+        if (bulletMatch) {
+          out.push(
+            <div key={`li-${bi}-${li}`} className="flex items-start gap-2 my-0.5 pl-1">
+              <span className="text-[#35503F] dark:text-emerald-400 mt-[7px] shrink-0 w-1.5 h-1.5 rounded-full bg-current" />
+              <span>{renderInline(bulletMatch[1], `bl-${bi}-${li}`)}</span>
+            </div>
+          );
+          return;
+        }
+        out.push(<div key={`p-${bi}-${li}`}>{renderInline(line, `pp-${bi}-${li}`)}</div>);
+      });
+    }
+    bi++;
+  }
+  return <>{out}</>;
+};
+
 const formatMessage = (text: string) => {
   if (!text) return null;
 
@@ -170,8 +265,8 @@ const TypewriterEffect = ({ text, onComplete }: { text: string; onComplete?: () 
   }, [text]); // Removed onComplete to prevent restart loops
 
   return (
-    <div className="text-[16px] leading-[1.8] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium text-gray-800 font-sans">
-      {formatMessage(displayedText)}
+    <div className="text-[16px] leading-[1.8] tracking-[-0.01em] break-words font-medium text-gray-800 font-sans">
+      <MessageMarkdown text={displayedText} />
     </div>
   );
 };
@@ -1940,9 +2035,9 @@ const StartChatting = () => {
                               onComplete={() => handleTypingComplete(msg.id)}
                             />
                           ) : (
-                            <div className={`text-[16px] tracking-[-0.01em] whitespace-pre-wrap break-words font-medium font-sans ${msg.role === 'user' ? 'text-white leading-[1.5]' : 'text-gray-800 dark:text-gray-100 leading-[1.8]'
+                            <div className={`text-[16px] tracking-[-0.01em] break-words font-medium font-sans ${msg.role === 'user' ? 'text-white leading-[1.5] whitespace-pre-wrap' : 'text-gray-800 dark:text-gray-100 leading-[1.8]'
                               }`}>
-                              {formatMessage(msg.content)}
+                              {msg.role === 'user' ? formatMessage(msg.content) : <MessageMarkdown text={msg.content} />}
                             </div>
                           )}
                         </div>
