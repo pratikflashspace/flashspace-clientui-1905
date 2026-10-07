@@ -123,7 +123,7 @@ export const FooterSEO = () => {
         
         <div className="mt-12 pt-8 border-t border-gray-300">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-[0.2em]">
-            © {new Date().getFullYear()} Stirring Minds Services Private Limited.
+            © {new Date().getFullYear()} Elivo LLP.
           </p>
         </div>
 
