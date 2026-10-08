@@ -496,7 +496,10 @@ const MapLibreMap: React.FC<MapLibreMapProps> = ({
               <div>
                 <span style="font-size: 9px; color: #888; display: block;">Starting from</span>
                 <span style="font-size: 13px; font-weight: 700; color: #1a1a1a;">
-                  ${markerData.price ? markerData.price.replace(/\/month.*/, '') : 'Ask for Price'}
+                  ${markerData.price
+                    ? (() => { const p = String(markerData.price); const n = Number(p.replace(/[^0-9.]/g, ''));
+                        return isNaN(n) ? p : `₹${n.toLocaleString('en-IN')}${p.includes('/yr') || markerData.serviceType === 'Virtual Office' ? '/yr' : '/mo'}`; })()
+                    : 'Ask for Price'}
                 </span>
               </div>
               <button class="view-details-btn" style="
