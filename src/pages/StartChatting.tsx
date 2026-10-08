@@ -1120,11 +1120,13 @@ const StartChatting = () => {
               position: item.coordinates || generateRandomCoordinates(center, 0),
               title: item.spaceId ? "FlashSpace " + item.spaceId : "FlashSpace Center",
               address: item.address,
-              image: item.image,
-              price: serviceType === 'virtual' ? item.gstPlanPrice : (item.price || item.monthlyPrice || item.startingPrice),
-              rating: item.rating || 5.0,
-              reviews: item.reviews || 10,
-              features: item.features || [],
+              image: item.images?.[0] || item.image,
+              price: serviceType === 'virtual'
+                ? (item.finalGstPricePerYear ?? item.gstPlanPrice)
+                : (item.finalPricePerMonth ?? item.price ?? item.monthlyPrice ?? item.startingPrice),
+              rating: item.avgRating ?? item.rating ?? 5.0,
+              reviews: item.totalReviews ?? item.reviews ?? 10,
+              features: item.features || item.amenities || [],
               serviceType: serviceType === 'virtual' ? 'Virtual Office' : 'Coworking Space',
               originalData: item
             }));
@@ -1144,11 +1146,11 @@ const StartChatting = () => {
               position: item.coordinates || generateRandomCoordinates(center, 0),
               title: item.spaceId ? "FlashSpace " + item.spaceId : "FlashSpace Center",
               address: item.address,
-              image: item.image,
-              price: item.gstPlanPrice,
-              rating: item.rating,
-              reviews: item.reviews,
-              features: item.features || [],
+              image: item.images?.[0] || item.image,
+              price: item.finalGstPricePerYear ?? item.gstPlanPrice,
+              rating: item.avgRating ?? item.rating,
+              reviews: item.totalReviews ?? item.reviews,
+              features: item.features || item.amenities || [],
               serviceType: 'Virtual Office',
               originalData: item
             }));
@@ -1159,11 +1161,11 @@ const StartChatting = () => {
               position: item.coordinates || generateRandomCoordinates(center, 0),
               title: item.spaceId ? "FlashSpace " + item.spaceId : "FlashSpace Center",
               address: item.address,
-              image: item.image,
-              price: item.price,
-              rating: item.rating,
-              reviews: item.reviews,
-              features: item.features || [],
+              image: item.images?.[0] || item.image,
+              price: item.finalPricePerMonth ?? item.price,
+              rating: item.avgRating ?? item.rating,
+              reviews: item.totalReviews ?? item.reviews,
+              features: item.features || item.amenities || [],
               serviceType: 'Coworking Space',
               originalData: item
             }));
@@ -1192,7 +1194,17 @@ const StartChatting = () => {
           }
 
           if (aiMatchedResults.length > 0) {
-            results = aiMatchedResults;
+            // SHOW_CARDS from the AI = user wants the city's listings: show the full
+            // city inventory, AI-mentioned spaces first (map + cards mirror the whole city).
+            if (isAIResponse && cityName && cityName !== 'SALES_TEAM' && cityName !== 'SUPPORT_TEAM') {
+              const mentioned = new Set(aiMatchedResults.map((r: any) =>
+                (r.originalData?.spaceId || '').toLowerCase()));
+              const rest = results.filter((r: any) =>
+                !mentioned.has((r.originalData?.spaceId || '').toLowerCase()));
+              results = [...aiMatchedResults, ...rest];
+            } else {
+              results = aiMatchedResults;
+            }
           } else if (areaName) {
             const lowerArea = areaName.toLowerCase();
             const areaFiltered = results.filter(r => 
