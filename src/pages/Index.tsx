@@ -1,4 +1,6 @@
 import Header from "@/components/Header";
+import useSeo from "@/hooks/useSeo";
+import { absoluteUrl, clampDescription } from "@/lib/seo/metadata";
 import { HeroWithSearch } from "@/components/sections/HeroWithSearch";
 import { ScrollNavLayout } from "@/components/sections/ScrollNavLayout";
 import { PlanLocationsShowcase } from "@/components/sections/PlanLocationsShowcase";
@@ -48,8 +50,17 @@ interface IndexProps {
 
 const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
   const navigate = useNavigate();
+
+  useSeo({
+    title:
+      "Virtual Office & Coworking Space in India — GST Registration from \u20b9800/mo | FlashSpace",
+    description: clampDescription(
+      "Virtual offices for GST registration, coworking spaces and business setup across 23 cities in India. GST-ready in 24 hours, from \u20b9800/month."
+    ),
+    canonical: absoluteUrl("/"),
+  });
+
   useEffect(() => {
-    document.title = "FlashSpace";
     let hasOpened = false;
     
     // Auto-open chat widget when scrolling past hero section (Only on Home Page)

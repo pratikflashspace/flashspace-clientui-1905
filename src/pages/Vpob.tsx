@@ -42,7 +42,7 @@ const Vpob = () => {
         provider: {
           '@type': 'Organization',
           name: 'FlashSpace',
-          url: 'https://flashspace.co'
+          url: 'https://www.flashspace.ai'
         },
         description:
           'Virtual Place of Business (VPOB) addresses and Form REG-14 Additional Place of Business (APOB) registration for Amazon FBA and Flipkart Smart Fulfilment sellers across India.'
@@ -52,7 +52,7 @@ const Vpob = () => {
         '@type': 'Offer',
         name: 'FlashSpace Multi-State VPOB & APOB Package',
         availability: 'https://schema.org/InStock',
-        url: 'https://flashspace.co/vpob'
+        url: 'https://www.flashspace.ai/vpob'
       },
       {
         '@context': 'https://schema.org',
