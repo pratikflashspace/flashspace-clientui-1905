@@ -938,7 +938,13 @@ const StartChatting = () => {
   // Helper: Fetch and Update Map
   const updateMapForQuery = async (text: string, isAIResponse: boolean = false, forcedServiceType?: 'virtual' | 'coworking' | 'business_setup' | string, forcedCityName?: string, aiMessageContent?: string) => {
     const { cityName: detectedCityName, areaName, property, serviceType: detectedServiceType } = detectIntents(text);
-    const serviceType = forcedServiceType || detectedServiceType;
+    // Normalize SHOW_CARDS service labels to the internal types: the AI tag uses
+    // 'virtual-office'/'coworking-space', the map code expects 'virtual'/'coworking'.
+    const normalizeService = (s?: string) =>
+      s === 'virtual-office' ? 'virtual' :
+      s === 'coworking-space' ? 'coworking' :
+      s === 'business-setup' ? 'business_setup' : s;
+    const serviceType = normalizeService(forcedServiceType) || detectedServiceType;
     const cityName = forcedCityName || detectedCityName;
 
     if (cityName) {
