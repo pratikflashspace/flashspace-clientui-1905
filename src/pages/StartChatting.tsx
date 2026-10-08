@@ -5,7 +5,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from "@/lib/utils";
 import {
-  Send, Speech, Volume2, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
+  Send, Speech, Volume2, VolumeOff, Mic, Plus, MapPin, Building2, FileText, Briefcase, Users, Menu as MenuIcon,
   Phone, Mail, User, Sparkles, MoreVertical, MessageSquare, MessageCircle, Search, Heart, FolderKanban,
   Bell, Compass, PlusCircle, ArrowRight, ExternalLink, Home, Calendar, Megaphone,
   Settings, MoreHorizontal, X, ArrowLeft, Sun, Moon, History, ChevronDown, LayoutDashboard,
@@ -1419,8 +1419,20 @@ const StartChatting = () => {
     recognition.start();
   };
 
-  // [NEW] Speak Function
-  const handleSpeak = (text: string) => {
+  // [NEW] Speak Function — toggle: clicking again stops narration
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+
+  const stopSpeaking = () => {
+    window.speechSynthesis.cancel();
+    setSpeakingMessageId(null);
+  };
+
+  const handleSpeak = (text: string, messageId?: string) => {
+    // If this message is already being spoken, stop instead of restarting
+    if (messageId && speakingMessageId === messageId) {
+      stopSpeaking();
+      return;
+    }
     window.speechSynthesis.cancel();
 
     // Simple clean up of markdown for better speech
@@ -1447,6 +1459,11 @@ const StartChatting = () => {
     utterance.pitch = 1.1; // Slightly higher for lighter tone
     utterance.rate = 0.95; // Slightly slower for composure
 
+    if (messageId) {
+      setSpeakingMessageId(messageId);
+      utterance.onend = () => setSpeakingMessageId(null);
+      utterance.onerror = () => setSpeakingMessageId(null);
+    }
     window.speechSynthesis.speak(utterance);
   };
 
@@ -1454,6 +1471,7 @@ const StartChatting = () => {
   useEffect(() => {
     return () => {
       window.speechSynthesis.cancel();
+      setSpeakingMessageId(null);
     };
   }, []);
 
@@ -2082,12 +2100,20 @@ const StartChatting = () => {
 
                       {msg.role === 'assistant' && !msg.isTyping && (
                         <button
-                          onClick={() => handleSpeak(msg.content)}
-                          className="opacity-60 hover:opacity-100 transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-[#35503F] shrink-0"
-                          title="Read Aloud"
-                          aria-label="Read message aloud"
+                          onClick={() => handleSpeak(msg.content, msg.id)}
+                          className={`transition-opacity duration-200 p-2 h-fit self-start mt-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0 ${
+                            speakingMessageId === msg.id
+                              ? "opacity-100 text-[#35503F] animate-pulse"
+                              : "opacity-60 hover:opacity-100 text-gray-500 hover:text-[#35503F]"
+                          }`}
+                          title={speakingMessageId === msg.id ? "Stop reading" : "Read Aloud"}
+                          aria-label={speakingMessageId === msg.id ? "Stop reading message aloud" : "Read message aloud"}
                         >
-                          <Volume2 className="w-4 h-4" />
+                          {speakingMessageId === msg.id ? (
+                            <VolumeOff className="w-4 h-4" />
+                          ) : (
+                            <Volume2 className="w-4 h-4" />
+                          )}
                         </button>
                       )}
                     </div>
