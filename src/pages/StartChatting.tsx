@@ -1641,6 +1641,17 @@ const StartChatting = () => {
       } else {
         // Also strip any partial or unmatched SHOW_CARDS tags
         aiResponseText = aiResponseText.replace(/\[SHOW_CARDS:[^\]]*\]?/ig, '').trim();
+
+        // Fallback: the AI listed spaces (FSxx## IDs present) but omitted the SHOW_CARDS tag.
+        // Infer the city/service from the user's message and render cards anyway so the
+        // map and space widgets stay in sync with the reply.
+        if (/\bFS[A-Z]{2,4}\d+/i.test(aiResponseText)) {
+          const { cityName: uc, serviceType: us } = detectIntents(userMessage.content);
+          if (uc) {
+            const svc = (us === 'virtual' || us === 'coworking') ? us : 'virtual';
+            fetchedSpaces = await updateMapForQuery(userMessage.content, true, svc, uc, aiResponseText);
+          }
+        }
       }
 
       // Add AI response to chat
