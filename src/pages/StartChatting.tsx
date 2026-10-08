@@ -1436,7 +1436,24 @@ const StartChatting = () => {
     window.speechSynthesis.cancel();
 
     // Simple clean up of markdown for better speech
-    const cleanText = text.replace(/\*\*/g, '').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+    let cleanText = text.replace(/\*\*/g, '').replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+
+    // Expand shorthand so the voice reads naturally (₹5,500/mo -> rupees 5,500 per month)
+    cleanText = cleanText
+      .replace(/₹\s*/g, 'rupees ')
+      .replace(/\/mo\b/gi, ' per month')
+      .replace(/\/yr\b/gi, ' per year')
+      .replace(/\/month\b/gi, ' per month')
+      .replace(/\/year\b/gi, ' per year')
+      .replace(/\bmo\b/gi, 'month')
+      .replace(/\byr\b/gi, 'year')
+      .replace(/\bGST addr\/yr\b/gi, 'GST address per year')
+      .replace(/\bGST\/yr\b/gi, 'GST per year')
+      .replace(/\bBR\/yr\b/gi, 'business registration per year')
+      .replace(/\b24\/7\b/g, '24 by 7')
+      .replace(/&times;|×/g, ' times ')
+      .replace(/\bFSDL(\d+)\b/g, 'F S D L $1')
+      .replace(/\bFS([A-Z]{2,3})(\d+)\b/g, (m, c, n) => `F S ${c} ${n}`);
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
 
