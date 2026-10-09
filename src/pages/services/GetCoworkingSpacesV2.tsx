@@ -906,9 +906,19 @@ const GetWorkspacesV2 = () => {
   const { user, isAuthenticated } = useAuth();
   const searchParams = new URLSearchParams(location.search);
 
-  const formattedUrlCity = urlCity
-    ? urlCity.charAt(0).toUpperCase() + urlCity.slice(1).toLowerCase()
-    : null;
+  // Slug -> real city name. Fixes case-sensitive multi-word cities like
+  // "himachal-pradesh" -> "Himachal Pradesh" (previously "Himachal-pradesh").
+  const slugToCity = (slug: string): string => {
+    if (/-/.test(slug)) {
+      return slug
+        .split("-")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(" ");
+    }
+    return slug.charAt(0).toUpperCase() + slug.slice(1).toLowerCase();
+  };
+
+  const formattedUrlCity = urlCity ? slugToCity(urlCity) : null;
 
   const initialCity = formattedUrlCity || searchParams.get("city") || "Delhi";
   const checkoutReturnTo = `${location.pathname}${location.search}${location.hash}`;
