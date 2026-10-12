@@ -152,11 +152,11 @@ export const PackageWorkspaces = ({
                 if (ws.location) {
                   const locLower = ws.location.toLowerCase();
                   if (locLower === 'bangalore' || locLower === 'bengaluru') {
-                    images[0] = '/newLogo/banglore.jpg';
+                    images[0] = '/newLogo/banglore.webp';
                   } else if (locLower === 'gurgaon' || locLower === 'gurugram') {
-                    images[0] = '/newLogo/gurgaon.jpg';
+                    images[0] = '/newLogo/gurgaon.webp';
                   } else if (locLower === 'noida') {
-                    images[0] = '/newLogo/noida.jpg';
+                    images[0] = '/newLogo/noida.webp';
                   }
                 }
 
@@ -223,11 +223,11 @@ export const PackageWorkspaces = ({
                       <h3 className="text-[13px] font-bold text-gray-500 mb-3 uppercase tracking-wider text-center">Trusted by 5000+ businesses</h3>
                       <div className="bg-[#F0F4EE]/50 rounded-2xl p-6 border border-[#D4E0D0] shadow-sm text-center overflow-hidden">
                         <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-10">
-                          <img src="/newLogo/agrizy.png" alt="Agrizy" className="h-12 md:h-14 object-contain mix-blend-multiply" />
-                          <img src="/newLogo/Adda247.png" alt="Adda247" className="h-9 md:h-11 object-contain mix-blend-multiply" />
-                          <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-10 md:h-12 object-contain mix-blend-multiply" />
-                          <img src="/newLogo/growthschool.png" alt="Growth School" className="h-6 md:h-7 object-contain mix-blend-multiply" />
-                          <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-9 md:h-11 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/agrizy.webp" alt="Agrizy" className="h-12 md:h-14 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/Adda247.webp" alt="Adda247" className="h-9 md:h-11 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/flipkart-logo-png_seeklogo-284422.webp" alt="Flipkart" className="h-10 md:h-12 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/growthschool.webp" alt="Growth School" className="h-6 md:h-7 object-contain mix-blend-multiply" />
+                          <img src="/newLogo/plum%20logo.webp" alt="Plum" className="h-9 md:h-11 object-contain mix-blend-multiply" />
                           <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-10 md:h-12 object-contain mix-blend-multiply" />
                         </div>
                       </div>

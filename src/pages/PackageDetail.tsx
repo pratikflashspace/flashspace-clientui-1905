@@ -20,7 +20,7 @@ const INITIAL_MOCK_SPACES: Record<string, { id: string, name: string, location: 
     { id: "FSGUR01", name: "Cyber City Space", location: "Cyber City", coordinates: [77.0860, 28.4900], image: "/virtual-office.png" }
   ],
   Bangalore: [
-    { id: "FSBLR01", name: "Startup Valley", location: "Koramangala", coordinates: [77.6200, 12.9352], image: "/newLogo/banglore.jpg" }
+    { id: "FSBLR01", name: "Startup Valley", location: "Koramangala", coordinates: [77.6200, 12.9352], image: "/newLogo/banglore.webp" }
   ]
 };
 
@@ -210,9 +210,9 @@ export default function PackageDetail() {
                   <div className="grid sm:grid-cols-2 gap-6">
                     {[
                       { city: "Delhi", price: "1025", image: "/to_cloudinary/delhi_city_1782458486025.png" },
-                      { city: "Gurgaon", price: "1158", image: "/newLogo/gurgaon.jpg" },
-                      { city: "Noida", price: "1000", image: "/newLogo/noida.jpg" },
-                      { city: "Bangalore", price: "1117", image: "/newLogo/banglore.jpg" }
+                      { city: "Gurgaon", price: "1158", image: "/newLogo/gurgaon.webp" },
+                      { city: "Noida", price: "1000", image: "/newLogo/noida.webp" },
+                      { city: "Bangalore", price: "1117", image: "/newLogo/banglore.webp" }
                     ].map((item) => (
                       <div 
                         key={item.city} 
@@ -339,13 +339,13 @@ export default function PackageDetail() {
                 </div>
                 <div className="py-2 px-2 overflow-hidden">
                   <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
-                    <img src="/newLogo/agrizy.png" alt="Agrizy" className="h-20 object-contain hover:scale-105 transition-all" />
-                    <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-14 object-contain hover:scale-105 transition-all" />
-                    <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-20 object-contain hover:scale-105 transition-all" />
-                    <img src="/newLogo/truly%20madly.png" alt="Truly Madly" className="h-16 object-contain hover:scale-105 transition-all" />
-                    <img src="/newLogo/study%20iq.png" alt="Study IQ" className="h-16 object-contain hover:scale-105 transition-all" />
-                    <img src="/newLogo/Adda247.png" alt="Adda247" className="h-12 object-contain hover:scale-105 transition-all" />
-                    <img src="/newLogo/growthschool.png" alt="Growth School" className="h-10 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/agrizy.webp" alt="Agrizy" className="h-20 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/plum%20logo.webp" alt="Plum" className="h-14 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/flipkart-logo-png_seeklogo-284422.webp" alt="Flipkart" className="h-20 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/truly%20madly.webp" alt="Truly Madly" className="h-16 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/study%20iq.webp" alt="Study IQ" className="h-16 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/Adda247.webp" alt="Adda247" className="h-12 object-contain hover:scale-105 transition-all" />
+                    <img src="/newLogo/growthschool.webp" alt="Growth School" className="h-10 object-contain hover:scale-105 transition-all" />
                   </div>
                 </div>
               </div>

@@ -10,37 +10,37 @@ interface LogoItem {
 const clientLogos: LogoItem[] = [
   {
     name: "Agrizy",
-    src: "/newLogo/agrizy.png",
+    src: "/newLogo/agrizy.webp",
     className: "h-[72px] sm:h-[64px]", // Increased heights for mobile
   },
   {
     name: "Adda247",
-    src: "/newLogo/Adda247.png",
+    src: "/newLogo/Adda247.webp",
     className: "h-[64px] sm:h-[72px]",
   },
   {
     name: "Flipkart",
-    src: "/newLogo/flipkart-logo-png_seeklogo-284422.png",
+    src: "/newLogo/flipkart-logo-png_seeklogo-284422.webp",
     className: "h-[86px] sm:h-[72px]",
   },
   {
     name: "Growth School",
-    src: "/newLogo/growthschool.png",
+    src: "/newLogo/growthschool.webp",
     className: "h-[40px] sm:h-[48px]",
   },
   {
     name: "Plum",
-    src: "/newLogo/plum%20logo.png",
+    src: "/newLogo/plum%20logo.webp",
     className: "h-[48px] sm:h-[56px]",
   },
   {
     name: "Study IQ",
-    src: "/newLogo/study%20iq.png",
+    src: "/newLogo/study%20iq.webp",
     className: "h-[56px] sm:h-[56px] translate-x-2 sm:translate-x-4",
   },
   {
     name: "Truly Madly",
-    src: "/newLogo/truly%20madly.png",
+    src: "/newLogo/truly%20madly.webp",
     className: "h-[64px] sm:h-[64px]",
   },
 ];
@@ -67,7 +67,7 @@ export const TrustedByFilmstripMobile = () => {
                 index === clientLogos.length - 1 && clientLogos.length % 2 !== 0 ? 'col-span-2' : ''
               }`}
             >
-              <img
+              <img loading="lazy"
                 src={logo.src}
                 alt={logo.name}
                 className={`${logo.className} w-auto max-w-full object-contain brightness-105 contrast-[1.1] transition-all duration-300`}

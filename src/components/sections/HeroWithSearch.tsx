@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Sparkles } from "lucide-react";
 
-const heroImage = "https://res.cloudinary.com/davqpypmw/image/upload/v1780035710/flashspace_homepage/qm9lp632cwyizdnsd95t.png";
+const heroImage = "/hero-optimized.webp"; // was 2.18MB cloudinary PNG; now 116KB webp (LCP fix)
 const popularCities = ["Ahmedabad", "Bangalore", "Chennai", "Delhi", "Gurgaon", "Hyderabad", "Mumbai", "Noida", "Pune"];
 const otherCities = ["Agra", "Chandigarh", "Jaipur", "Kochi", "Kolkata"];
 
@@ -292,7 +292,7 @@ export const HeroWithSearch = () => {
         {/* Desktop Image */}
         <div className="hidden lg:block">
           <div className="aspect-[3/2] overflow-hidden rounded-[20px] border border-[#D4E0D0] bg-[#FAFAF7]">
-            <img src={heroImage} alt="Modern FlashSpace workspace" className="h-full w-full object-cover" />
+            <img width={1536} height={1024} fetchPriority="high" loading="eager" src={heroImage} alt="Modern FlashSpace workspace" className="h-full w-full object-cover" />
           </div>
         </div>
       </div>

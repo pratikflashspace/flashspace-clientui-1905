@@ -1946,12 +1946,12 @@ const GetWorkspacesV2 = () => {
                               5,000+ {(workspaceType === "coworking-space" || workspaceType === "coworking") ? "Virtual Office" : "Coworking Space"} clients served
                             </h3>
                             <div className="flex justify-between items-center gap-x-2 gap-y-4 opacity-90 transition-all duration-300 border border-border/60 rounded-xl bg-white shadow-sm px-6 sm:px-10 py-5 w-full overflow-hidden">
-                              <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-8 sm:h-12 object-contain shrink-0" />
-                              <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-12 sm:h-16 object-contain shrink-0" />
+                              <img src="/newLogo/plum%20logo.webp" alt="Plum" className="h-8 sm:h-12 object-contain shrink-0" />
+                              <img src="/newLogo/flipkart-logo-png_seeklogo-284422.webp" alt="Flipkart" className="h-12 sm:h-16 object-contain shrink-0" />
                               <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-5 sm:h-7 object-contain shrink-0" />
                               <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 sm:h-12 object-contain shrink-0" />
-                              <img src="/newLogo/Adda247.png" alt="Adda247" className="h-8 sm:h-12 object-contain shrink-0" />
-                              <img src="/newLogo/growthschool.png" alt="GrowthSchool" className="h-6 sm:h-9 object-contain shrink-0" />
+                              <img src="/newLogo/Adda247.webp" alt="Adda247" className="h-8 sm:h-12 object-contain shrink-0" />
+                              <img src="/newLogo/growthschool.webp" alt="GrowthSchool" className="h-6 sm:h-9 object-contain shrink-0" />
                             </div>
                           </div>
                         )}
@@ -2154,11 +2154,11 @@ const GetWorkspacesV2 = () => {
                             5,000+ {(workspaceType === "coworking-space" || workspaceType === "coworking") ? "Virtual Office" : "Coworking Space"} clients served
                           </h3>
                           <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-4 opacity-90 border border-border/60 rounded-xl bg-white shadow-sm px-4 py-4 w-full overflow-hidden">
-                            <img src="/newLogo/plum%20logo.png" alt="Plum" className="h-6 object-contain shrink-0" />
-                            <img src="/newLogo/flipkart-logo-png_seeklogo-284422.png" alt="Flipkart" className="h-10 object-contain shrink-0" />
+                            <img src="/newLogo/plum%20logo.webp" alt="Plum" className="h-6 object-contain shrink-0" />
+                            <img src="/newLogo/flipkart-logo-png_seeklogo-284422.webp" alt="Flipkart" className="h-10 object-contain shrink-0" />
                             <img src="https://cdni.trulymadly.com/tm-static-assets-production/web/logo.webp" alt="Truly Madly" className="h-5 object-contain shrink-0" />
                             <img src="/Logo/StudyIQ.png" alt="Study IQ" className="h-8 object-contain shrink-0" />
-                            <img src="/newLogo/Adda247.png" alt="Adda247" className="h-8 object-contain shrink-0" />
+                            <img src="/newLogo/Adda247.webp" alt="Adda247" className="h-8 object-contain shrink-0" />
                           </div>
                         </div>
                       )}

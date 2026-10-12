@@ -32,7 +32,7 @@ const locations = [
     id: 'bangalore',
     title: 'Virtual Office Address in Bangalore for GST Registration',
     price: '1117', // 13400 / 12
-    image: '/newLogo/banglore.jpg',
+    image: '/newLogo/banglore.webp',
   },
   {
     id: 'kolkata',

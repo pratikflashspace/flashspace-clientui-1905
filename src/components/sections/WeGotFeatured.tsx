@@ -9,16 +9,16 @@ interface LogoItem {
 }
 
 const pressLogos: LogoItem[] = [
-  { name: "BBC", src: "/newLogo/bbb.png", customImageClass: "h-14 sm:h-16" },
-  { name: "Hindustan Times", src: "/newLogo/Hindustan_Times_Logo.png", customImageClass: "h-4 sm:h-12 lg:h-20" },
-  { name: "BW Businessworld", src: "/newLogo/businessworld.png", customImageClass: "h-4 sm:h-18 lg:h-8" },
+  { name: "BBC", src: "/newLogo/bbb.webp", customImageClass: "h-14 sm:h-16" },
+  { name: "Hindustan Times", src: "/newLogo/Hindustan_Times_Logo.webp", customImageClass: "h-4 sm:h-12 lg:h-20" },
+  { name: "BW Businessworld", src: "/newLogo/businessworld.webp", customImageClass: "h-4 sm:h-18 lg:h-8" },
   { name: "Entrepreneur", styleClass: "font-sans font-medium text-sm md:text-xl tracking-widest uppercase" },
-  { name: "Inc42", src: "/newLogo/inc42.png", customImageClass: "h-6 sm:h-16 lg:h-8" },
-  { name: "The Guardian", src: "/newLogo/theGuardian.png" , customImageClass: "h-6 sm:h-6 lg:h-8"},
-  { name: "Times of India", src: "/newLogo/TOI.png", customImageClass: "h-14 sm:h-20 lg:h-16" },
-  { name: "YourStory", styleClass: "font-sans font-bold text-lg md:text-3xl tracking-tighter", src: "/newLogo/YourStory-Logo.png", customImageClass: "h-10 sm:h-16" },
-  { name: "Zee News", styleClass: "font-sans font-black text-lg md:text-3xl" , src:"/newLogo/zeeNews.jpg", customImageClass: "h-14 sm:h-16"},
-  { name: "Business Standard", src: "/newLogo/business-standard-logo.png", customImageClass: "h-12 sm:h-12 lg:h-18" },
+  { name: "Inc42", src: "/newLogo/inc42.webp", customImageClass: "h-6 sm:h-16 lg:h-8" },
+  { name: "The Guardian", src: "/newLogo/theGuardian.webp" , customImageClass: "h-6 sm:h-6 lg:h-8"},
+  { name: "Times of India", src: "/newLogo/TOI.webp", customImageClass: "h-14 sm:h-20 lg:h-16" },
+  { name: "YourStory", styleClass: "font-sans font-bold text-lg md:text-3xl tracking-tighter", src: "/newLogo/YourStory-Logo.webp", customImageClass: "h-10 sm:h-16" },
+  { name: "Zee News", styleClass: "font-sans font-black text-lg md:text-3xl" , src:"/newLogo/zeeNews.webp", customImageClass: "h-14 sm:h-16"},
+  { name: "Business Standard", src: "/newLogo/business-standard-logo.webp", customImageClass: "h-12 sm:h-12 lg:h-18" },
 ];
 
 const LogoTextCard = ({ logo, index }: { logo: LogoItem; index: number }) => {
@@ -31,7 +31,7 @@ const LogoTextCard = ({ logo, index }: { logo: LogoItem; index: number }) => {
     >
       <div className="relative z-10 flex items-center justify-center transition-all duration-300">
         {logo.src ? (
-          <img
+          <img loading="lazy"
             src={logo.src}
             alt={logo.name}
             className={`${logo.customImageClass || "h-7 sm:h-12"} w-auto object-contain opacity-100 group-hover:scale-110 transition-all duration-300`}

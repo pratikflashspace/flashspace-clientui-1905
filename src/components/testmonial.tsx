@@ -40,7 +40,7 @@ const TestimonialsSection = () => {
     { name: "Study IQ", logo: "/Logo/StudyIQ.png", needsInvert: false },
     {
       name: "Flipkart",
-      logo: "/newLogo/flipkart-logo-png_seeklogo-284422.png",
+      logo: "/newLogo/flipkart-logo-png_seeklogo-284422.webp",
       needsInvert: false,
     },
     {
@@ -157,7 +157,7 @@ const TestimonialsSection = () => {
                     <div
                       className={`${company.needsInvert ? "bg-[#172A3A]" : "bg-white"} border-2 border-gray-200 dark:border-white/10 p-6 w-full h-full flex items-center justify-center hover:shadow-xl transition-all duration-300 rounded-xl group hover:border-[#EDB003] relative overflow-hidden`}
                     >
-                      <img
+                      <img loading="lazy"
                         src={company.logo}
                         alt={company.name}
                         className="max-w-full max-h-full object-contain transition-all duration-300 group-hover:scale-105"
@@ -184,7 +184,7 @@ const TestimonialsSection = () => {
                   key={index}
                   className={`${company.needsInvert ? "bg-[#172A3A]" : "bg-white"} border border-gray-200 dark:border-white/10 p-3 w-full aspect-[3/2] flex items-center justify-center rounded-lg relative overflow-hidden`}
                 >
-                  <img
+                  <img loading="lazy"
                     src={company.logo}
                     alt={company.name}
                     className={`max-w-full max-h-full object-contain ${company.name === 'Flipkart' ? 'scale-[2]' : ''}`}

@@ -10,37 +10,37 @@ interface LogoItem {
 const clientLogos: LogoItem[] = [
   {
     name: "Agrizy",
-    src: "/newLogo/agrizy.png",
+    src: "/newLogo/agrizy.webp",
     className: "h-32 sm:h-24",
   },
   {
     name: "Adda247",
-    src: "/newLogo/Adda247.png",
+    src: "/newLogo/Adda247.webp",
     className: "h-36 sm:h-16",
   },
   {
     name: "Flipkart",
-    src: "/newLogo/flipkart-logo-png_seeklogo-284422.png",
+    src: "/newLogo/flipkart-logo-png_seeklogo-284422.webp",
     className: "h-40 sm:h-24",
   },
   {
     name: "Growth School",
-    src: "/newLogo/growthschool.png",
+    src: "/newLogo/growthschool.webp",
     className: "h-28 sm:h-12",
   },
   {
     name: "Plum",
-    src: "/newLogo/plum%20logo.png",
+    src: "/newLogo/plum%20logo.webp",
     className: "h-28 sm:h-14",
   },
   {
     name: "Study IQ",
-    src: "/newLogo/study%20iq.png",
+    src: "/newLogo/study%20iq.webp",
     className: "h-24 sm:h-16 translate-x-2 sm:translate-x-4",
   },
   {
     name: "Truly Madly",
-    src: "/newLogo/truly%20madly.png",
+    src: "/newLogo/truly%20madly.webp",
     className: "h-36 sm:h-20",
   },
 ];
@@ -67,7 +67,7 @@ const LogoCard = ({ logo, index }: { logo: LogoItem; index: number }) => {
       />
 
       <div className="relative z-10 flex items-center justify-center py-6 px-2 sm:px-4 transition-all duration-500 w-full h-full">
-        <img
+        <img loading="lazy"
           src={logo.src}
           alt={logo.name}
           className={`${logo.className || "h-10 sm:h-14"

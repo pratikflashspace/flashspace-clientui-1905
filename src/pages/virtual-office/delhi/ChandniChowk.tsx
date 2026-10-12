@@ -89,13 +89,13 @@ const ChandniChowk = () => {
   };
 
   const clientLogos = [
-    { name: "Flipkart", src: "/newLogo/flipkart-logo-png_seeklogo-284422.png", scaleClass: "max-h-12 sm:max-h-16" },
-    { name: "Adda247", src: "/newLogo/Adda247.png", scaleClass: "max-h-12 sm:max-h-16" },
-    { name: "Growth School", src: "/newLogo/growthschool.png", scaleClass: "max-h-7 sm:max-h-8" },
-    { name: "Plum", src: "/newLogo/plum%20logo.png", scaleClass: "max-h-10 sm:max-h-12" },
-    { name: "Study IQ", src: "/newLogo/study%20iq.png", scaleClass: "max-h-12 sm:max-h-16" },
-    { name: "Agrizy", src: "/newLogo/agrizy.png", scaleClass: "max-h-12 sm:max-h-16" },
-    { name: "Truly Madly", src: "/newLogo/truly%20madly.png", scaleClass: "max-h-12 sm:max-h-16" },
+    { name: "Flipkart", src: "/newLogo/flipkart-logo-png_seeklogo-284422.webp", scaleClass: "max-h-12 sm:max-h-16" },
+    { name: "Adda247", src: "/newLogo/Adda247.webp", scaleClass: "max-h-12 sm:max-h-16" },
+    { name: "Growth School", src: "/newLogo/growthschool.webp", scaleClass: "max-h-7 sm:max-h-8" },
+    { name: "Plum", src: "/newLogo/plum%20logo.webp", scaleClass: "max-h-10 sm:max-h-12" },
+    { name: "Study IQ", src: "/newLogo/study%20iq.webp", scaleClass: "max-h-12 sm:max-h-16" },
+    { name: "Agrizy", src: "/newLogo/agrizy.webp", scaleClass: "max-h-12 sm:max-h-16" },
+    { name: "Truly Madly", src: "/newLogo/truly%20madly.webp", scaleClass: "max-h-12 sm:max-h-16" },
   ];
 
   const initialFsdl01 = {
