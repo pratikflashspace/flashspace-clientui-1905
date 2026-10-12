@@ -437,7 +437,7 @@ export default function PackageDetail() {
                     </ul>
                   </div>
                   <div className="relative rounded-xl overflow-hidden shadow-lg border border-gray-200 bg-white">
-                     <img src="/homewebsite.png" alt="Website Development" className="w-full h-auto object-cover" />
+                     <img src="/scrollimgs/homewebsite.webp" alt="Website Development" className="w-full h-auto object-cover" />
                   </div>
                 </div>
               </div>
