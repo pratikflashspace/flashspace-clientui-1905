@@ -85,12 +85,16 @@ async function main() {
     for (const route of routes) {
       try {
         await page.goto(BASE + route, { waitUntil: "networkidle0", timeout: 60000 });
-        // wait for the app's data + meta effects: check title is route-specific
+        // Wait until the SPA shows real content (city listing, blog text, or search box)
         await page.waitForFunction(
-          () => document.readyState === "complete",
-          { timeout: 10000 }
+          () => {
+            const t = document.body.innerText || "";
+            const hasContent = t.length > 2500;
+            return hasContent;
+          },
+          { timeout: 20000 }
         ).catch(() => {});
-        await wait(4000);
+        await wait(3000);
         const html = await page.evaluate(() => {
           const d = document.documentElement.cloneNode(true);
           d.querySelectorAll("script[src*='googletagmanager'], script[src*='facebook'], script[src*='connect.facebook']").forEach((s) => s.remove());
