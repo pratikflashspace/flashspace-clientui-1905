@@ -894,17 +894,55 @@ const WorkspaceCard = ({
   );
 };
 
-const GetWorkspacesV2 = () => {
-  useEffect(() => {
-    document.title = "Coworking Space in India — Book Hot Desks & Private Cabins | FlashSpace";
-      window.scrollTo(0, 0);
-  }, []);
+const SEO_META_CW: Record<string, { title: string; description: string }> = {
+  coworking: {
+    title: "Coworking Space in India — Book Hot Desks & Private Cabins | FlashSpace",
+    description:
+      "Book fully equipped coworking spaces across major Indian cities. Hot desks, private cabins, and meeting rooms with transparent pricing on FlashSpace.",
+  },
+  "virtual-office": {
+    title: "Virtual Office for GST Registration in India — From ₹800/mo | FlashSpace",
+    description:
+      "Get a GST-ready virtual office address across India with mail management and instant allocation. Compare premium business addresses from ₹800/month on FlashSpace.",
+  },
+};
 
+const CITY_PAGE_META_CW = (city: string, type: string) => {
+  const isCoworking = type === "coworking";
+  const keyword = isCoworking ? `Coworking Spaces in ${city}` : `Virtual Office in ${city}`;
+  const suffix = isCoworking ? "desks, cabins & meeting rooms" : "GST-ready business address";
+  return {
+    title: `${keyword} — ${suffix} | FlashSpace`,
+    description: isCoworking
+      ? `Compare coworking spaces in ${city}: hot desks, private cabins and meeting rooms with live availability, real photos and transparent pricing on FlashSpace.`
+      : `Compare virtual offices in ${city}: GST-ready premium business addresses with mail management from ₹800/month. Real photos, live availability, instant booking on FlashSpace.`,
+  };
+};
+
+const GetWorkspacesV2 = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { city: urlCity } = useParams<{ city?: string }>();
   const { user, isAuthenticated } = useAuth();
   const searchParams = new URLSearchParams(location.search);
+
+  // Per-city/per-type SEO title + meta description
+  useEffect(() => {
+    const city = urlCity
+      ? urlCity.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ")
+      : null;
+    const type = location.pathname.includes("coworking") ? "coworking" : "virtual-office";
+    const meta = city ? CITY_PAGE_META_CW(city, type) : SEO_META_CW[type];
+    document.title = meta.title;
+    let descEl = document.querySelector('meta[name="description"]');
+    if (!descEl) {
+      descEl = document.createElement("meta");
+      descEl.setAttribute("name", "description");
+      document.head.appendChild(descEl);
+    }
+    descEl.setAttribute("content", meta.description);
+    window.scrollTo(0, 0);
+  }, [urlCity, location.pathname]);
 
   // Slug -> real city name. Fixes case-sensitive multi-word cities like
   // "himachal-pradesh" -> "Himachal Pradesh" (previously "Himachal-pradesh").
@@ -1821,7 +1859,7 @@ const GetWorkspacesV2 = () => {
             {/* Results text */}
             {workspaceType !== "business-setup" && (
               <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-sm text-muted-foreground font-normal">
                   Showing{" "}
                   <span className="font-semibold text-foreground">
                     {sortedWorkspaces.length} of {totalResults} result(s)
@@ -1830,7 +1868,7 @@ const GetWorkspacesV2 = () => {
                   <span className="font-medium text-foreground">
                     {activeCity}
                   </span>
-                </p>
+                </h1>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
                     <button

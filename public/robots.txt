@@ -1,3 +1,4 @@
+# Allow all standard crawlers
 User-agent: Googlebot
 Allow: /
 
@@ -10,5 +11,33 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+# Explicitly welcome AI/LLM crawlers (feeds AI Overviews, ChatGPT, Perplexity, Claude)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Everything else
 User-agent: *
 Allow: /
+
+Sitemap: https://www.flashspace.ai/sitemap.xml
