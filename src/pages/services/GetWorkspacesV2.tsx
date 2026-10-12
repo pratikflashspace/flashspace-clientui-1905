@@ -1700,6 +1700,15 @@ const GetWorkspacesV2 = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Instantly-rendered SEO h1: present before data loads, unique per city */}
+      <h1 className="sr-only">
+        {workspaceType === "coworking"
+          ? `Coworking Spaces in ${activeCity}`
+          : workspaceType === "business-setup"
+            ? "Business Setup & Compliance Services"
+            : `Virtual Office in ${activeCity}`}
+        {" "}— GST-Ready Business Address | FlashSpace
+      </h1>
       <Header />
 
       {/* Desktop: split view — listings left, map right */}
@@ -1856,7 +1865,7 @@ const GetWorkspacesV2 = () => {
             {/* Results text */}
             {workspaceType !== "business-setup" && (
               <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                <h1 className="text-sm text-muted-foreground font-normal">
+                <p className="text-sm text-muted-foreground">
                   Showing{" "}
                   <span className="font-semibold text-foreground">
                     {sortedWorkspaces.length} of {totalResults} result(s)
@@ -1865,7 +1874,7 @@ const GetWorkspacesV2 = () => {
                   <span className="font-medium text-foreground">
                     {activeCity}
                   </span>
-                </h1>
+                </p>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-0.5 bg-muted/60 rounded-full p-0.5">
                     <button
