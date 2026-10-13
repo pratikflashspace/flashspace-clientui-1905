@@ -261,6 +261,18 @@ const TypewriterEffect = ({ text, onComplete }: { text: string; onComplete?: () 
   const speed = 15; // ms per char to simulate GPT streaming
   
   const onCompleteRef = useRef(onComplete);
+  // SEO: keep the chat app out of the index
+  useEffect(() => {
+    const m = document.querySelector('meta[name="robots"]');
+    if (m) { m.setAttribute("content", "noindex, follow"); }
+    else {
+      const meta = document.createElement("meta");
+      meta.name = "robots"; meta.content = "noindex, follow";
+      document.head.appendChild(meta);
+    }
+    return () => { if (m) m.setAttribute("content", "index, follow"); };
+  }, []);
+
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);

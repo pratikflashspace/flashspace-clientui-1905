@@ -73,7 +73,7 @@ export const PlanComparison = () => {
       availability: [false, false, true, true]
     },
     {
-      name: "Pvt Ltd/LLP/OPC Registeration",
+      name: "Pvt Ltd/LLP/OPC Registration",
       availability: [false, false, false, true]
     },
   ];

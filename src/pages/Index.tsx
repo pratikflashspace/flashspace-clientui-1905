@@ -48,6 +48,14 @@ interface IndexProps {
 
 const Index = ({ openLogin = false, openSignup = false }: IndexProps) => {
   const navigate = useNavigate();
+  // SEO: login view should not be indexed separately
+  useEffect(() => {
+    if (!openLogin) return;
+    let m = document.querySelector('meta[name="robots"]');
+    if (!m) { m = document.createElement("meta"); m.name = "robots"; document.head.appendChild(m); }
+    m.setAttribute("content", "noindex, follow");
+  }, [openLogin]);
+
   useEffect(() => {
     document.title = "FlashSpace";
     let hasOpened = false;
