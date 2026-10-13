@@ -58,29 +58,6 @@ async function main() {
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 800 });
 
-    // Proxy /api + /uploads to production (preview server has no backend)
-    await page.setRequestInterception(true);
-    page.on("request", async (req) => {
-      try {
-        const u = new URL(req.url());
-        if (u.origin === BASE && (u.pathname.startsWith("/api") || u.pathname.startsWith("/uploads"))) {
-          const prodUrl = PROD + u.pathname + u.search;
-          const resp = await fetch(prodUrl, {
-            method: req.method(),
-            headers: { "User-Agent": "prerender", "Accept": req.headers()["accept"] || "*/*" },
-            body: ["GET", "HEAD"].includes(req.method()) ? undefined : req.postData(),
-          });
-          const buf = Buffer.from(await resp.arrayBuffer());
-          req.respond({
-            status: resp.status,
-            headers: { "Content-Type": resp.headers.get("content-type") || "application/json", "Access-Control-Allow-Origin": "*" },
-            body: buf,
-          });
-          return;
-        }
-        req.continue();
-      } catch (e) { try { req.continue(); } catch {} }
-    });
 
     let ok = 0, failed = 0;
     for (const route of routes) {
