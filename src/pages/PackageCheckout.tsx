@@ -38,7 +38,7 @@ const PackageCheckout = () => {
     const [paymentLoading, setPaymentLoading] = useState(false);
     const [isDevMode] = useState(import.meta.env.DEV);
 
-    // Pricing
+    // Pricing config for packages
     const prices: Record<string, number> = {
         'basic': 9999,
         'pro': 11999,
