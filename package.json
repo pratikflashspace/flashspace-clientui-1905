@@ -8,8 +8,7 @@
     "build": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "postbuild": "node scripts/copy-prerendered.mjs"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@blocknote/core": "^0.51.4",
