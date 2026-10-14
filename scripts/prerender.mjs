@@ -57,6 +57,17 @@ async function main() {
     });
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 800 });
+    // Rewrite API calls to the origin (bypasses Cloudflare bot checks on www from datacenter IPs)
+    await page.setRequestInterception(true);
+    page.on("request", (req) => {
+      const u = req.url();
+      if (u.startsWith("https://www.flashspace.ai/api/")) {
+        req.continue({ url: u.replace("https://www.flashspace.ai/api/", "https://api.flashspace.co/api/") });
+      } else {
+        req.continue();
+      }
+    });
+
 
 
     let ok = 0, failed = 0;

@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "postbuild": "node scripts/prerender.mjs"
+    "postbuild": "node scripts/copy-prerendered.mjs"
   },
   "dependencies": {
     "@blocknote/core": "^0.51.4",
