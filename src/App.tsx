@@ -273,19 +273,19 @@ const App = () => (
                       />
                       <Route
                         path="/Solutions/virtual-office"
-                        element={<VirtualOfficeSolution />}
+                        element={<Navigate to="/services/virtual-office" replace />}
                       />
                       <Route
                         path="/solutions/virtual-office"
-                        element={<VirtualOfficeSolution />}
+                        element={<Navigate to="/services/virtual-office" replace />}
                       />
                       <Route
                         path="/Solutions/coworking-space"
-                        element={<CoworkingSpaceSolution />}
+                        element={<Navigate to="/services/coworking-space" replace />}
                       />
                       <Route
                         path="/solutions/coworking-space"
-                        element={<CoworkingSpaceSolution />}
+                        element={<Navigate to="/services/coworking-space" replace />}
                       />
                       <Route
                         path="/Solutions/on-demand"
