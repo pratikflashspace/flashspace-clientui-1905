@@ -36,6 +36,7 @@ const Dayoffice = lazy(() => import("./pages/Solutions/Dayoffice"));
 const EventSpacePage = lazy(() => import("./pages/Solutions/Eventspace"));
 const OneCRMPage = lazy(() => import("./pages/Solutions/OneCRMPage"));
 const WebsiteDevelopmentSolution = lazy(() => import("./pages/Solutions/website-development"));
+const UsaIncorporation = lazy(() => import("./pages/Solutions/usa-incorporation"));
 const SpacePortalLayout = lazy(() => import("./layouts/SpacePortalLayout"));
 const Career = lazy(() => import("./pages/Career"));
 const Login = lazy(() => import("./pages/Login"));
@@ -339,6 +340,18 @@ const App = () => (
                       <Route
                         path="/solutions/website-development"
                         element={<WebsiteDevelopmentSolution />}
+                      />
+                      <Route
+                        path="/Solutions/usa-incorporation"
+                        element={<UsaIncorporation />}
+                      />
+                      <Route
+                        path="/solutions/usa-incorporation"
+                        element={<UsaIncorporation />}
+                      />
+                      <Route
+                        path="/usa-incorporation"
+                        element={<UsaIncorporation />}
                       />
 
                       {/* Spaces*/}
